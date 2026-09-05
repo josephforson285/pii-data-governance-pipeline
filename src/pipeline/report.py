@@ -10,9 +10,18 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from pipeline.clean import NON_CRITICAL, CleaningLog, policy_sensitivity
-from pipeline.pii import DETECTORS, PIIReport
+from pipeline.pii import DETECTORS, PIIReport, redact
 from pipeline.profile import QualityProfile, VALID_STATUSES
 from pipeline.validate import ValidationResult
+
+# Columns whose sample values identify a person. Examples drawn from these are
+# redacted: a quality report that quotes raw PII is a disclosure of its own.
+SENSITIVE_COLUMNS = {"first_name", "last_name", "email", "phone", "date_of_birth", "address"}
+SENSITIVE_CHECKS = {"unparseable_date_of_birth"}
+
+
+def _safe(value: str, sensitive: bool) -> str:
+    return redact(str(value)) if sensitive else str(value)
 
 VERSION = "0.1.0"
 WIDTH = 78
@@ -82,18 +91,24 @@ def render_quality_report(p: QualityProfile, source: Path) -> str:
 
     out += _section("4. FORMAT INVENTORY")
     out.append("Distinct value shapes per column (digits -> 9, letters -> A).")
+    out.append("Examples from identifying columns are redacted.")
     for col, shapes in p.format_inventory.items():
         out.append("")
         out.append(f"{col}  ({len(shapes)} shapes)")
+        sensitive = col in SENSITIVE_COLUMNS
         out.append(f"  {'SHAPE':<24}{'COUNT':>7}   EXAMPLE")
         for sig, n, ex in shapes:
-            out.append(f"  {sig[:23]:<24}{n:>7}   {ex[:28]}")
+            # For identifying columns the shape already carries the format, so a
+            # redacted example would only restate it.
+            shown = "[redacted]" if sensitive else ex[:28]
+            out.append(f"  {sig[:23]:<24}{n:>7}   {shown}")
     out.append("")
 
     out += _section("5. INVALID VALUES")
     out.append(f"{'CHECK':<28}{'COUNT':>7}   EXAMPLES")
     for name, info in p.invalid_values.items():
-        ex = ", ".join(str(e) for e in info["examples"])[:38]
+        sensitive = name in SENSITIVE_CHECKS
+        ex = ", ".join(_safe(e, sensitive) for e in info["examples"])[:38]
         out.append(f"{name:<28}{info['count']:>7}   {ex}")
     out.append("")
 

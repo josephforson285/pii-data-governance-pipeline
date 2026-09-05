@@ -4,7 +4,7 @@ DATA QUALITY REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 5,000
-Generated  : 2026-09-05T11:43:05Z
+Generated  : 2026-09-05T13:11:48Z
 Pipeline   : v0.1.0
 
 ------------------------------------------------------------------------------
@@ -58,28 +58,29 @@ Examples (id x occurrences): 2732 x4, 201 x3, 2828 x2, 48 x2, 2031 x2, 571 x2, 2
 4. FORMAT INVENTORY
 ------------------------------------------------------------------------------
 Distinct value shapes per column (digits -> 9, letters -> A).
+Examples from identifying columns are redacted.
 
 phone  (8 shapes)
   SHAPE                     COUNT   EXAMPLE
-  999-999-9999               3910   892-958-9935
-  9999999999                  176   4209668337
-  9-999-999-9999              151   1-635-295-9367
-  +9-999-999-9999             150   +1-947-513-8706
-  999 999 9999                146   521 282 2421
-  (999) 999-9999              143   (613) 551-7142
-  999.999.9999                134   747.632.3862
-  99999                        11   12345
+  999-999-9999               3910   [redacted]
+  9999999999                  176   [redacted]
+  9-999-999-9999              151   [redacted]
+  +9-999-999-9999             150   [redacted]
+  999 999 9999                146   [redacted]
+  (999) 999-9999              143   [redacted]
+  999.999.9999                134   [redacted]
+  99999                        11   [redacted]
 
 date_of_birth  (8 shapes)
   SHAPE                     COUNT   EXAMPLE
-  9999-99-99                 4472   1957-03-16
-  9999/99/99                  127   1960/01/28
-  99/99/9999                  109   05/10/2006
-  99-99-9999                   94   24-07-1961
-  AAAAAAAA 99, 9999            29   November 01, 1997
-  AAAAAAA 99, 9999             25   January 30, 1983
-  AAAAA 99, 9999               21   April 06, 1988
-  AAAA 99, 9999                20   July 31, 1991
+  9999-99-99                 4472   [redacted]
+  9999/99/99                  127   [redacted]
+  99/99/9999                  109   [redacted]
+  99-99-9999                   94   [redacted]
+  AAAAAAAA 99, 9999            29   [redacted]
+  AAAAAAA 99, 9999             25   [redacted]
+  AAAAA 99, 9999               21   [redacted]
+  AAAA 99, 9999                20   [redacted]
 
 created_date  (8 shapes)
   SHAPE                     COUNT   EXAMPLE
@@ -96,7 +97,7 @@ created_date  (8 shapes)
 5. INVALID VALUES
 ------------------------------------------------------------------------------
 CHECK                         COUNT   EXAMPLES
-unparseable_date_of_birth       489   1960/01/28, 1957/06/17, May 24, 1940, 
+unparseable_date_of_birth       489   ####/##/##, ####/##/##, May ##, ####, 
 unparseable_created_date        300   11/10/2021, 07/19/2024, 23-09-2024, 05
 non_numeric_income               14   75k
 negative_income                  70   -20902.86, -3014.52, -25434.13, -39987
