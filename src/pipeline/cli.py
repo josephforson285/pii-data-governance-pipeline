@@ -102,6 +102,28 @@ def _cmd_clean(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_mask(args: argparse.Namespace) -> int:
+    import pandas as pd
+
+    from pipeline.mask import mask
+    from pipeline.report import render_masked_sample, write
+
+    src = Path(args.input)
+    cleaned = pd.read_csv(src, dtype=str, keep_default_na=False)
+    result = mask(cleaned)
+
+    out_csv = Path(args.processed) / "customers_masked.csv"
+    result.masked.to_csv(out_csv, index=False)
+    log.info("masked %d columns over %d rows -> %s",
+             len(result.columns_masked), len(result.masked), out_csv.name)
+    log.info("uniquely re-identifiable: %d -> %d rows", result.unique_before, result.unique_after)
+
+    write(Path(args.reports) / "masked_sample.txt",
+          render_masked_sample(result, cleaned, src))
+    log.info("wrote masked_sample.txt")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="pipeline", description="PII detection and data quality pipeline")
     p.add_argument("-v", "--verbose", action="store_true")
@@ -136,6 +158,12 @@ def build_parser() -> argparse.ArgumentParser:
     cl.add_argument("--rejects", default=str(ROOT / "data" / "rejects"))
     cl.add_argument("--reports", default=str(REPORTS))
     cl.set_defaults(func=_cmd_clean)
+
+    mk = sub.add_parser("mask", help="mask PII in the cleaned dataset (part 5)")
+    mk.add_argument("--input", default=str(ROOT / "data" / "processed" / "customers_cleaned.csv"))
+    mk.add_argument("--processed", default=str(ROOT / "data" / "processed"))
+    mk.add_argument("--reports", default=str(REPORTS))
+    mk.set_defaults(func=_cmd_mask)
 
     return p
 

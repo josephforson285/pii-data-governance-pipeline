@@ -1,0 +1,152 @@
+==============================================================================
+MASKED SAMPLE - BEFORE / AFTER
+==============================================================================
+Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/processed/customers_cleaned.csv
+SHA256     : 61aa713d0ce0b40b
+Rows       : 3,808
+Generated  : 2026-09-05T13:14:04Z
+Pipeline   : v0.1.0
+
+HANDLING: this artifact shows unmasked values by design - it is the
+evidence the control works. It is committed only because the dataset
+is synthetic. Against production data it would be classified
+restricted and kept out of version control.
+
+------------------------------------------------------------------------------
+1. MASKING RULES
+------------------------------------------------------------------------------
+COLUMN          RULE                              RATIONALE
+first_name      John -> J***                      Initial only; length not preserved
+last_name       Doe -> D***                       Initial only; length not preserved
+email           j.doe@gmail.com -> j***@gmail.com Domain kept: analytic, not identifying
+phone           555-123-4567 -> ***-***-4567      Last four for support verification
+address         -> [MASKED ADDRESS]               Free text; replaced wholesale
+date_of_birth   1985-03-15 -> 1985-**-**          Year kept for age analysis
+income          52000 -> 50000-74999              Banded to break uniqueness
+
+Untouched: customer_id, account_status, created_date
+customer_id is left intact so the extract still joins, which means it
+remains a linkage key back to the unmasked source.
+
+------------------------------------------------------------------------------
+2. RECORD COMPARISON
+------------------------------------------------------------------------------
+Record 1
+  FIELD           BEFORE                                  AFTER
+  customer_id     1                                       1
+ *first_name      Danielle                                D***
+ *last_name       Johnson                                 J***
+ *email           danielle.johnson@gmail.com              d***@gmail.com
+ *phone           521-282-2421                            ***-***-2421
+ *date_of_birth   1957-03-16                              1957-**-**
+ *address         819 Johnson Course, East William, AK 7  [MASKED ADDRESS]
+ *income          72365.99                                50000-74999
+  account_status  active                                  active
+  created_date    2025-06-06                              2025-06-06
+
+Record 2
+  FIELD           BEFORE                                  AFTER
+  customer_id     2                                       2
+ *first_name      James                                   J***
+ *last_name       Santos                                  S***
+ *email           james.santos@gmail.com                  j***@gmail.com
+ *phone           892-958-9935                            ***-***-9935
+ *date_of_birth   1976-05-14                              1976-**-**
+ *address         26542 Susan Junction Apt. 161, Melanie  [MASKED ADDRESS]
+ *income          37300.42                                25000-49999
+  account_status  inactive                                inactive
+  created_date    2025-07-13                              2025-07-13
+
+Record 3
+  FIELD           BEFORE                                  AFTER
+  customer_id     3                                       3
+ *first_name      Jessica                                 J***
+ *last_name       Herrera                                 H***
+ *email           jessica.herrera@yahoo.com               j***@yahoo.com
+ *phone           230-295-4582                            ***-***-4582
+ *date_of_birth   2006-10-08                              2006-**-**
+ *address         959 Janet Cape Apt. 413, South Joshuas  [MASKED ADDRESS]
+ *income          69650.72                                50000-74999
+  account_status  active                                  active
+  created_date    2026-04-28                              2026-04-28
+
+Record 4
+  FIELD           BEFORE                                  AFTER
+  customer_id     4                                       4
+ *first_name      Michael                                 M***
+ *last_name       Santiago                                S***
+ *email           michael.santiago@hotmail.com            m***@hotmail.com
+ *phone           774-403-9928                            ***-***-9928
+ *date_of_birth   1987-07-05                              1987-**-**
+ *address         327 Nelson Route, Lake Mark, WI 07832   [MASKED ADDRESS]
+ *income          111133.4                                100000-124999
+  account_status  inactive                                inactive
+  created_date    2026-05-20                              2026-05-20
+
+Record 5
+  FIELD           BEFORE                                  AFTER
+  customer_id     5                                       5
+ *first_name      Jeremy                                  J***
+ *last_name       Johnson                                 J***
+ *email           jeremy.johnson@yahoo.com                j***@yahoo.com
+ *phone           484-206-3615                            ***-***-3615
+ *date_of_birth   1960-01-28                              1960-**-**
+ *address         76724 John Points Suite 969, Coxberg,   [MASKED ADDRESS]
+ *income          172986.95                               150000-174999
+  account_status  inactive                                inactive
+  created_date    2020-01-27                              2020-01-27
+
+Record 6
+  FIELD           BEFORE                                  AFTER
+  customer_id     7                                       7
+ *first_name      Aaron                                   A***
+ *last_name       Bowen                                   B***
+ *email           aaron.bowen@hotmail.com                 a***@hotmail.com
+ *phone           304-899-6214                            ***-***-6214
+ *date_of_birth   1988-10-10                              1988-**-**
+ *address         489 Eric Track, New Stephanie, NC 0057  [MASKED ADDRESS]
+ *income          197182.48                               175000-199999
+  account_status  suspended                               suspended
+  created_date    2025-08-05                              2025-08-05
+
+* masked field
+
+------------------------------------------------------------------------------
+3. LEAKED PII IN FREE TEXT
+------------------------------------------------------------------------------
+Part 2 found emails, phones and SSNs inside the address field.
+Replacing the whole field removes them. Partial masking - keeping a
+city or postal code - would have left every one of them in place.
+
+------------------------------------------------------------------------------
+4. RE-IDENTIFICATION AFTER MASKING
+------------------------------------------------------------------------------
+Group sizes on the quasi-identifiers, before and after. Larger groups
+mean each person is hidden among more people.
+
+GROUP SIZE          BEFORE     AFTER
+k=1 (unique)          3808        44
+k=2                      0       126
+k=3-5                    0      1121
+k>5                      0      2517
+
+Uniquely re-identifiable: 100.0% -> 1.2%
+
+Achieved by generalising the quasi-identifiers, not by masking the
+direct identifiers: dropping the postal code with the address, coarsening
+the birth date to a year and banding income. Masking names and emails
+alone would have left the figure unchanged.
+
+44 records remain unique and are still re-identifiable by
+anyone holding a second dataset with birth year and income. The extract
+is pseudonymous, not anonymous, and stays personal data under GDPR.
+
+------------------------------------------------------------------------------
+5. UTILITY RETAINED
+------------------------------------------------------------------------------
+Still supported : age analysis, income segmentation by band,
+                  email-provider mix, status and tenure reporting,
+                  joins on customer_id
+Now impossible  : contacting individuals, geographic analysis,
+                  exact income statistics, exact age or birthday
+

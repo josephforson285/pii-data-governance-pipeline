@@ -9,7 +9,10 @@ import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 
+import pandas as pd
+
 from pipeline.clean import NON_CRITICAL, CleaningLog, policy_sensitivity
+from pipeline.mask import MASKERS, MaskResult
 from pipeline.pii import DETECTORS, PIIReport, redact
 from pipeline.profile import QualityProfile, VALID_STATUSES
 from pipeline.validate import ValidationResult
@@ -373,6 +376,85 @@ def render_cleaning_log(log: CleaningLog, source: Path) -> str:
     out.append("at the cost of nulls flowing downstream. The strict policy is kept")
     out.append("here because the brief declares these fields mandatory; the number")
     out.append("is reported so the trade-off can be re-argued with evidence.")
+    out.append("")
+    return "\n".join(out) + "\n"
+
+
+def render_masked_sample(r: MaskResult, original: "pd.DataFrame", source: Path,
+                         n: int = 6) -> str:
+    out = header("Masked Sample - Before / After", source, len(r.masked))
+    out.append("HANDLING: this artifact shows unmasked values by design - it is the")
+    out.append("evidence the control works. It is committed only because the dataset")
+    out.append("is synthetic. Against production data it would be classified")
+    out.append("restricted and kept out of version control.")
+    out.append("")
+
+    out += _section("1. MASKING RULES")
+    out.append(f"{'COLUMN':<16}{'RULE':<34}RATIONALE")
+    rules = {
+        "first_name": ("John -> J***", "Initial only; length not preserved"),
+        "last_name": ("Doe -> D***", "Initial only; length not preserved"),
+        "email": ("j.doe@gmail.com -> j***@gmail.com", "Domain kept: analytic, not identifying"),
+        "phone": ("555-123-4567 -> ***-***-4567", "Last four for support verification"),
+        "address": ("-> [MASKED ADDRESS]", "Free text; replaced wholesale"),
+        "date_of_birth": ("1985-03-15 -> 1985-**-**", "Year kept for age analysis"),
+        "income": ("52000 -> 50000-74999", "Banded to break uniqueness"),
+    }
+    for col, (rule, why) in rules.items():
+        out.append(f"{col:<16}{rule:<34}{why}")
+    out.append("")
+    out.append(f"Untouched: {', '.join(r.columns_untouched)}")
+    out.append("customer_id is left intact so the extract still joins, which means it")
+    out.append("remains a linkage key back to the unmasked source.")
+    out.append("")
+
+    out += _section("2. RECORD COMPARISON")
+    for i in range(min(n, len(r.masked))):
+        before, after = original.iloc[i], r.masked.iloc[i]
+        out.append(f"Record {i + 1}")
+        out.append(f"  {'FIELD':<16}{'BEFORE':<40}AFTER")
+        for col in r.masked.columns:
+            b, a = str(before[col])[:38], str(after[col])[:30]
+            marker = " " if col not in MASKERS else "*"
+            out.append(f" {marker}{col:<16}{b:<40}{a}")
+        out.append("")
+    out.append("* masked field")
+    out.append("")
+
+    out += _section("3. LEAKED PII IN FREE TEXT")
+    out.append("Part 2 found emails, phones and SSNs inside the address field.")
+    out.append("Replacing the whole field removes them. Partial masking - keeping a")
+    out.append("city or postal code - would have left every one of them in place.")
+    out.append("")
+
+    out += _section("4. RE-IDENTIFICATION AFTER MASKING")
+    out.append("Group sizes on the quasi-identifiers, before and after. Larger groups")
+    out.append("mean each person is hidden among more people.")
+    out.append("")
+    total = len(r.masked)
+    out.append(f"{'GROUP SIZE':<16}{'BEFORE':>10}{'AFTER':>10}")
+    for label in ["k=1 (unique)", "k=2", "k=3-5", "k>5"]:
+        out.append(f"{label:<16}{r.k_before.get(label, 0):>10}{r.k_after.get(label, 0):>10}")
+    out.append("")
+    out.append(f"Uniquely re-identifiable: {100 * r.unique_before / total:.1f}% "
+               f"-> {100 * r.unique_after / total:.1f}%")
+    out.append("")
+    out.append("Achieved by generalising the quasi-identifiers, not by masking the")
+    out.append("direct identifiers: dropping the postal code with the address, coarsening")
+    out.append("the birth date to a year and banding income. Masking names and emails")
+    out.append("alone would have left the figure unchanged.")
+    out.append("")
+    out.append(f"{r.unique_after} records remain unique and are still re-identifiable by")
+    out.append("anyone holding a second dataset with birth year and income. The extract")
+    out.append("is pseudonymous, not anonymous, and stays personal data under GDPR.")
+    out.append("")
+
+    out += _section("5. UTILITY RETAINED")
+    out.append("Still supported : age analysis, income segmentation by band,")
+    out.append("                  email-provider mix, status and tenure reporting,")
+    out.append("                  joins on customer_id")
+    out.append("Now impossible  : contacting individuals, geographic analysis,")
+    out.append("                  exact income statistics, exact age or birthday")
     out.append("")
     return "\n".join(out) + "\n"
 
