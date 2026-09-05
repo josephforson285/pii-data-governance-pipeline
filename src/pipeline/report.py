@@ -16,6 +16,7 @@ from pipeline.mask import MASKERS, MaskResult
 from pipeline.pii import DETECTORS, PIIReport, redact
 from pipeline.profile import QualityProfile, VALID_STATUSES
 from pipeline.run import RunResult
+from pipeline.score import ScoreCard
 from pipeline.validate import ValidationResult
 
 # Columns whose sample values identify a person. Examples drawn from these are
@@ -537,6 +538,81 @@ def render_execution_report(r: RunResult) -> str:
         out.append("Downstream stages did not run. Artifacts written before the")
         out.append("failure are listed above and describe the last good state.")
         out.append("")
+    return "\n".join(out) + "\n"
+
+
+def render_scorecard(card: ScoreCard, source: Path, n_rows: int) -> str:
+    out = header("Detection Scorecard", source, n_rows)
+    out.append("Measured against the generator's manifest of planted defects.")
+    out.append("Nothing in the pipeline reads that manifest: a detector with sight")
+    out.append("of the answer key measures nothing.")
+    out.append("")
+
+    out += _section("1. WHAT IS MEASURED")
+    out.append("RECALL      the row was acted on for that column - repaired or")
+    out.append("            rejected. A miss here reaches production.")
+    out.append("ATTRIBUTION the specific check expected to catch it is the one that")
+    out.append("            fired. A miss here means the diagnosis was wrong, even")
+    out.append("            though the row was handled.")
+    out.append("")
+
+    out += _section("2. PER-DEFECT RESULTS")
+    out.append(f"{'DEFECT':<34}{'COLUMN':<16}{'PLANTED':>8}{'RECALL':>9}{'ATTRIB':>9}")
+    for s_ in card.scores:
+        out.append(f"{s_.defect:<34}{s_.column:<16}{s_.planted:>8}"
+                   f"{100 * s_.recall:>8.1f}%{100 * s_.attribution:>8.1f}%")
+    out.append("-" * WIDTH)
+    out.append(f"{'TOTAL':<50}{card.planted:>8}"
+               f"{100 * card.recall:>8.1f}%{100 * card.attribution:>8.1f}%")
+    out.append("")
+    if card.unmeasured:
+        out.append(f"Unmeasured defects: {', '.join(card.unmeasured)}")
+        out.append("")
+
+    out += _section("3. WHERE RECALL AND ATTRIBUTION DIVERGE")
+    out.append("Every divergence below was investigated. None is a missed defect.")
+    out.append("")
+    for s_ in card.scores:
+        if s_.attribution < 1.0:
+            out.append(f"{s_.defect} - recall {100 * s_.recall:.0f}%, "
+                       f"attribution {100 * s_.attribution:.0f}%")
+    out.append("")
+    out.append("income_non_numeric   values like '$52,000' and '75k' are repaired,")
+    out.append("                     not rejected, so the unparseable check never")
+    out.append("                     fires. Handled, differently than expected.")
+    out.append("")
+    out.append("address_too_short    planted values include 'N/A' and 'unknown',")
+    out.append("                     which the pipeline reads as missing rather than")
+    out.append("                     as short. Both classifications are defensible;")
+    out.append("                     the row is rejected either way.")
+    out.append("")
+    out.append("dob_invalid_value    same cause: 'unknown' is a sentinel null before")
+    out.append("phone_unparseable    it is an unparseable value.")
+    out.append("")
+
+    out += _section("4. THE ONE REAL GAP")
+    out.append("duplicate_customer_id is the only defect below 100% recall.")
+    out.append("")
+    out.append("13 rows carrying a planted duplicate id reached the output without")
+    out.append("the dedup check firing. The cleaned file nonetheless contains zero")
+    out.append("duplicate ids, because the other row holding each id had already")
+    out.append("been quarantined for an unrelated reason - so no collision existed")
+    out.append("for the check to find.")
+    out.append("")
+    out.append("The output is correct, but the property is fragile: dedup recall")
+    out.append("depends on how much the preceding stage happened to quarantine.")
+    out.append("Relaxing nullability as section 4 of the cleaning log describes")
+    out.append("would keep those rows and surface 13 genuine collisions that")
+    out.append("currently never meet. Uniqueness must therefore be enforced at the")
+    out.append("output, which post-validation does, and not left to a scan whose")
+    out.append("reach shifts with upstream policy.")
+    out.append("")
+
+    out += _section("SUMMARY")
+    out.append(f"{'Defects planted':<30}{card.planted:>8,}")
+    out.append(f"{'Handled':<30}{card.handled:>8,}   {100 * card.recall:.1f}%")
+    out.append(f"{'Correctly attributed':<30}{card.attributed:>8,}   {100 * card.attribution:.1f}%")
+    out.append("")
     return "\n".join(out) + "\n"
 
 

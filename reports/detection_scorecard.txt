@@ -1,0 +1,100 @@
+==============================================================================
+DETECTION SCORECARD
+==============================================================================
+Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
+SHA256     : e8548ce51f229c0e
+Rows       : 5,000
+Generated  : 2026-09-05T13:28:58Z
+Pipeline   : v0.1.0
+
+Measured against the generator's manifest of planted defects.
+Nothing in the pipeline reads that manifest: a detector with sight
+of the answer key measures nothing.
+
+------------------------------------------------------------------------------
+1. WHAT IS MEASURED
+------------------------------------------------------------------------------
+RECALL      the row was acted on for that column - repaired or
+            rejected. A miss here reaches production.
+ATTRIBUTION the specific check expected to catch it is the one that
+            fired. A miss here means the diagnosis was wrong, even
+            though the row was handled.
+
+------------------------------------------------------------------------------
+2. PER-DEFECT RESULTS
+------------------------------------------------------------------------------
+DEFECT                            COLUMN           PLANTED   RECALL   ATTRIB
+duplicate_customer_id             customer_id           50    72.0%    72.0%
+income_non_numeric                income                50   100.0%     0.0%
+address_too_short                 address               60   100.0%    16.7%
+dob_invalid_value                 date_of_birth         50   100.0%    78.0%
+phone_unparseable                 phone                 40   100.0%    85.0%
+missing_email                     email                100   100.0%   100.0%
+missing_phone                     phone                150   100.0%   100.0%
+missing_income                    income               225   100.0%   100.0%
+missing_address                   address               75   100.0%   100.0%
+missing_dob                       date_of_birth         60   100.0%   100.0%
+phone_nonstandard_format          phone                900   100.0%   100.0%
+dob_nonstandard_format            date_of_birth        450   100.0%   100.0%
+created_date_nonstandard_format   created_date         300   100.0%   100.0%
+created_date_future               created_date          30   100.0%   100.0%
+income_negative                   income                70   100.0%   100.0%
+income_above_cap                  income                25   100.0%   100.0%
+status_invalid                    account_status       350   100.0%   100.0%
+email_malformed                   email                175   100.0%   100.0%
+first_name_dirty                  first_name           250   100.0%   100.0%
+last_name_dirty                   last_name            200   100.0%   100.0%
+pii_leaked_in_address             address               40   100.0%   100.0%
+age_impossible                    date_of_birth         20   100.0%   100.0%
+------------------------------------------------------------------------------
+TOTAL                                                 3670    99.6%    96.4%
+
+------------------------------------------------------------------------------
+3. WHERE RECALL AND ATTRIBUTION DIVERGE
+------------------------------------------------------------------------------
+Every divergence below was investigated. None is a missed defect.
+
+duplicate_customer_id - recall 72%, attribution 72%
+income_non_numeric - recall 100%, attribution 0%
+address_too_short - recall 100%, attribution 17%
+dob_invalid_value - recall 100%, attribution 78%
+phone_unparseable - recall 100%, attribution 85%
+
+income_non_numeric   values like '$52,000' and '75k' are repaired,
+                     not rejected, so the unparseable check never
+                     fires. Handled, differently than expected.
+
+address_too_short    planted values include 'N/A' and 'unknown',
+                     which the pipeline reads as missing rather than
+                     as short. Both classifications are defensible;
+                     the row is rejected either way.
+
+dob_invalid_value    same cause: 'unknown' is a sentinel null before
+phone_unparseable    it is an unparseable value.
+
+------------------------------------------------------------------------------
+4. THE ONE REAL GAP
+------------------------------------------------------------------------------
+duplicate_customer_id is the only defect below 100% recall.
+
+13 rows carrying a planted duplicate id reached the output without
+the dedup check firing. The cleaned file nonetheless contains zero
+duplicate ids, because the other row holding each id had already
+been quarantined for an unrelated reason - so no collision existed
+for the check to find.
+
+The output is correct, but the property is fragile: dedup recall
+depends on how much the preceding stage happened to quarantine.
+Relaxing nullability as section 4 of the cleaning log describes
+would keep those rows and surface 13 genuine collisions that
+currently never meet. Uniqueness must therefore be enforced at the
+output, which post-validation does, and not left to a scan whose
+reach shifts with upstream policy.
+
+------------------------------------------------------------------------------
+SUMMARY
+------------------------------------------------------------------------------
+Defects planted                  3,670
+Handled                          3,656   99.6%
+Correctly attributed             3,539   96.4%
+

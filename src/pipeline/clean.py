@@ -35,11 +35,24 @@ class Rejection:
 
 
 @dataclass
+class Repair:
+    row: int
+    column: str
+    tag: str
+
+
+@dataclass
 class CleaningLog:
     rows_in: int
     rows_out: int = 0
     repairs: Counter = field(default_factory=Counter)
+    repaired: list[Repair] = field(default_factory=list)
     rejections: list[Rejection] = field(default_factory=list)
+
+    def touched_rows(self, column: str) -> set[int]:
+        """Rows this run acted on for a column, whether repaired or rejected."""
+        return ({r.row for r in self.rejections if r.column == column}
+                | {r.row for r in self.repaired if r.column == column})
 
     @property
     def rows_quarantined(self) -> int:
@@ -166,6 +179,7 @@ def clean(df: pd.DataFrame, rules: dict) -> tuple[pd.DataFrame, CleaningLog]:
                 reasons.append(Rejection(idx, cid_raw, tag or "invalid", column, str(row[column])[:40]))
             elif tag:
                 log.repairs[tag] += 1
+                log.repaired.append(Repair(idx, column, tag))
             return value
 
         try:

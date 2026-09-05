@@ -140,6 +140,32 @@ def _cmd_run(args: argparse.Namespace) -> int:
     return 0 if result.ok else 1
 
 
+def _cmd_score(args: argparse.Namespace) -> int:
+    from pipeline.clean import clean
+    from pipeline.loading import load_raw
+    from pipeline.pii import detect
+    from pipeline.report import render_scorecard, write
+    from pipeline.score import load_ground_truth, score
+    from pipeline.validate import load_rules
+
+    src = Path(args.input)
+    truth_path = src.parent / "_ground_truth.json"
+    if not truth_path.exists():
+        log.error("no ground truth at %s; scoring needs a generated dataset", truth_path)
+        return 1
+
+    raw = load_raw(src)
+    _, clog = clean(raw, load_rules(Path(args.rules)))
+    card = score(load_ground_truth(truth_path), clog, detect(raw))
+    log.info("recall %.1f%%, attribution %.1f%% over %d planted defects",
+             100 * card.recall, 100 * card.attribution, card.planted)
+
+    out = write(Path(args.reports) / "detection_scorecard.txt",
+                render_scorecard(card, src, len(raw)))
+    log.info("wrote %s", out)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="pipeline", description="PII detection and data quality pipeline")
     p.add_argument("-v", "--verbose", action="store_true")
@@ -188,6 +214,12 @@ def build_parser() -> argparse.ArgumentParser:
     rn.add_argument("--rejects", default=str(ROOT / "data" / "rejects"))
     rn.add_argument("--reports", default=str(REPORTS))
     rn.set_defaults(func=_cmd_run)
+
+    sc = sub.add_parser("score", help="measure detection against the planted defects")
+    sc.add_argument("--input", default=str(RAW))
+    sc.add_argument("--rules", default=str(ROOT / "config" / "rules.yml"))
+    sc.add_argument("--reports", default=str(REPORTS))
+    sc.set_defaults(func=_cmd_score)
 
     return p
 
