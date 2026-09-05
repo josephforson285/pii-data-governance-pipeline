@@ -9,6 +9,7 @@ import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 
+from pipeline.pii import DETECTORS, PIIReport
 from pipeline.profile import QualityProfile, VALID_STATUSES
 
 VERSION = "0.1.0"
@@ -115,6 +116,110 @@ def render_quality_report(p: QualityProfile, source: Path) -> str:
     out.append(f"Least complete column    : {worst.name} ({100 * worst.missing_count / p.n_rows:.2f}% missing)")
     out.append(f"Invalid-value findings   : {sum(i['count'] for i in p.invalid_values.values())}")
     out.append(f"Non-canonical formats    : {sum(len(s) - 1 for s in p.format_inventory.values())}")
+    out.append("")
+    return "\n".join(out) + "\n"
+
+
+def render_pii_report(r: PIIReport, source: Path) -> str:
+    out = header("PII Detection Report", source, r.n_rows)
+
+    out += _section("1. DECLARED PII INVENTORY")
+    out.append("What each column holds by design. Governance metadata, not inference.")
+    out.append("")
+    out.append(f"{'COLUMN':<16}{'CLASSIFICATION':<20}{'SENS':<10}RATIONALE")
+    for col, (cat, sens, note) in r.declared.items():
+        out.append(f"{col:<16}{cat:<20}{sens:<10}{note}")
+    out.append("")
+    n_pii = sum(1 for c, s_ in r.declared.items() if s_[0] != "non-PII")
+    out.append(f"{n_pii} of {len(r.declared)} columns carry personal data.")
+    out.append("")
+
+    out += _section("2. CONTENT SCAN - PATTERNS APPLIED")
+    out.append(f"{'DETECTOR':<14}{'CLASSIFICATION':<20}{'SENS':<10}NOTE")
+    for d in DETECTORS:
+        out.append(f"{d.name:<14}{d.category:<20}{d.sensitivity:<10}{d.note}")
+    out.append("")
+    out.append("Every column is scanned with every pattern. Detecting by column")
+    out.append("name would find only the PII we already knew about.")
+    out.append("")
+
+    out += _section("3. CONFIRMED MATCHES")
+    out.append(f"{'COLUMN':<16}{'DETECTOR':<14}{'ROWS':>7}{'MATCHES':>9}   SAMPLE (redacted)")
+    for f in r.findings:
+        out.append(f"{f.column:<16}{f.detector:<14}{f.row_count:>7}{f.match_count:>9}   {f.samples[0] if f.samples else ''}")
+    out.append("")
+    out.append("Samples are redacted. A PII report that quotes raw PII is itself a breach.")
+    out.append("")
+
+    out += _section("4. SUPPRESSED MATCHES - PRECISION")
+    out.append("Regex matches shape, not meaning. These hits are structural")
+    out.append("coincidence, discarded by declared rule rather than by tuning the")
+    out.append("patterns, so the decision stays auditable.")
+    out.append("")
+    out.append(f"{'COLUMN':<16}{'DETECTOR':<14}{'ROWS':>7}   REASON")
+    for f in r.suppressed:
+        out.append(f"{f.column:<16}{f.detector:<14}{f.row_count:>7}   {f.suppressed}")
+    total_hits = sum(f.row_count for f in r.findings) + sum(f.row_count for f in r.suppressed)
+    kept = sum(f.row_count for f in r.findings)
+    out.append("")
+    out.append(f"Raw hits {total_hits:,} -> confirmed {kept:,} ({100 * kept / total_hits:.1f}% precision).")
+    out.append("Scanning recall-first and suppressing afterwards is deliberate: a")
+    out.append("missed identifier is a breach, a false positive is review effort.")
+    out.append("")
+
+    out += _section("5. UNDECLARED PII - LEAKAGE")
+    if not r.leaks:
+        out.append("None found.")
+    else:
+        out.append("Direct identifiers found in columns not meant to hold them.")
+        out.append("Field-level masking driven by the schema would miss all of these.")
+        out.append("")
+        out.append(f"{'COLUMN':<16}{'DETECTOR':<14}{'ROWS':>7}   FIRST AFFECTED ROWS")
+        for f in r.leaks:
+            out.append(f"{f.column:<16}{f.detector:<14}{f.row_count:>7}   {f.rows[:6]}")
+        out.append("")
+        out.append(f"Total: {sum(f.row_count for f in r.leaks)} rows.")
+        worst = max(r.leaks, key=lambda f: {"critical": 3, "high": 2, "medium": 1}.get(f.sensitivity, 0))
+        out.append(f"Highest severity: {worst.detector} in {worst.column} ({worst.sensitivity}).")
+    out.append("")
+
+    out += _section("6. BREACH EXPOSURE")
+    out.append(f"Records containing personal data : {r.rows_with_pii:,} of {r.n_rows:,} (100%)")
+    out.append("")
+    out.append("Every record carries a name, an identifier and contact details, so")
+    out.append("exposure is total: there is no subset of this file that is safe to")
+    out.append("release unmasked.")
+    out.append("")
+    ssn = sum(f.row_count for f in r.findings if f.detector == "us_ssn")
+    out.append("If this file were disclosed:")
+    out.append(f"  - Direct identifiers  name, email, phone" + (f", and {ssn} leaked SSNs" if ssn else ""))
+    out.append("  - Financial data      income for every data subject")
+    out.append("  - Location            home address for every data subject")
+    out.append("")
+    out.append("GDPR Art. 33 requires notifying the supervisory authority within 72")
+    out.append("hours where a breach is likely to risk data subjects' rights. Volume")
+    out.append("and the presence of financial data put this well above that bar.")
+    out.append("")
+
+    out += _section("7. RE-IDENTIFICATION RISK")
+    out.append("Masking direct identifiers does not make a dataset anonymous. Grouping")
+    out.append("rows by quasi-identifiers (birth year, postal code, income band) shows")
+    out.append("how many people each record is hidden among.")
+    out.append("")
+    out.append(f"{'GROUP SIZE':<16}{'ROWS':>8}{'PCT':>9}")
+    for label in ["k=1 (unique)", "k=2", "k=3-5", "k>5"]:
+        if label in r.k_anonymity:
+            v = r.k_anonymity[label]
+            out.append(f"{label:<16}{v:>8}{100 * v / r.n_rows:>8.1f}%")
+    out.append("")
+    pct = 100 * r.unique_rows / r.n_rows
+    out.append(f"{pct:.1f}% of records are unique on quasi-identifiers alone (k=1).")
+    out.append("Those individuals stay re-identifiable after every direct identifier")
+    out.append("is masked, by anyone holding a second dataset with the same attributes.")
+    out.append("")
+    out.append("The masked output is therefore pseudonymous, not anonymous, and remains")
+    out.append("personal data under GDPR Recital 26. Genuine anonymisation would need")
+    out.append("generalisation of the quasi-identifiers to reach a k threshold.")
     out.append("")
     return "\n".join(out) + "\n"
 

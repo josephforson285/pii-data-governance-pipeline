@@ -34,6 +34,22 @@ def _cmd_profile(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_detect(args: argparse.Namespace) -> int:
+    from pipeline.loading import load_raw
+    from pipeline.pii import detect
+    from pipeline.report import render_pii_report, write
+
+    src = Path(args.input)
+    df = load_raw(src)
+    report = detect(df)
+    log.info("scanned %d columns, %d confirmed findings, %d leaks",
+             len(df.columns), len(report.findings), len(report.leaks))
+
+    out = write(Path(args.reports) / "pii_detection_report.txt", render_pii_report(report, src))
+    log.info("wrote %s", out)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="pipeline", description="PII detection and data quality pipeline")
     p.add_argument("-v", "--verbose", action="store_true")
@@ -49,6 +65,11 @@ def build_parser() -> argparse.ArgumentParser:
     pr.add_argument("--input", default=str(RAW))
     pr.add_argument("--reports", default=str(REPORTS))
     pr.set_defaults(func=_cmd_profile)
+
+    dt = sub.add_parser("detect", help="detect PII in the raw dataset (part 2)")
+    dt.add_argument("--input", default=str(RAW))
+    dt.add_argument("--reports", default=str(REPORTS))
+    dt.set_defaults(func=_cmd_detect)
 
     return p
 
