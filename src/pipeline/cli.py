@@ -50,6 +50,22 @@ def _cmd_detect(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_validate(args: argparse.Namespace) -> int:
+    from pipeline.loading import load_raw
+    from pipeline.report import render_validation_report, write
+    from pipeline.validate import load_rules, validate
+
+    src = Path(args.input)
+    result = validate(load_raw(src), load_rules(Path(args.rules)), stage="pre-clean")
+    log.info("%d rule failures across %d rows, %d uncoercible values",
+             len(result.failures), len(result.failing_rows), len(result.coercion))
+
+    out = write(Path(args.reports) / "validation_results.txt",
+                render_validation_report(result, src))
+    log.info("wrote %s", out)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="pipeline", description="PII detection and data quality pipeline")
     p.add_argument("-v", "--verbose", action="store_true")
@@ -70,6 +86,12 @@ def build_parser() -> argparse.ArgumentParser:
     dt.add_argument("--input", default=str(RAW))
     dt.add_argument("--reports", default=str(REPORTS))
     dt.set_defaults(func=_cmd_detect)
+
+    va = sub.add_parser("validate", help="validate against the schema (part 3)")
+    va.add_argument("--input", default=str(RAW))
+    va.add_argument("--rules", default=str(ROOT / "config" / "rules.yml"))
+    va.add_argument("--reports", default=str(REPORTS))
+    va.set_defaults(func=_cmd_validate)
 
     return p
 

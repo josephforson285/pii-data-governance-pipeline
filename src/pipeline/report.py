@@ -11,6 +11,7 @@ from pathlib import Path
 
 from pipeline.pii import DETECTORS, PIIReport
 from pipeline.profile import QualityProfile, VALID_STATUSES
+from pipeline.validate import ValidationResult
 
 VERSION = "0.1.0"
 WIDTH = 78
@@ -220,6 +221,77 @@ def render_pii_report(r: PIIReport, source: Path) -> str:
     out.append("The masked output is therefore pseudonymous, not anonymous, and remains")
     out.append("personal data under GDPR Recital 26. Genuine anonymisation would need")
     out.append("generalisation of the quasi-identifiers to reach a k threshold.")
+    out.append("")
+    return "\n".join(out) + "\n"
+
+
+def render_validation_report(pre: ValidationResult, source: Path,
+                             post: ValidationResult | None = None) -> str:
+    out = header("Validation Results", source, pre.n_rows)
+    out.append("Engine: pandera, lazy=True - every rule is evaluated against every")
+    out.append("row so one bad value cannot hide the rest.")
+    out.append("")
+
+    out += _section("1. RULES APPLIED")
+    out.append("Declared in config/rules.yml and translated to pandera checks, so")
+    out.append("the rules can change without touching pipeline code.")
+    out.append("")
+
+    out += _section(f"2. TYPE COERCION - {pre.stage.upper()}")
+    out.append("Values that are present but will not convert to their declared type.")
+    out.append("Pandera sees these as null once coerced, so they would otherwise be")
+    out.append("counted as missing - a different defect needing a different fix.")
+    out.append("")
+    out.append(f"{'COLUMN':<20}{'UNCOERCIBLE':>13}   EXAMPLES")
+    for col, n in pre.coercion_by_column.items():
+        ex = ", ".join(dict.fromkeys(str(f.failure_case) for f in pre.coercion if f.column == col))[:36]
+        out.append(f"{col:<20}{n:>13}   {ex}")
+    out.append(f"{'TOTAL':<20}{len(pre.coercion):>13}")
+    out.append("")
+
+    out += _section("3. RULE FAILURES")
+    if post is None:
+        out.append(f"{'RULE':<44}{'FAILURES':>10}")
+        for rule, n in pre.by_rule.items():
+            out.append(f"{rule:<44}{n:>10}")
+        out.append("-" * WIDTH)
+        out.append(f"{'TOTAL':<44}{len(pre.failures):>10}")
+        out.append("")
+        out.append(f"Rows with at least one failure: {len(pre.failing_rows):,} "
+                   f"of {pre.n_rows:,} ({100 * len(pre.failing_rows) / pre.n_rows:.1f}%)")
+    else:
+        rules = list(dict.fromkeys(list(pre.by_rule) + list(post.by_rule)))
+        out.append(f"{'RULE':<44}{'PRE':>8}{'POST':>8}{'DELTA':>9}")
+        for rule in rules:
+            a, b = pre.by_rule.get(rule, 0), post.by_rule.get(rule, 0)
+            out.append(f"{rule:<44}{a:>8}{b:>8}{b - a:>+9}")
+        out.append("-" * WIDTH)
+        a, b = len(pre.failures), len(post.failures)
+        out.append(f"{'TOTAL':<44}{a:>8}{b:>8}{b - a:>+9}")
+        out.append("")
+        out.append(f"Rows failing : {len(pre.failing_rows):,} -> {len(post.failing_rows):,}")
+        if b:
+            out.append("")
+            out.append("Remaining failures are values that could not be repaired without")
+            out.append("inventing data. They are quarantined, not silently dropped.")
+    out.append("")
+
+    out += _section("4. FAILURE DETAIL")
+    out.append("First 40 failures, with the row and the offending value.")
+    out.append("")
+    out.append(f"{'ROW':>7}   {'COLUMN':<16}{'CHECK':<26}VALUE")
+    shown = (post or pre).failures[:40]
+    for f in shown:
+        row = str(f.index) if f.index is not None else "-"
+        out.append(f"{row:>7}   {f.column:<16}{f.check[:25]:<26}{str(f.failure_case)[:24]}")
+    out.append("")
+
+    out += _section("SUMMARY")
+    final = post or pre
+    out.append(f"Stage validated       : {final.stage}")
+    out.append(f"Rule failures         : {len(final.failures):,}")
+    out.append(f"Uncoercible values    : {len(final.coercion):,}")
+    out.append(f"Schema compliant      : {'YES' if final.passed else 'NO'}")
     out.append("")
     return "\n".join(out) + "\n"
 
