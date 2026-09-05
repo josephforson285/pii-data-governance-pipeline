@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Generated data. Raw/cleaned/rejects hold unmasked PII - never commit.
+# All of it is reproducible: `python -m pipeline generate --seed 42`
+data/raw/*
+data/processed/*
+data/rejects/*
+!data/**/.gitkeep
+
+# Only the masked extract is safe to share
+!data/processed/customers_masked.csv

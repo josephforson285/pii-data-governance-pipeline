@@ -1,0 +1,5 @@
+pandas==2.2.3
+pandera==0.33.1
+faker==40.38.0
+PyYAML==6.0.3
+pytest==9.0.3

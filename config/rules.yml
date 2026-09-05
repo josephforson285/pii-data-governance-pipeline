@@ -1,0 +1,57 @@
+# Validation rules from the project brief. Consumed by src/pipeline/validate.py.
+schema:
+  customer_id:
+    dtype: int64
+    nullable: false
+    unique: true
+    checks: {gt: 0}
+
+  first_name:
+    dtype: str
+    nullable: false
+    checks: {min_len: 2, max_len: 50, pattern: "^[A-Za-z][A-Za-z '\\-]*$"}
+
+  last_name:
+    dtype: str
+    nullable: false
+    checks: {min_len: 2, max_len: 50, pattern: "^[A-Za-z][A-Za-z '\\-]*$"}
+
+  email:
+    dtype: str
+    nullable: false
+    checks: {pattern: "^[^@\\s]+@[^@\\s]+\\.[A-Za-z]{2,}$"}
+
+  phone:
+    dtype: str
+    nullable: false
+    checks: {pattern: "^\\d{3}-\\d{3}-\\d{4}$"}
+
+  date_of_birth:
+    dtype: date
+    nullable: false
+    checks: {min_age: 18, max_age: 120}
+
+  address:
+    dtype: str
+    nullable: false
+    checks: {min_len: 10, max_len: 200}
+
+  income:
+    dtype: float64
+    nullable: false
+    checks: {ge: 0, le: 10000000}
+
+  account_status:
+    dtype: str
+    nullable: false
+    checks: {isin: [active, inactive, suspended]}
+
+  created_date:
+    dtype: date
+    nullable: false
+    checks: {not_future: true}
+
+# Cross-column rules Pandera checks at dataframe level
+dataframe_checks:
+  - name: dob_before_created
+    description: A customer cannot be created before they were born
