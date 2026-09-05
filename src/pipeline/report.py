@@ -9,6 +9,7 @@ import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
 
+from pipeline.clean import NON_CRITICAL, CleaningLog, policy_sensitivity
 from pipeline.pii import DETECTORS, PIIReport
 from pipeline.profile import QualityProfile, VALID_STATUSES
 from pipeline.validate import ValidationResult
@@ -292,6 +293,71 @@ def render_validation_report(pre: ValidationResult, source: Path,
     out.append(f"Rule failures         : {len(final.failures):,}")
     out.append(f"Uncoercible values    : {len(final.coercion):,}")
     out.append(f"Schema compliant      : {'YES' if final.passed else 'NO'}")
+    out.append("")
+    return "\n".join(out) + "\n"
+
+
+def render_cleaning_log(log: CleaningLog, source: Path) -> str:
+    out = header("Cleaning Log", source, log.rows_in)
+
+    out += _section("1. NORMALISATIONS APPLIED")
+    out.append("Repairs made where the intended value is unambiguous.")
+    out.append("")
+    out.append(f"{'REPAIR':<30}{'ROWS':>8}")
+    for tag, n in log.repairs.most_common():
+        out.append(f"{tag:<30}{n:>8}")
+    out.append("-" * WIDTH)
+    out.append(f"{'TOTAL':<30}{sum(log.repairs.values()):>8}")
+    out.append("")
+    out.append("Rules: phone -> XXX-XXX-XXXX, dates -> YYYY-MM-DD, names -> Title Case,")
+    out.append("status -> lower case against the permitted set, email -> lower case.")
+    out.append("")
+
+    out += _section("2. QUARANTINE")
+    out.append("Rows that cannot be repaired without inventing data. Written to")
+    out.append("data/rejects/quarantine.csv with the reason, never dropped: a deleted")
+    out.append("row is an unanswerable question later.")
+    out.append("")
+    out.append(f"{'REASON':<30}{'ROWS':>8}")
+    for reason, n in log.reasons.items():
+        out.append(f"{reason:<30}{n:>8}")
+    out.append("")
+    out.append(f"Distinct rows quarantined: {log.rows_quarantined:,}")
+    out.append("(A row can fail several rules, so reasons sum above this figure.)")
+    out.append("")
+
+    out += _section("3. RECONCILIATION")
+    out.append(f"{'Rows in':<22}{log.rows_in:>10,}")
+    out.append(f"{'Rows cleaned':<22}{log.rows_out:>10,}")
+    out.append(f"{'Rows quarantined':<22}{log.rows_quarantined:>10,}")
+    out.append("-" * WIDTH)
+    ok = log.reconciles()
+    out.append(f"{'Balance':<22}{log.rows_out + log.rows_quarantined:>10,}   {'OK' if ok else 'MISMATCH'}")
+    out.append("")
+    out.append("Asserted on every run. Without it, a row lost to a silent exception")
+    out.append("looks identical to a row that was never there.")
+    out.append("")
+    out.append(f"Retention: {100 * log.rows_out / log.rows_in:.1f}%")
+    out.append("")
+
+    out += _section("4. POLICY SENSITIVITY")
+    s = policy_sensitivity(log)
+    out.append("config/rules.yml declares every column non-nullable, so a record is")
+    out.append("rejected for a blank optional field as readily as for a corrupt one.")
+    out.append("That is a governance choice, not a fact about the data.")
+    out.append("")
+    out.append(f"Treated as optional: {', '.join(sorted(NON_CRITICAL))}")
+    out.append("")
+    out.append(f"{'Quarantined under current policy':<42}{s['quarantined']:>8}")
+    out.append(f"{'Failing only on a blank optional field':<42}{s['recoverable_under_tiered_policy']:>8}")
+    out.append(f"{'Retention if those were kept and flagged':<42}"
+               f"{100 * s['retention_if_relaxed'] / log.rows_in:>7.1f}%")
+    out.append("")
+    out.append(f"Retaining them would raise retention from {100 * log.rows_out / log.rows_in:.1f}% "
+               f"to {100 * s['retention_if_relaxed'] / log.rows_in:.1f}%,")
+    out.append("at the cost of nulls flowing downstream. The strict policy is kept")
+    out.append("here because the brief declares these fields mandatory; the number")
+    out.append("is reported so the trade-off can be re-argued with evidence.")
     out.append("")
     return "\n".join(out) + "\n"
 

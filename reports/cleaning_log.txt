@@ -1,0 +1,83 @@
+==============================================================================
+CLEANING LOG
+==============================================================================
+Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
+SHA256     : e8548ce51f229c0e
+Rows       : 5,000
+Generated  : 2026-09-05T13:10:45Z
+Pipeline   : v0.1.0
+
+------------------------------------------------------------------------------
+1. NORMALISATIONS APPLIED
+------------------------------------------------------------------------------
+Repairs made where the intended value is unambiguous.
+
+REPAIR                            ROWS
+phone_normalised                   900
+date_normalised                    750
+name_normalised                    375
+status_normalised                  209
+status_alias_mapped                 31
+income_normalised                   22
+income_suffix_expanded              14
+------------------------------------------------------------------------------
+TOTAL                             2301
+
+Rules: phone -> XXX-XXX-XXXX, dates -> YYYY-MM-DD, names -> Title Case,
+status -> lower case against the permitted set, email -> lower case.
+
+------------------------------------------------------------------------------
+2. QUARANTINE
+------------------------------------------------------------------------------
+Rows that cannot be repaired without inventing data. Written to
+data/rejects/quarantine.csv with the reason, never dropped: a deleted
+row is an unanswerable question later.
+
+REASON                            ROWS
+missing_required_field             691
+malformed_email                    175
+unmappable_account_status          110
+income_out_of_range                 95
+name_too_short                      75
+unparseable_date                    39
+duplicate_customer_id               36
+unparseable_phone                   34
+future_created_date                 30
+implausible_age                     20
+address_too_short                   10
+
+Distinct rows quarantined: 1,192
+(A row can fail several rules, so reasons sum above this figure.)
+
+------------------------------------------------------------------------------
+3. RECONCILIATION
+------------------------------------------------------------------------------
+Rows in                    5,000
+Rows cleaned               3,808
+Rows quarantined           1,192
+------------------------------------------------------------------------------
+Balance                    5,000   OK
+
+Asserted on every run. Without it, a row lost to a silent exception
+looks identical to a row that was never there.
+
+Retention: 76.2%
+
+------------------------------------------------------------------------------
+4. POLICY SENSITIVITY
+------------------------------------------------------------------------------
+config/rules.yml declares every column non-nullable, so a record is
+rejected for a blank optional field as readily as for a corrupt one.
+That is a governance choice, not a fact about the data.
+
+Treated as optional: address, income, phone
+
+Quarantined under current policy              1192
+Failing only on a blank optional field         442
+Retention if those were kept and flagged     85.0%
+
+Retaining them would raise retention from 76.2% to 85.0%,
+at the cost of nulls flowing downstream. The strict policy is kept
+here because the brief declares these fields mandatory; the number
+is reported so the trade-off can be re-argued with evidence.
+

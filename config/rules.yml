@@ -55,3 +55,34 @@ schema:
 dataframe_checks:
   - name: dob_before_created
     description: A customer cannot be created before they were born
+
+# Remediation policy. Cleaning repairs what is unambiguous and quarantines the
+# rest; nothing is dropped silently. Deliberately declared here so the policy
+# can be argued about without reading Python.
+remediation:
+  # Variants that map to a permitted account_status with no guesswork.
+  status_aliases:
+    actv: active
+    inactve: inactive
+    susp: suspended
+  # Date formats accepted on input. Tried in order; first match wins.
+  date_formats:
+    - "%Y-%m-%d"
+    - "%Y/%m/%d"
+    - "%m/%d/%Y"
+    - "%d-%m-%Y"
+    - "%B %d, %Y"
+  # A row failing any of these cannot be repaired without inventing data.
+  quarantine_reasons:
+    - duplicate_customer_id
+    - missing_required_field
+    - unparseable_date
+    - unparseable_phone
+    - unparseable_income
+    - income_out_of_range
+    - implausible_age
+    - future_created_date
+    - malformed_email
+    - unmappable_account_status
+    - address_too_short
+    - name_too_short

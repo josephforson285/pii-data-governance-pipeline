@@ -66,6 +66,42 @@ def _cmd_validate(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_clean(args: argparse.Namespace) -> int:
+    from pipeline.clean import clean, quarantine_frame
+    from pipeline.loading import load_raw
+    from pipeline.report import render_cleaning_log, render_validation_report, write
+    from pipeline.validate import load_rules, validate
+
+    src = Path(args.input)
+    rules = load_rules(Path(args.rules))
+    raw = load_raw(src)
+
+    pre = validate(raw, rules, stage="pre-clean")
+    log.info("pre-clean: %d rule failures", len(pre.failures))
+
+    cleaned, clog = clean(raw, rules)
+    if not clog.reconciles():
+        raise RuntimeError(
+            f"row reconciliation failed: {clog.rows_in} in, "
+            f"{clog.rows_out} out, {clog.rows_quarantined} quarantined"
+        )
+    log.info("cleaned %d rows, quarantined %d", clog.rows_out, clog.rows_quarantined)
+
+    Path(args.processed).mkdir(parents=True, exist_ok=True)
+    Path(args.rejects).mkdir(parents=True, exist_ok=True)
+    cleaned.to_csv(Path(args.processed) / "customers_cleaned.csv", index=False)
+    quarantine_frame(clog).to_csv(Path(args.rejects) / "quarantine.csv", index=False)
+
+    post = validate(cleaned, rules, stage="post-clean")
+    log.info("post-clean: %d rule failures", len(post.failures))
+
+    write(Path(args.reports) / "cleaning_log.txt", render_cleaning_log(clog, src))
+    write(Path(args.reports) / "validation_results.txt",
+          render_validation_report(pre, src, post=post))
+    log.info("wrote cleaning_log.txt and validation_results.txt")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="pipeline", description="PII detection and data quality pipeline")
     p.add_argument("-v", "--verbose", action="store_true")
@@ -92,6 +128,14 @@ def build_parser() -> argparse.ArgumentParser:
     va.add_argument("--rules", default=str(ROOT / "config" / "rules.yml"))
     va.add_argument("--reports", default=str(REPORTS))
     va.set_defaults(func=_cmd_validate)
+
+    cl = sub.add_parser("clean", help="normalise, quarantine and re-validate (part 4)")
+    cl.add_argument("--input", default=str(RAW))
+    cl.add_argument("--rules", default=str(ROOT / "config" / "rules.yml"))
+    cl.add_argument("--processed", default=str(ROOT / "data" / "processed"))
+    cl.add_argument("--rejects", default=str(ROOT / "data" / "rejects"))
+    cl.add_argument("--reports", default=str(REPORTS))
+    cl.set_defaults(func=_cmd_clean)
 
     return p
 

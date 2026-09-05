@@ -1,0 +1,124 @@
+==============================================================================
+PII DETECTION REPORT
+==============================================================================
+Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
+SHA256     : e8548ce51f229c0e
+Rows       : 5,000
+Generated  : 2026-09-05T13:00:41Z
+Pipeline   : v0.1.0
+
+------------------------------------------------------------------------------
+1. DECLARED PII INVENTORY
+------------------------------------------------------------------------------
+What each column holds by design. Governance metadata, not inference.
+
+COLUMN          CLASSIFICATION      SENS      RATIONALE
+customer_id     pseudonymous key    medium    Linkage key. Pseudonymised data is still personal data (GDPR Recital 26)
+first_name      direct identifier   high      Identifies with surname
+last_name       direct identifier   high      Identifies with forename
+email           direct identifier   high      Contactable; account identifier
+phone           direct identifier   high      Contactable
+date_of_birth   quasi-identifier    high      With postcode and sex, re-identifies most individuals
+address         quasi-identifier    high      Locates the individual physically
+income          quasi-identifier    high      Financial data; discriminatory if disclosed
+account_status  non-PII             low       Operational attribute
+created_date    non-PII             low       Operational attribute
+
+8 of 10 columns carry personal data.
+
+------------------------------------------------------------------------------
+2. CONTENT SCAN - PATTERNS APPLIED
+------------------------------------------------------------------------------
+DETECTOR      CLASSIFICATION      SENS      NOTE
+email         direct identifier   high      Directly contactable; common account-recovery vector
+us_ssn        direct identifier   critical  National identifier; enables identity theft
+phone         direct identifier   high      Directly contactable; SIM-swap and smishing vector
+postal_code   quasi-identifier    medium    Narrows population to a few thousand people
+date_iso      quasi-identifier    medium    Birth date is a strong re-identification signal
+ip_address    direct identifier   medium    Personal data under GDPR (Breyer, C-582/14)
+
+Every column is scanned with every pattern. Detecting by column
+name would find only the PII we already knew about.
+
+------------------------------------------------------------------------------
+3. CONFIRMED MATCHES
+------------------------------------------------------------------------------
+COLUMN          DETECTOR         ROWS  MATCHES   SAMPLE (redacted)
+address         postal_code      4865     6300   ### Johnson Course, East William, AK #####
+phone           phone            4810     4810   ### ### ####
+email           email            4725     4725   d***@gmail.com
+date_of_birth   date_iso         4436     4436   ####-##-##
+address         phone              18       18   #### Martin Mills Suite ###, Lake Rebeccasid
+address         email              14       14   ##### Chan Square, Kaylatown, VI #####, cont
+address         us_ssn              8        8   ##### Daniel Place Suite ###, New Rebeccamou
+
+Samples are redacted. A PII report that quotes raw PII is itself a breach.
+
+------------------------------------------------------------------------------
+4. SUPPRESSED MATCHES - PRECISION
+------------------------------------------------------------------------------
+Regex matches shape, not meaning. These hits are structural
+coincidence, discarded by declared rule rather than by tuning the
+patterns, so the decision stays auditable.
+
+COLUMN          DETECTOR         ROWS   REASON
+created_date    date_iso         4700   Account creation timestamp; operational, not a birth date
+income          postal_code      1786   Numeric field; any 5-digit amount matches the postal shape
+phone           postal_code        11   Truncated phone number, not a postal code
+
+Raw hits 25,373 -> confirmed 18,876 (74.4% precision).
+Scanning recall-first and suppressing afterwards is deliberate: a
+missed identifier is a breach, a false positive is review effort.
+
+------------------------------------------------------------------------------
+5. UNDECLARED PII - LEAKAGE
+------------------------------------------------------------------------------
+Direct identifiers found in columns not meant to hold them.
+Field-level masking driven by the schema would miss all of these.
+
+COLUMN          DETECTOR         ROWS   FIRST AFFECTED ROWS
+address         email              14   [1387, 1801, 2194, 2532, 2740, 2751]
+address         us_ssn              8   [1101, 2218, 3481, 3878, 3931, 4174]
+address         phone              18   [17, 430, 452, 560, 1882, 2054]
+
+Total: 40 rows.
+Highest severity: us_ssn in address (critical).
+
+------------------------------------------------------------------------------
+6. BREACH EXPOSURE
+------------------------------------------------------------------------------
+Records containing personal data : 5,000 of 5,000 (100%)
+
+Every record carries a name, an identifier and contact details, so
+exposure is total: there is no subset of this file that is safe to
+release unmasked.
+
+If this file were disclosed:
+  - Direct identifiers  name, email, phone, and 8 leaked SSNs
+  - Financial data      income for every data subject
+  - Location            home address for every data subject
+
+GDPR Art. 33 requires notifying the supervisory authority within 72
+hours where a breach is likely to risk data subjects' rights. Volume
+and the presence of financial data put this well above that bar.
+
+------------------------------------------------------------------------------
+7. RE-IDENTIFICATION RISK
+------------------------------------------------------------------------------
+Masking direct identifiers does not make a dataset anonymous. Grouping
+rows by quasi-identifiers (birth year, postal code, income band) shows
+how many people each record is hidden among.
+
+GROUP SIZE          ROWS      PCT
+k=1 (unique)        4968    99.4%
+k=2                   22     0.4%
+k=3-5                 10     0.2%
+
+99.4% of records are unique on quasi-identifiers alone (k=1).
+Those individuals stay re-identifiable after every direct identifier
+is masked, by anyone holding a second dataset with the same attributes.
+
+The masked output is therefore pseudonymous, not anonymous, and remains
+personal data under GDPR Recital 26. Genuine anonymisation would need
+generalisation of the quasi-identifiers to reach a k threshold.
+

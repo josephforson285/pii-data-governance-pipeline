@@ -1,0 +1,136 @@
+==============================================================================
+DATA QUALITY REPORT
+==============================================================================
+Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
+SHA256     : e8548ce51f229c0e
+Rows       : 5,000
+Generated  : 2026-09-05T11:43:05Z
+Pipeline   : v0.1.0
+
+------------------------------------------------------------------------------
+1. SCHEMA CONFORMANCE
+------------------------------------------------------------------------------
+Missing columns    : none
+Unexpected columns : none
+
+COLUMN          DTYPE READ    EXPECTED    VERDICT
+customer_id     object        integer     needs coercion
+first_name      object        string      as expected
+last_name       object        string      as expected
+email           object        string      as expected
+phone           object        string      as expected
+date_of_birth   object        date        needs coercion
+address         object        string      as expected
+income          object        numeric     needs coercion
+account_status  object        string      as expected
+created_date    object        date        needs coercion
+
+Every column reads as object: the CSV is loaded as text so that
+malformed values survive to be reported instead of being coerced away.
+
+------------------------------------------------------------------------------
+2. COMPLETENESS
+------------------------------------------------------------------------------
+COLUMN              NULL  SENTINEL  MISSING     PCT
+customer_id            0         0        0   0.00%
+first_name             0         0        0   0.00%
+last_name              0         0        0   0.00%
+email                 44        56      100   2.00%
+phone                 64        92      156   3.12%
+date_of_birth         28        43       71   1.42%
+address               30        95      125   2.50%
+income                83       156      239   4.78%
+account_status         0         0        0   0.00%
+created_date           0         0        0   0.00%
+
+SENTINEL counts values that read as present but mean absent
+('N/A', 'NULL', 'unknown', whitespace). These survive dropna().
+
+------------------------------------------------------------------------------
+3. UNIQUENESS
+------------------------------------------------------------------------------
+customer_id unique      : NO
+Distinct ids duplicated : 47
+Surplus rows            : 50
+Examples (id x occurrences): 2732 x4, 201 x3, 2828 x2, 48 x2, 2031 x2, 571 x2, 204 x2, 3373 x2, 862 x2, 156 x2
+
+------------------------------------------------------------------------------
+4. FORMAT INVENTORY
+------------------------------------------------------------------------------
+Distinct value shapes per column (digits -> 9, letters -> A).
+
+phone  (8 shapes)
+  SHAPE                     COUNT   EXAMPLE
+  999-999-9999               3910   892-958-9935
+  9999999999                  176   4209668337
+  9-999-999-9999              151   1-635-295-9367
+  +9-999-999-9999             150   +1-947-513-8706
+  999 999 9999                146   521 282 2421
+  (999) 999-9999              143   (613) 551-7142
+  999.999.9999                134   747.632.3862
+  99999                        11   12345
+
+date_of_birth  (8 shapes)
+  SHAPE                     COUNT   EXAMPLE
+  9999-99-99                 4472   1957-03-16
+  9999/99/99                  127   1960/01/28
+  99/99/9999                  109   05/10/2006
+  99-99-9999                   94   24-07-1961
+  AAAAAAAA 99, 9999            29   November 01, 1997
+  AAAAAAA 99, 9999             25   January 30, 1983
+  AAAAA 99, 9999               21   April 06, 1988
+  AAAA 99, 9999                20   July 31, 1991
+
+created_date  (8 shapes)
+  SHAPE                     COUNT   EXAMPLE
+  9999-99-99                 4700   2025-06-06
+  9999/99/99                   79   2020/12/24
+  99/99/9999                   78   11/10/2021
+  99-99-9999                   67   23-09-2024
+  AAAAAAAA 99, 9999            20   December 21, 2024
+  AAAA 99, 9999                15   July 19, 2021
+  AAAAAAA 99, 9999             14   January 23, 2025
+  AAAAA 99, 9999               10   April 13, 2023
+
+------------------------------------------------------------------------------
+5. INVALID VALUES
+------------------------------------------------------------------------------
+CHECK                         COUNT   EXAMPLES
+unparseable_date_of_birth       489   1960/01/28, 1957/06/17, May 24, 1940, 
+unparseable_created_date        300   11/10/2021, 07/19/2024, 23-09-2024, 05
+non_numeric_income               14   75k
+negative_income                  70   -20902.86, -3014.52, -25434.13, -39987
+income_above_cap                 25   448920101.06, 585087660.46, 499446821.
+implausible_age                  20   156, 157, 159, 166, 167
+future_created_date              30   2027-11-23, 2026-12-20, 2028-10-29
+
+------------------------------------------------------------------------------
+6. CATEGORICAL VALIDITY - account_status
+------------------------------------------------------------------------------
+Permitted: active, inactive, suspended
+
+VALUE                  COUNT   STATUS
+'inactive'              1567   valid
+'active'                1550   valid
+'suspended'             1533   valid
+'ACTIVE'                  52   INVALID
+'closed'                  44   INVALID
+'Active'                  42   INVALID
+'  active'                42   INVALID
+'1'                       37   INVALID
+'SUSPENDED'               37   INVALID
+'Inactive'                36   INVALID
+'actv'                    31   INVALID
+'pending'                 29   INVALID
+
+Invalid total: 350 rows (7.00%)
+
+------------------------------------------------------------------------------
+SUMMARY
+------------------------------------------------------------------------------
+Rows profiled            : 5,000
+Columns with missing data: 5
+Least complete column    : income (4.78% missing)
+Invalid-value findings   : 948
+Non-canonical formats    : 21
+
