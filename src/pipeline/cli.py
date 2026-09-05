@@ -6,6 +6,8 @@ import logging
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+RAW = ROOT / "data" / "raw" / "customers_raw.csv"
+REPORTS = ROOT / "reports"
 
 log = logging.getLogger("pipeline")
 
@@ -18,6 +20,20 @@ def _cmd_generate(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_profile(args: argparse.Namespace) -> int:
+    from pipeline.loading import load_raw
+    from pipeline.profile import profile
+    from pipeline.report import render_quality_report, write
+
+    src = Path(args.input)
+    df = load_raw(src)
+    log.info("loaded %s (%d rows)", src.name, len(df))
+
+    out = write(Path(args.reports) / "data_quality_report.txt", render_quality_report(profile(df), src))
+    log.info("wrote %s", out)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="pipeline", description="PII detection and data quality pipeline")
     p.add_argument("-v", "--verbose", action="store_true")
@@ -26,8 +42,13 @@ def build_parser() -> argparse.ArgumentParser:
     g = sub.add_parser("generate", help="generate the synthetic raw dataset")
     g.add_argument("--rows", type=int, default=5000)
     g.add_argument("--seed", type=int, default=42)
-    g.add_argument("--out", default=str(ROOT / "data" / "raw"))
+    g.add_argument("--out", default=str(RAW.parent))
     g.set_defaults(func=_cmd_generate)
+
+    pr = sub.add_parser("profile", help="profile the raw dataset (part 1)")
+    pr.add_argument("--input", default=str(RAW))
+    pr.add_argument("--reports", default=str(REPORTS))
+    pr.set_defaults(func=_cmd_profile)
 
     return p
 
