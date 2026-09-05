@@ -15,6 +15,7 @@ from pipeline.clean import NON_CRITICAL, CleaningLog, policy_sensitivity
 from pipeline.mask import MASKERS, MaskResult
 from pipeline.pii import DETECTORS, PIIReport, redact
 from pipeline.profile import QualityProfile, VALID_STATUSES
+from pipeline.run import RunResult
 from pipeline.validate import ValidationResult
 
 # Columns whose sample values identify a person. Examples drawn from these are
@@ -456,6 +457,86 @@ def render_masked_sample(r: MaskResult, original: "pd.DataFrame", source: Path,
     out.append("Now impossible  : contacting individuals, geographic analysis,")
     out.append("                  exact income statistics, exact age or birthday")
     out.append("")
+    return "\n".join(out) + "\n"
+
+
+def render_execution_report(r: RunResult) -> str:
+    out = header("Pipeline Execution Report", r.source, r.stages[0].rows_out if r.stages else 0)
+    out.append(f"Started    : {r.started}")
+    out.append(f"Status     : {'SUCCESS' if r.ok else 'FAILED at ' + str(r.failed_stage)}")
+    out.append(f"Duration   : {r.seconds:.2f}s")
+    out.append("")
+
+    out += _section("1. STAGE TIMELINE")
+    out.append(f"{'#':<3}{'STAGE':<16}{'IN':>8}{'OUT':>8}{'SECONDS':>9}  {'STATUS':<8}DETAIL")
+    for i, s_ in enumerate(r.stages, 1):
+        out.append(f"{i:<3}{s_.name:<16}{s_.rows_in:>8}{s_.rows_out:>8}"
+                   f"{s_.seconds:>9.2f}  {s_.status:<8}{s_.detail[:30]}")
+    out.append("-" * WIDTH)
+    out.append(f"{'':<3}{'TOTAL':<16}{'':>8}{'':>8}{r.seconds:>9.2f}")
+    out.append("")
+    if r.stages:
+        slowest = max(r.stages, key=lambda x: x.seconds)
+        out.append(f"Slowest stage: {slowest.name} ({slowest.seconds:.2f}s, "
+                   f"{100 * slowest.seconds / r.seconds:.0f}% of runtime)")
+    out.append("")
+
+    out += _section("2. STAGE ORDER")
+    out.append("PII detection runs on the raw file, before cleaning: exposure is a")
+    out.append("property of what landed on disk, and scanning post-clean would")
+    out.append("understate it by every quarantined row.")
+    out.append("")
+    out.append("Validation runs twice. A single post-clean pass only proves the clean")
+    out.append("data is clean; the pre/post delta is what shows remediation worked.")
+    out.append("")
+
+    out += _section("3. ROW ACCOUNTING")
+    o = r.outputs
+    if "quarantined" in o:
+        rows_in = r.stages[0].rows_out
+        cleaned = rows_in - o["quarantined"]
+        out.append(f"{'Rows read':<34}{rows_in:>10,}")
+        out.append(f"{'Rows cleaned':<34}{cleaned:>10,}")
+        out.append(f"{'Rows quarantined':<34}{o['quarantined']:>10,}")
+        out.append("-" * WIDTH)
+        out.append(f"{'Balance':<34}{cleaned + o['quarantined']:>10,}   "
+                   f"{'OK' if cleaned + o['quarantined'] == rows_in else 'MISMATCH'}")
+        out.append("")
+        out.append("Asserted inside the clean stage: a mismatch aborts the run rather")
+        out.append("than producing an output file that is quietly short of rows.")
+    out.append("")
+
+    out += _section("4. OUTCOMES")
+    labels = {
+        "quality_issues": "Invalid values found",
+        "pii_findings": "PII finding types confirmed",
+        "pii_leaks": "Rows with PII leaked into free text",
+        "failures_pre": "Rule failures before cleaning",
+        "repairs": "Values normalised",
+        "quarantined": "Rows quarantined",
+        "failures_post": "Rule failures after cleaning",
+        "unique_before": "Uniquely re-identifiable before masking",
+        "unique_after": "Uniquely re-identifiable after masking",
+    }
+    for key, label in labels.items():
+        if key in o:
+            out.append(f"{label:<44}{o[key]:>8,}")
+    out.append("")
+
+    out += _section("5. ARTIFACTS WRITTEN")
+    for path in r.artifacts:
+        size = path.stat().st_size if path.exists() else 0
+        out.append(f"  {str(path.name):<32}{size:>10,} bytes")
+    out.append("")
+
+    if not r.ok:
+        out += _section("6. FAILURE")
+        out.append(f"Stage : {r.failed_stage}")
+        out.append(f"Error : {r.error}")
+        out.append("")
+        out.append("Downstream stages did not run. Artifacts written before the")
+        out.append("failure are listed above and describe the last good state.")
+        out.append("")
     return "\n".join(out) + "\n"
 
 

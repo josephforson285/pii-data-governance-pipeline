@@ -13,3 +13,6 @@ data/rejects/*
 
 # Only the masked extract is safe to share
 !data/processed/customers_masked.csv
+
+# Run log, regenerated every run
+reports/pipeline.log

@@ -1,10 +1,10 @@
 ==============================================================================
 MASKED SAMPLE - BEFORE / AFTER
 ==============================================================================
-Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/processed/customers_cleaned.csv
-SHA256     : 61aa713d0ce0b40b
+Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
+SHA256     : e8548ce51f229c0e
 Rows       : 3,808
-Generated  : 2026-09-05T13:14:04Z
+Generated  : 2026-09-05T13:26:11Z
 Pipeline   : v0.1.0
 
 HANDLING: this artifact shows unmasked values by design - it is the

@@ -124,6 +124,22 @@ def _cmd_mask(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_run(args: argparse.Namespace) -> int:
+    from pipeline.report import render_execution_report, write
+    from pipeline.run import run
+
+    result = run(
+        source=Path(args.input),
+        rules_path=Path(args.rules),
+        processed=Path(args.processed),
+        rejects=Path(args.rejects),
+        reports=Path(args.reports),
+    )
+    write(Path(args.reports) / "pipeline_execution_report.txt", render_execution_report(result))
+    log.info("run %s in %.2fs", "succeeded" if result.ok else "FAILED", result.seconds)
+    return 0 if result.ok else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="pipeline", description="PII detection and data quality pipeline")
     p.add_argument("-v", "--verbose", action="store_true")
@@ -165,14 +181,28 @@ def build_parser() -> argparse.ArgumentParser:
     mk.add_argument("--reports", default=str(REPORTS))
     mk.set_defaults(func=_cmd_mask)
 
+    rn = sub.add_parser("run", help="run every stage end to end (part 6)")
+    rn.add_argument("--input", default=str(RAW))
+    rn.add_argument("--rules", default=str(ROOT / "config" / "rules.yml"))
+    rn.add_argument("--processed", default=str(ROOT / "data" / "processed"))
+    rn.add_argument("--rejects", default=str(ROOT / "data" / "rejects"))
+    rn.add_argument("--reports", default=str(REPORTS))
+    rn.set_defaults(func=_cmd_run)
+
     return p
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    REPORTS.mkdir(parents=True, exist_ok=True)
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO,
-        format="%(asctime)s %(levelname)-7s %(message)s",
+        format="%(asctime)s %(levelname)-7s %(name)s %(message)s",
         datefmt="%H:%M:%S",
+        handlers=[logging.StreamHandler(), logging.FileHandler(REPORTS / "pipeline.log", mode="w")],
     )
-    return args.func(args)
+    try:
+        return args.func(args)
+    except Exception:
+        log.exception("unhandled error in %s", args.command)
+        return 1

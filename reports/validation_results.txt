@@ -4,7 +4,7 @@ VALIDATION RESULTS
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 5,000
-Generated  : 2026-09-05T13:10:45Z
+Generated  : 2026-09-05T13:26:11Z
 Pipeline   : v0.1.0
 
 Engine: pandera, lazy=True - every rule is evaluated against every
