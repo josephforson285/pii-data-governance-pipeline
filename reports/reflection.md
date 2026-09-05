@@ -37,8 +37,8 @@ Source: `pii_detection_report.txt`.
   of these.
 - **`customer_id` is PII.** It is a direct linkage key back to the unmasked
   source. Pseudonymised data is still personal data (GDPR Recital 26).
-- Content scanning ran recall-first: 20,504 raw hits reduced to 13,876
-  confirmed (~68% precision) by declared suppression rules, not by narrowing
+- Content scanning ran recall-first: 25,373 raw hits reduced to 18,876
+  confirmed (74.4% precision) by declared suppression rules, not by narrowing
   the patterns.
 
 **Your analysis** — rank the exposure. Which single finding would you escalate
