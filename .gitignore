@@ -11,8 +11,11 @@ data/processed/*
 data/rejects/*
 !data/**/.gitkeep
 
-# Only the masked extract is safe to share
+# Deliverables are committed even though they carry unmasked PII, because the
+# dataset is synthetic. Against production data neither would be, and the
+# reproduction command below would be the only way to hand them over.
 !data/processed/customers_masked.csv
+!data/processed/customers_cleaned.csv
 
 # Run log, regenerated every run
 reports/pipeline.log
