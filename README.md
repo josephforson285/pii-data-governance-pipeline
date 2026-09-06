@@ -17,7 +17,7 @@ export PYTHONPATH=src
 python -m pipeline generate      # synthetic raw dataset + defect manifest
 python -m pipeline run           # every stage, all reports
 python -m pipeline score         # detection measured against the manifest
-pytest                           # 34 tests
+pytest                           # 82 tests
 ```
 
 Individual stages (`profile`, `detect`, `validate`, `clean`, `mask`) can be run
@@ -43,11 +43,11 @@ clean data is clean. The pre/post delta is what shows remediation worked.
 
 | Measure | Value |
 | --- | --- |
-| Rows in / cleaned / quarantined | 5,000 / 3,808 / 1,192 |
+| Rows in / cleaned / quarantined | 5,000 / 3,684 / 1,316 |
 | Rule failures, pre -> post | 3,510 -> 0 |
 | Rows with PII leaked into free text | 40, incl. 8 SSNs |
-| Uniquely re-identifiable, pre -> post mask | 100% -> 1.2% |
-| Detection recall / attribution | 99.6% / 96.4% |
+| Uniquely re-identifiable, pre -> post mask | 100% -> 48.2% |
+| Detection recall / attribution | 100% / 96.8% |
 
 ## Design notes
 
@@ -64,9 +64,17 @@ a reason. The run asserts `rows_in == rows_out + rows_quarantined` and aborts
 on a mismatch, so a row lost to a swallowed exception cannot look like a row
 that was never there.
 
-**Masking is measured, not asserted.** Masking names and emails leaves 100% of
-records uniquely re-identifiable on birth year, postal code and income. The
-drop to 1.2% comes from generalising those quasi-identifiers instead.
+**Masking is measured over everything released.** Assessing only the masked
+columns gave a flattering 1.2% unique; including `created_date`, which was
+released untouched and is near-unique, the true figure was 99.7%. Generalising
+it brings the honest number to 48.2% - still not anonymity.
+
+**Policy lives in `config/rules.yml`.** Thresholds, patterns, masking rules and
+sensitive columns have one definition. Nothing is hardcoded in a module.
+
+**Repair only what is recoverable.** Cleaning never strips characters to make a
+value fit: that produces a plausible value nobody can tell is wrong. `Jose`
+stays `Jose`; `John3` is quarantined.
 
 **The scorer cannot see the answer key.** `generate` writes a manifest of every
 planted defect. Nothing under `run` reads it; only `score` does.
