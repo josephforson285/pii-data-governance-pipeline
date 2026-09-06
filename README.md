@@ -57,7 +57,7 @@ clean data is clean. The pre/post delta is what shows remediation worked.
 | --- | --- |
 | Rows in / cleaned / quarantined | 5,000 / 3,682 / 1,318 |
 | Rule failures, pre -> post | 3,527 -> 0 |
-| Rows with PII leaked into free text | 40, incl. 8 SSNs |
+| Rows with PII leaked into free text | 40, incl. 11 SSNs |
 | Uniquely re-identifiable, pre -> post mask | 100% -> 47.8% |
 | Detection recall / attribution | 100% / 97.0% |
 

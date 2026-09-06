@@ -23,8 +23,8 @@ that are wrong, which makes them more expensive than the visible ones.
 Eight of ten columns carry personal data; all 5,000 records contain a name, an
 identifier and contact details. No subset is safe unmasked.
 
-I would escalate first the **eight US SSNs inside the free-text `address`
-field**, alongside 18 phones and 14 emails — 40 rows. An SSN enables identity
+I would escalate first the **eleven US SSNs inside the free-text `address`
+field**, alongside 18 phones and 11 emails — 40 rows. An SSN enables identity
 theft directly; the column was never meant to hold identifiers, so no
 schema-driven control would have caught them; and their presence implies the
 source system accepts unvalidated free text into a field treated as
@@ -140,7 +140,7 @@ twice while building the tool to prevent it.
 
 | Risk identified | Control | GDPR basis |
 | --- | --- | --- |
-| Direct identifiers in free text (40 rows, 8 SSNs) | Content scanning on ingest, not schema-driven masking | Art. 32 |
+| Direct identifiers in free text (40 rows, 11 SSNs) | Content scanning on ingest, not schema-driven masking | Art. 32 |
 | 47.8% unique on released attributes | Assess uniqueness over everything released; generalise to a k threshold | Recital 26 |
 | `customer_id` links extract to source | Treat masked extract as personal data; release under contract | Recital 26 |
 | Four copies, no deletion | Retention schedule and erasure across all artifacts | Art. 5(1)(e), Art. 17 |
