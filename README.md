@@ -17,8 +17,19 @@ export PYTHONPATH=src
 python -m pipeline generate      # synthetic raw dataset + defect manifest
 python -m pipeline run           # every stage, all reports
 python -m pipeline score         # detection measured against the manifest
-pytest                           # 138 tests
+pytest                           # 149 tests
 ```
+
+To start from nothing - useful for a demo, or to prove the numbers reproduce:
+
+```bash
+./demo-reset.sh --run            # clear every generated artifact, then rebuild
+```
+
+It verifies the interpreter before deleting anything, and refuses to run if
+`reports/reflection.md` has uncommitted changes - that file is written by hand
+and is the only one nothing regenerates. It picks up `.venv/bin/python`
+automatically; point it elsewhere with `PYTHON=/path/to/python ./demo-reset.sh`.
 
 Individual stages (`profile`, `detect`, `validate`, `clean`, `mask`) can be run
 on their own. `run` exits non-zero if any stage fails and still writes the
