@@ -6,9 +6,19 @@ import pandas as pd
 import pytest
 
 from pipeline.mask import (
-    MASKED_ADDRESS, apply_masks, band_income,
-    mask_address, mask_dob, mask_email, mask_name, mask_phone,
+    apply_masks, build_maskers, make_bander, make_suppressor,
+    mask_email_local, mask_initial, mask_last_four, mask_year_only,
 )
+
+
+@pytest.fixture
+def band(cfg):
+    return make_bander(cfg.income_band_width)
+
+
+@pytest.fixture
+def suppress(cfg):
+    return make_suppressor(cfg.address_placeholder)
 
 
 @pytest.mark.parametrize("value,expected", [
@@ -19,12 +29,12 @@ from pipeline.mask import (
     ("", ""),
     (None, ""),
 ])
-def test_mask_name(value, expected):
-    assert mask_name(value) == expected
+def test_mask_initial(value, expected):
+    assert mask_initial(value) == expected
 
 
-def test_mask_name_hides_length():
-    assert mask_name("Al") == mask_name("Alexandria")
+def test_mask_initial_hides_length():
+    assert mask_initial("Al") == mask_initial("Alexandria")
 
 
 @pytest.mark.parametrize("value,expected", [
@@ -34,8 +44,8 @@ def test_mask_name_hides_length():
     ("not-an-email", "***"),
     ("", "***"),
 ])
-def test_mask_email(value, expected):
-    assert mask_email(value) == expected
+def test_mask_email_local(value, expected):
+    assert mask_email_local(value) == expected
 
 
 @pytest.mark.parametrize("value,expected", [
@@ -45,8 +55,8 @@ def test_mask_email(value, expected):
     ("12", "***-***-****"),
     ("", "***-***-****"),
 ])
-def test_mask_phone(value, expected):
-    assert mask_phone(value) == expected
+def test_mask_last_four(value, expected):
+    assert mask_last_four(value) == expected
 
 
 @pytest.mark.parametrize("value,expected", [
@@ -54,8 +64,8 @@ def test_mask_phone(value, expected):
     ("invalid_date", "****-**-**"),
     ("", "****-**-**"),
 ])
-def test_mask_dob(value, expected):
-    assert mask_dob(value) == expected
+def test_mask_year_only(value, expected):
+    assert mask_year_only(value) == expected
 
 
 @pytest.mark.parametrize("value,expected", [
@@ -64,30 +74,36 @@ def test_mask_dob(value, expected):
     ("24999.99", "0-24999"),
     ("not a number", "unknown"),
 ])
-def test_band_income(value, expected):
-    assert band_income(value) == expected
+def test_band_income(band, value, expected):
+    assert band(value) == expected
 
 
-def test_address_is_replaced_not_partially_masked():
+def test_address_is_replaced_not_partially_masked(suppress, cfg):
     leaky = "12 High St, Springfield 90210, contact john@corp.com, SSN 123-45-6789"
-    assert mask_address(leaky) == MASKED_ADDRESS
+    assert suppress(leaky) == cfg.address_placeholder
 
 
-@pytest.mark.parametrize("masker,value", [
-    (mask_name, "Jonathan"),
-    (mask_email, "jon.smith@gmail.com"),
-    (mask_phone, "555-123-4567"),
-    (mask_address, "12 High Street, Springfield"),
-    (mask_dob, "1985-03-15"),
-    (band_income, "52000.0"),
+@pytest.mark.parametrize("strategy,value", [
+    ("initial", "Jonathan"),
+    ("email_local", "jon.smith@gmail.com"),
+    ("last_four", "555-123-4567"),
+    ("suppress", "12 High Street, Springfield"),
+    ("year_only", "1985-03-15"),
+    ("band", "52000.0"),
 ])
-def test_masking_is_idempotent(masker, value):
+def test_masking_is_idempotent(cfg, strategy, value):
     """Re-masking already-masked data must not degrade or crash it."""
-    once = masker(value)
-    assert masker(once) == once
+    lookup = {
+        "initial": mask_initial, "email_local": mask_email_local,
+        "last_four": mask_last_four, "year_only": mask_year_only,
+        "suppress": make_suppressor(cfg.address_placeholder),
+        "band": make_bander(cfg.income_band_width),
+    }
+    once = lookup[strategy](value)
+    assert lookup[strategy](once) == once
 
 
-def test_no_original_value_survives_masking():
+def test_no_original_value_survives_masking(cfg):
     """The end-to-end guarantee: no identifying token from the input appears
     anywhere in the masked output row."""
     df = pd.DataFrame([{
@@ -102,7 +118,7 @@ def test_no_original_value_survives_masking():
         "account_status": "active",
         "created_date": "2024-01-01",
     }])
-    row = apply_masks(df).iloc[0].to_dict()
+    row = apply_masks(df, cfg).iloc[0].to_dict()
     blob = " ".join(str(v) for v in row.values())
 
     for secret in ["Jonathan", "Smithers", "jonathan.smithers", "555-123",
@@ -110,16 +126,31 @@ def test_no_original_value_survives_masking():
         assert secret not in blob, f"{secret!r} survived masking"
 
 
-def test_masking_preserves_row_count_and_columns():
+def test_masking_preserves_row_count_and_columns(cfg):
     df = pd.DataFrame([{c: "x" for c in
                         ["customer_id", "first_name", "last_name", "email", "phone",
                          "date_of_birth", "address", "income", "account_status", "created_date"]}] * 5)
-    out = apply_masks(df)
+    out = apply_masks(df, cfg)
     assert len(out) == len(df)
     assert list(out.columns) == list(df.columns)
 
 
-def test_non_pii_columns_are_untouched():
-    df = pd.DataFrame([{"customer_id": "7", "account_status": "active", "created_date": "2024-01-01"}])
-    out = apply_masks(df)
+def test_non_pii_columns_are_untouched(cfg):
+    df = pd.DataFrame([{"customer_id": "7", "account_status": "active"}])
+    out = apply_masks(df, cfg)
     assert out.iloc[0].to_dict() == df.iloc[0].to_dict()
+
+
+def test_masking_rules_come_from_config(cfg):
+    """The renderer used to hold its own copy of the masking rules, so a change
+    to the policy could leave the report describing the previous behaviour."""
+    assert {r.column for r in cfg.mask_rules} == set(build_maskers(cfg))
+
+
+def test_reidentification_is_measured_over_everything_released(cfg):
+    """Regression: post-mask k-anonymity ignored columns released unmasked,
+    which understated uniqueness by a wide margin."""
+    released = {r.column for r in cfg.mask_rules} | set(cfg.unmasked_columns)
+    modelled = set(cfg.quasi_identifiers_after)
+    assert modelled <= released
+    assert "created_date" in released

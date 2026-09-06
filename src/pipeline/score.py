@@ -12,8 +12,6 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-import pandas as pd
-
 
 @dataclass
 class Score:
@@ -53,11 +51,22 @@ class ScoreCard:
 
     @property
     def recall(self) -> float:
+        """Micro: weighted by planted volume, so frequent defects dominate."""
         return self.handled / self.planted if self.planted else 1.0
 
     @property
     def attribution(self) -> float:
         return self.attributed / self.planted if self.planted else 1.0
+
+    @property
+    def macro_recall(self) -> float:
+        """Each defect class weighted equally, so a rare broken rule shows."""
+        return sum(s.recall for s in self.scores) / len(self.scores) if self.scores else 1.0
+
+    @property
+    def macro_attribution(self) -> float:
+        return (sum(s.attribution for s in self.scores) / len(self.scores)
+                if self.scores else 1.0)
 
 
 # Which check each planted defect is expected to be caught by. Attribution
@@ -90,12 +99,18 @@ DEFECT_TO_CHECK = {
     "last_name_dirty": ("mixed", "last_name"),
 }
 
+# "mixed" defects plant several kinds of damage in one column (case, padding,
+# digits), which no single check owns. Their attribution equals their recall by
+# construction, so they cannot lower the attribution score - a known weakness
+# of this measurement, recorded rather than hidden.
+
 
 def load_ground_truth(path: Path) -> dict:
     return json.loads(path.read_text())
 
 
 def score(truth: dict, clean_log, pii_report) -> ScoreCard:
+    """Compare planted rows against what each stage actually acted on."""
     rejected_by_reason: dict[str, set[int]] = {}
     for r in clean_log.rejections:
         rejected_by_reason.setdefault(r.reason, set()).add(r.row)

@@ -21,8 +21,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-import pandas as pd
-
 log = logging.getLogger("pipeline.run")
 
 
@@ -43,6 +41,7 @@ class RunResult:
     stages: list[Stage] = field(default_factory=list)
     artifacts: list[Path] = field(default_factory=list)
     outputs: dict[str, Any] = field(default_factory=dict)
+    rules_version: int = 0
     failed_stage: str | None = None
     error: str | None = None
 
@@ -92,7 +91,8 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
         render_cleaning_log, render_masked_sample, render_pii_report,
         render_quality_report, render_validation_report, write,
     )
-    from pipeline.validate import load_rules, validate
+    from pipeline.config import load as load_config
+    from pipeline.validate import validate
 
     from datetime import datetime, timezone
 
@@ -106,48 +106,55 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
 
     try:
         with _Timer(result, "load", 0) as t:
-            rules = load_rules(rules_path)
+            cfg = load_config(rules_path)
+            result.rules_version = cfg.version
             raw = load_raw(source)
             # Structural check before any stage touches a column, so a renamed
             # or absent field fails here with a usable message rather than as a
             # KeyError from whichever stage happened to reach it first.
-            missing = [c for c in rules["schema"] if c not in raw.columns]
+            missing = [c for c in cfg.schema if c not in raw.columns]
             if missing:
                 raise ValueError(
                     f"input is missing required columns: {', '.join(missing)}; "
                     f"found {', '.join(raw.columns)}"
                 )
+            unexpected = [c for c in raw.columns if c not in cfg.schema]
+            if unexpected:
+                # Schema drift in a PII pipeline may be a new sensitive column
+                # arriving unclassified, so it is surfaced rather than ignored.
+                log.warning("unexpected columns not in schema: %s", ", ".join(unexpected))
+                result.outputs["unexpected_columns"] = ", ".join(unexpected)
             t.finish(len(raw), f"{len(raw.columns)} columns")
 
         with _Timer(result, "profile", len(raw)) as t:
-            prof = profile(raw)
-            artifact(write(reports / "data_quality_report.txt", render_quality_report(prof, source)))
+            prof = profile(raw, cfg)
+            artifact(write(reports / "data_quality_report.txt", render_quality_report(prof, source, cfg)))
             issues = sum(i["count"] for i in prof.invalid_values.values())
             result.outputs["quality_issues"] = issues
             t.finish(len(raw), f"{issues} invalid values")
 
         with _Timer(result, "detect_pii", len(raw)) as t:
             pii = detect(raw)
-            artifact(write(reports / "pii_detection_report.txt", render_pii_report(pii, source)))
+            artifact(write(reports / "pii_detection_report.txt", render_pii_report(pii, source, cfg)))
             result.outputs["pii_findings"] = len(pii.findings)
             result.outputs["pii_leaks"] = sum(f.row_count for f in pii.leaks)
             t.finish(len(raw), f"{len(pii.findings)} findings, {result.outputs['pii_leaks']} leaked rows")
 
         with _Timer(result, "validate_pre", len(raw)) as t:
-            pre = validate(raw, rules, stage="pre-clean")
+            pre = validate(raw, cfg, stage="pre-clean")
             result.outputs["failures_pre"] = len(pre.failures)
             t.finish(len(raw), f"{len(pre.failures)} rule failures")
 
         with _Timer(result, "clean", len(raw)) as t:
-            cleaned, clog = clean(raw, rules)
+            cleaned, clog = clean(raw, cfg)
             if not clog.reconciles():
                 raise RuntimeError(
                     f"reconciliation failed: {clog.rows_in} in != "
                     f"{clog.rows_out} out + {clog.rows_quarantined} quarantined"
                 )
             cleaned.to_csv(processed / "customers_cleaned.csv", index=False)
-            quarantine_frame(clog).to_csv(rejects / "quarantine.csv", index=False)
-            artifact(write(reports / "cleaning_log.txt", render_cleaning_log(clog, source)))
+            quarantine_frame(clog, cfg.sensitive_columns).to_csv(rejects / "quarantine.csv", index=False)
+            artifact(write(reports / "cleaning_log.txt", render_cleaning_log(clog, source, cfg)))
             artifact(processed / "customers_cleaned.csv")
             artifact(rejects / "quarantine.csv")
             result.outputs["quarantined"] = clog.rows_quarantined
@@ -155,17 +162,17 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
             t.finish(len(cleaned), f"{clog.rows_quarantined} quarantined, reconciled")
 
         with _Timer(result, "validate_post", len(cleaned)) as t:
-            post = validate(cleaned, rules, stage="post-clean")
+            post = validate(cleaned, cfg, stage="post-clean")
             artifact(write(reports / "validation_results.txt",
-                           render_validation_report(pre, source, post=post)))
+                           render_validation_report(pre, source, cfg, post=post)))
             result.outputs["failures_post"] = len(post.failures)
             t.finish(len(cleaned), f"{len(post.failures)} rule failures")
 
         with _Timer(result, "mask", len(cleaned)) as t:
-            masked = mask(cleaned)
+            masked = mask(cleaned, cfg)
             masked.masked.to_csv(processed / "customers_masked.csv", index=False)
             artifact(write(reports / "masked_sample.txt",
-                           render_masked_sample(masked, cleaned, source)))
+                           render_masked_sample(masked, cleaned, source, cfg)))
             artifact(processed / "customers_masked.csv")
             result.outputs["unique_before"] = masked.unique_before
             result.outputs["unique_after"] = masked.unique_after

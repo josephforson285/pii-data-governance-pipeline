@@ -4,8 +4,10 @@ VALIDATION RESULTS
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 5,000
-Generated  : 2026-09-05T13:28:57Z
+Generated  : 2026-09-06T15:12:49Z
 Pipeline   : v0.1.0
+Rules      : v2
+Reference  : 2026-09-06 (today (not pinned))
 
 Engine: pandera, lazy=True - every rule is evaluated against every
 row so one bad value cannot hide the rest.
@@ -24,8 +26,8 @@ Pandera sees these as null once coerced, so they would otherwise be
 counted as missing - a different defect needing a different fix.
 
 COLUMN                UNCOERCIBLE   EXAMPLES
-date_of_birth                 489   1960/01/28, 1957/06/17, May 24, 1940
-created_date                  300   11/10/2021, 07/19/2024, 23-09-2024, 
+date_of_birth                 489   ####/##/##, May ##, ####, ##-##-####
+created_date                  300   ##/##/####, ##-##-####, ####/##/##, 
 income                         14   75k
 TOTAL                         803
 
@@ -61,6 +63,7 @@ Rows failing : 2,633 -> 0
 4. FAILURE DETAIL
 ------------------------------------------------------------------------------
 First 40 failures, with the row and the offending value.
+Values from identifying columns are redacted.
 
     ROW   COLUMN          CHECK                     VALUE
 

@@ -16,7 +16,6 @@ import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Iterable
 
 import pandas as pd
 
@@ -62,12 +61,13 @@ DECLARED = {
     "address":        (QUASI, "high", "Locates the individual physically"),
     "income":         (QUASI, "high", "Financial data; discriminatory if disclosed"),
     "account_status": ("non-PII", "low", "Operational attribute"),
-    "created_date":   ("non-PII", "low", "Operational attribute"),
+    "created_date":   (QUASI, "medium", "Near-unique when exact; a strong quasi-identifier despite being operational"),
 }
 
 # Columns whose declared purpose is free text or non-PII: any identifier found
 # here is a leak, not a design decision.
 NON_IDENTIFIER_COLUMNS = {"address", "account_status", "created_date", "income"}
+
 
 # Content regexes match shapes, not meaning, so some hits are structural
 # coincidence. Suppressions are declared here rather than folded into the

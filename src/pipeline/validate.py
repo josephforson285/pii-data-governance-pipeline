@@ -10,13 +10,13 @@ import re
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date
-from pathlib import Path
 from typing import Any
 
 import pandas as pd
-import yaml
 from pandera.errors import SchemaErrors
 from pandera.pandas import Check, Column, DataFrameSchema
+
+from pipeline.config import Config
 
 PANDERA_DTYPES = {
     "int64": "Int64", "float64": "float64", "str": "str", "date": "datetime64[ns]",
@@ -55,11 +55,15 @@ class ValidationResult:
         return dict(Counter(f.column for f in self.coercion).most_common())
 
 
-def load_rules(path: Path) -> dict:
-    return yaml.safe_load(path.read_text())
+DF_CHECK_OPS = {
+    "lt": lambda a, b: a < b,
+    "le": lambda a, b: a <= b,
+    "gt": lambda a, b: a > b,
+    "ge": lambda a, b: a >= b,
+}
 
 
-def _checks_for(column: str, spec: dict) -> list[Check]:
+def _checks_for(spec: dict, cfg: Config) -> list[Check]:
     """Translate the YAML check vocabulary into Pandera checks."""
     checks: list[Check] = []
     c = spec.get("checks") or {}
@@ -80,31 +84,39 @@ def _checks_for(column: str, spec: dict) -> list[Check]:
         ))
     if "pattern" in c:
         checks.append(Check.str_matches(c["pattern"], name="format"))
-    if "min_age" in c or "max_age" in c:
-        lo, hi = c.get("min_age", 0), c.get("max_age", 150)
+    if "income_cap" in c:
+        checks.append(Check.le(cfg.income_cap, name="within_cap"))
+    if c.get("min_age") or c.get("max_age"):
+        lo, hi = cfg.min_age, cfg.max_age
         checks.append(Check(
-            lambda s, lo=lo, hi=hi: _age_years(s).between(lo, hi),
+            lambda s, lo=lo, hi=hi, ref=cfg.reference_date:
+                _age_years(s, ref).between(lo, hi),
             name=f"age_{lo}_{hi}",
         ))
     if c.get("not_future"):
         checks.append(Check(
-            lambda s: s <= pd.Timestamp(date.today()),
+            lambda s, ref=cfg.reference_date: s <= pd.Timestamp(ref),
             name="not_in_future",
         ))
     return checks
 
 
-def _age_years(s: pd.Series) -> pd.Series:
-    today = pd.Timestamp(date.today())
-    return ((today - s).dt.days / 365.25).round(1)
+def _age_years(s: pd.Series, reference: date) -> pd.Series:
+    return ((pd.Timestamp(reference) - s).dt.days / 365.25).round(1)
 
 
-def build_schema(rules: dict) -> DataFrameSchema:
+def build_schema(cfg: Config) -> DataFrameSchema:
+    """Build the column schema.
+
+    strict="filter" is deliberate: an unexpected column in a PII pipeline may
+    be schema drift carrying new sensitive data, so it is reported by the
+    loader rather than silently validated as if it belonged.
+    """
     columns = {}
-    for name, spec in rules["schema"].items():
+    for name, spec in cfg.schema.items():
         columns[name] = Column(
             PANDERA_DTYPES[spec["dtype"]],
-            checks=_checks_for(name, spec),
+            checks=_checks_for(spec, cfg),
             nullable=spec.get("nullable", True),
             unique=spec.get("unique", False),
             coerce=True,
@@ -113,7 +125,37 @@ def build_schema(rules: dict) -> DataFrameSchema:
     return DataFrameSchema(columns, strict=False, name="customers")
 
 
-def _coerce_for_validation(df: pd.DataFrame, rules: dict) -> pd.DataFrame:
+def _dataframe_check_failures(typed: pd.DataFrame, cfg: Config) -> list[Failure]:
+    """Execute the cross-column rules declared in config.
+
+    An earlier version declared dob_before_created in YAML and never ran it,
+    which is worse than omitting it: the config advertised a guarantee the
+    pipeline did not provide. An unknown op now raises rather than skipping.
+    """
+    failures: list[Failure] = []
+    for check in cfg.dataframe_checks:
+        op = DF_CHECK_OPS.get(check.op)
+        if op is None:
+            raise ValueError(
+                f"dataframe check {check.name!r} uses unknown op {check.op!r}; "
+                f"known ops: {', '.join(sorted(DF_CHECK_OPS))}"
+            )
+        if check.left not in typed.columns or check.right not in typed.columns:
+            continue
+        left, right = typed[check.left], typed[check.right]
+        comparable = left.notna() & right.notna()
+        violated = comparable & ~op(left, right)
+        for idx in typed.index[violated]:
+            failures.append(Failure(
+                column=check.right,
+                check=check.name,
+                failure_case=str(typed.at[idx, check.right])[:24],
+                index=int(idx),
+            ))
+    return failures
+
+
+def _coerce_for_validation(df: pd.DataFrame, cfg: Config) -> pd.DataFrame:
     """Best-effort typing so checks see values, not strings.
 
     Anything that will not convert becomes NaN/NaT and is caught by the
@@ -121,7 +163,7 @@ def _coerce_for_validation(df: pd.DataFrame, rules: dict) -> pd.DataFrame:
     the run before any other rule gets to fire.
     """
     out = df.copy()
-    for name, spec in rules["schema"].items():
+    for name, spec in cfg.schema.items():
         if name not in out.columns:
             continue
         kind = spec["dtype"]
@@ -139,7 +181,7 @@ def _coerce_for_validation(df: pd.DataFrame, rules: dict) -> pd.DataFrame:
     return out
 
 
-def _coercion_failures(raw: pd.DataFrame, typed: pd.DataFrame, rules: dict) -> list[Failure]:
+def _coercion_failures(raw: pd.DataFrame, typed: pd.DataFrame, cfg: Config) -> list[Failure]:
     """Values that were present but would not convert.
 
     Pandera sees these as nulls once coerced, so they land under not_nullable
@@ -149,7 +191,7 @@ def _coercion_failures(raw: pd.DataFrame, typed: pd.DataFrame, rules: dict) -> l
     from pipeline.profile import is_missing
 
     out: list[Failure] = []
-    for name, spec in rules["schema"].items():
+    for name, spec in cfg.schema.items():
         if spec["dtype"] == "str" or name not in raw.columns:
             continue
         for idx, value in raw[name].items():
@@ -158,11 +200,11 @@ def _coercion_failures(raw: pd.DataFrame, typed: pd.DataFrame, rules: dict) -> l
     return out
 
 
-def validate(df: pd.DataFrame, rules: dict, stage: str) -> ValidationResult:
-    schema = build_schema(rules)
-    typed = _coerce_for_validation(df, rules)
+def validate(df: pd.DataFrame, cfg: Config, stage: str) -> ValidationResult:
+    schema = build_schema(cfg)
+    typed = _coerce_for_validation(df, cfg)
     result = ValidationResult(stage=stage, n_rows=len(df))
-    result.coercion = _coercion_failures(df, typed, rules)
+    result.coercion = _coercion_failures(df, typed, cfg)
 
     try:
         schema.validate(typed, lazy=True)
@@ -175,4 +217,5 @@ def validate(df: pd.DataFrame, rules: dict, stage: str) -> ValidationResult:
                 failure_case=getattr(row, "failure_case", None),
                 index=int(idx) if pd.notna(idx) else None,
             ))
+    result.failures.extend(_dataframe_check_failures(typed, cfg))
     return result

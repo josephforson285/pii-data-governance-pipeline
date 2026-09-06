@@ -4,8 +4,10 @@ PII DETECTION REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 5,000
-Generated  : 2026-09-05T13:28:56Z
+Generated  : 2026-09-06T15:12:49Z
 Pipeline   : v0.1.0
+Rules      : v2
+Reference  : 2026-09-06 (today (not pinned))
 
 ------------------------------------------------------------------------------
 1. DECLARED PII INVENTORY
@@ -22,9 +24,9 @@ date_of_birth   quasi-identifier    high      With postcode and sex, re-identifi
 address         quasi-identifier    high      Locates the individual physically
 income          quasi-identifier    high      Financial data; discriminatory if disclosed
 account_status  non-PII             low       Operational attribute
-created_date    non-PII             low       Operational attribute
+created_date    quasi-identifier    medium    Near-unique when exact; a strong quasi-identifier despite being operational
 
-8 of 10 columns carry personal data.
+9 of 10 columns carry personal data.
 
 ------------------------------------------------------------------------------
 2. CONTENT SCAN - PATTERNS APPLIED
@@ -66,9 +68,13 @@ created_date    date_iso         4700   Account creation timestamp; operational,
 income          postal_code      1786   Numeric field; any 5-digit amount matches the postal shape
 phone           postal_code        11   Truncated phone number, not a postal code
 
-Raw hits 25,373 -> confirmed 18,876 (74.4% precision).
-Scanning recall-first and suppressing afterwards is deliberate: a
-missed identifier is a breach, a false positive is review effort.
+Raw hits 25,373 -> confirmed 18,876 (74.4% confirmation rate).
+
+This is a confirmation rate, not precision. Precision would need
+each match labelled true or false against ground truth; these are
+regex hits filtered by declared policy. Scanning recall-first and
+suppressing afterwards is deliberate: a missed identifier is a
+breach, a false positive is review effort.
 
 ------------------------------------------------------------------------------
 5. UNDECLARED PII - LEAKAGE
@@ -87,7 +93,7 @@ Highest severity: us_ssn in address (critical).
 ------------------------------------------------------------------------------
 6. BREACH EXPOSURE
 ------------------------------------------------------------------------------
-Records containing personal data : 5,000 of 5,000 (100%)
+Records containing personal data : 5,000 of 5,000 (100.0%)
 
 Every record carries a name, an identifier and contact details, so
 exposure is total: there is no subset of this file that is safe to
@@ -98,9 +104,12 @@ If this file were disclosed:
   - Financial data      income for every data subject
   - Location            home address for every data subject
 
-GDPR Art. 33 requires notifying the supervisory authority within 72
-hours where a breach is likely to risk data subjects' rights. Volume
-and the presence of financial data put this well above that bar.
+Where GDPR applies, Art. 33 requires notifying the supervisory
+authority within 72 hours of becoming aware of a breach likely to
+result in a risk to data subjects' rights. Whether that threshold is
+met is a formal risk assessment, not a determination this pipeline
+can make; the volume, the financial data and the presence of national
+identifiers are the factors that assessment would weigh.
 
 ------------------------------------------------------------------------------
 7. RE-IDENTIFICATION RISK

@@ -16,7 +16,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 17,Jade,Carr,jade.carr@hotmail.com,346-471-3287,2007-10-09,"124 Pamela Summit Apt. 449, Lake Matthew, TX 83631",72751.31,suspended,2021-07-14
 19,Brandi,Hernandez,brandi.hernandez@yahoo.com,947-513-8706,1946-09-23,"3315 Dickson Summit, East Michelle, AS 23707",127560.52,active,2022-08-15
 20,Nicole,Johnson,nicole.johnson@yahoo.com,356-842-3621,1989-12-22,"342 Patrick Camp Suite 337, Kevinbury, IN 03602",193841.62,inactive,2025-06-13
-21,Donna,Ross,donna.ross@gmail.com,265-594-7252,1957-06-17,"Unit 4586 Box 8501, DPO AA 23906",150287.23,inactive,2019-12-29
 24,Jason,Floyd,jason.floyd@yahoo.com,635-295-9367,1980-10-01,"387 Donna Haven Suite 134, Port James, AK 06558",233759.16,active,2024-11-27
 25,John,Alvarez,john.alvarez@gmail.com,982-863-7690,1998-01-04,"676 Dylan Spurs, Port Michelleville, WI 56225",204850.6,suspended,2020-12-26
 26,Jeffery,Brock,jeffery.brock@yahoo.com,403-356-7126,1987-02-02,"72788 Dodson Mills, Rivasside, NV 21362",187277.4,suspended,2019-11-07
@@ -29,7 +28,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 38,Danny,Jones,danny.jones@hotmail.com,394-296-2588,1972-08-04,"29413 Angela Mall, Port Alexandra, NV 58529",164294.17,inactive,2022-02-11
 39,Kenneth,Chapman,kenneth.chapman@hotmail.com,698-884-1000,1968-02-15,"34123 Andrea Estate, South Shannonfort, LA 04779",167486.93,suspended,2021-12-06
 41,Brooke,Holloway,brooke.holloway@yahoo.com,396-394-9786,2003-01-31,"648 Kim Rapid Apt. 659, Anthonybury, TX 75893",117592.21,inactive,2023-11-22
-42,Brenda,Smith,brenda.smith@yahoo.com,485-673-5092,1991-12-23,"8742 Walters Overpass, South Michaelmouth, MD 88336",212135.88,active,2024-08-15
 43,Daniel,Martin,daniel.martin@yahoo.com,763-300-1828,1966-11-27,"071 King Crescent Suite 808, Gutierrezborough, NC 47920",162776.17,suspended,2021-09-16
 44,Cindy,Jimenez,cindy.jimenez@gmail.com,295-971-4872,1969-01-23,"7710 Jennifer Inlet, New Rickybury, MP 15372",54921.07,inactive,2026-07-07
 45,Steven,Wilson,steven.wilson@yahoo.com,418-610-1960,1996-10-04,"USNV Hicks, FPO AA 54960",54549.44,active,2021-04-13
@@ -39,7 +37,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 51,Jonathan,Smith,jonathan.smith@yahoo.com,269-891-4853,1994-10-22,"75946 Bryant Hollow, South Melissa, CT 31592",107638.17,suspended,2020-01-03
 54,Julie,Thompson,julie.thompson@hotmail.com,444-471-7484,1947-01-23,"842 Sloan Orchard Suite 517, East Karenbury, VI 89148",47054.98,suspended,2023-02-27
 55,Jennifer,Whitney,jennifer.whitney@hotmail.com,887-866-7281,2006-05-10,"48175 Richards View Suite 137, New Nicoleside, MD 80465",20068.03,suspended,2023-04-26
-48,Jeffrey,Brown,jeffrey.brown@hotmail.com,302-275-9808,1996-03-04,"20047 Colton Plain Apt. 675, Matthewsberg, FM 54880",65320.26,inactive,2020-05-13
 57,Diana,Bass,diana.bass@yahoo.com,557-270-5002,1981-05-22,"77351 Stephens Rue Suite 064, North Stacy, GU 60101",100035.01,active,2025-03-12
 58,Christopher,Lewis,christopher.lewis@gmail.com,756-920-5956,1983-01-30,"29318 Brenda Via Apt. 529, West Micheleberg, DC 71308",153792.46,suspended,2021-10-07
 60,Jeffrey,Gilbert,jeffrey.gilbert@hotmail.com,470-318-2753,1989-04-24,"007 Simmons Coves Suite 711, Charleneland, DC 36547",182816.5,active,2025-03-04
@@ -119,7 +116,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 148,Aaron,Rubio,aaron.rubio@hotmail.com,824-957-2625,1952-01-16,"PSC 4241, Box 5415, APO AP 85555",228365.02,active,2026-01-02
 149,Gabriel,Sanders,gabriel.sanders@hotmail.com,470-876-2330,1959-05-15,"110 Thomas Curve Apt. 870, Lake Matthewville, VI 55854",52866.67,active,2024-04-24
 151,Debra,Alexander,debra.alexander@hotmail.com,681-498-1534,1988-12-20,"731 Donald Crossing Suite 565, East Joshua, CO 33028",69387.72,suspended,2020-01-08
-152,Angela,Greene,angela.greene@hotmail.com,919-664-2166,1980-10-25,"89836 Lucas Tunnel Apt. 761, South Danielle, CA 69744",170599.45,inactive,2023-07-05
 153,Pamela,Smith,pamela.smith@yahoo.com,877-402-7965,1963-04-26,"8271 Brenda Bridge Suite 300, Hunterhaven, WI 54952",43480.34,active,2020-01-25
 154,Rodney,Morales,rodney.morales@hotmail.com,472-345-2169,1983-02-27,"41832 Myers Roads Apt. 463, East Christopherchester, DE 59925",31239.64,inactive,2025-01-03
 155,Cheryl,Brown,cheryl.brown@hotmail.com,966-782-5728,1984-12-20,"20275 Jackson Crossroad, Jessicaville, WI 04348",115492.07,inactive,2020-01-03
@@ -150,7 +146,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 187,Madison,Sanders,madison.sanders@hotmail.com,432-964-2480,1944-12-10,"Unit 5899 Box 4417, DPO AE 44578",114341.67,active,2023-06-16
 189,Austin,Erickson,austin.erickson@gmail.com,257-500-6873,1978-04-17,"875 Bruce Ville, West Connor, DC 97614",101214.72,active,2023-01-16
 192,Matthew,Benitez,matthew.benitez@yahoo.com,437-672-5161,2001-01-26,"75250 Shannon Fords, New Kathy, NM 12040",120024.65,suspended,2025-01-27
-193,David,Hamilton,david.hamilton@yahoo.com,392-208-3315,1968-03-01,"Unit 6008 Box 3505, DPO AP 25480",53070.59,inactive,2026-07-29
 194,Andrew,Smith,andrew.smith@gmail.com,801-506-7951,1989-10-06,"2168 Jackson View Apt. 447, Ryanberg, MA 64749",171249.6,inactive,2022-10-21
 195,Michael,Lopez,michael.lopez@yahoo.com,403-593-8916,2004-12-28,"230 David Station, South Nancyview, WI 70589",41677.03,inactive,2023-04-17
 196,Cindy,Wheeler,cindy.wheeler@gmail.com,567-788-5847,1941-01-30,"16761 Wells Drives, Lake Gina, AL 39968",238377.63,inactive,2020-04-07
@@ -166,7 +161,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 210,Holly,Goodman,holly.goodman@hotmail.com,628-990-6214,1958-11-25,"833 Claudia Highway Suite 228, Jenniferstad, OH 63464",162131.16,active,2025-12-21
 212,Hannah,Phillips,hannah.phillips@gmail.com,440-750-3222,1991-03-08,"98386 William Underpass Suite 066, Fryemouth, OH 07552",104279.37,inactive,2025-08-03
 214,David,Silva,david.silva@yahoo.com,701-830-7686,1955-10-14,"25909 Henry Ports, Charlesmouth, NC 29331",226469.78,inactive,2025-07-27
-202,Susan,Meyer,susan.meyer@gmail.com,906-579-4559,1993-07-03,"53355 Carter Terrace Suite 801, Seanbury, AZ 89964",116431.05,active,2026-04-24
 216,Nicole,James,nicole.james@gmail.com,301-902-7018,1994-03-18,"85887 Williams Run Apt. 581, East Teresaside, ND 01461",138871.42,suspended,2022-08-12
 217,Courtney,Clark,courtney.clark@gmail.com,262-607-5520,1982-05-17,"38612 Stephen Isle Apt. 110, Port Johnathan, CA 75862",75000.0,active,2022-08-28
 218,Lorraine,Bartlett,lorraine.bartlett@yahoo.com,293-878-4475,1966-08-15,"0618 Darlene River Apt. 901, Sarahville, LA 90400",160458.39,suspended,2021-07-31
@@ -177,7 +171,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 223,Christine,Mccullough,christine.mccullough@yahoo.com,215-566-4898,1960-03-29,"929 Aguirre Meadow Apt. 053, Lake Jodi, NE 36765",148725.35,active,2025-03-15
 224,Mary,Taylor,mary.taylor@yahoo.com,739-994-9814,1989-09-20,"7812 Meagan Walks Apt. 834, Lake Charlestown, PR 66977",182661.41,suspended,2024-09-22
 225,Crystal,Hess,crystal.hess@hotmail.com,963-265-8802,1978-10-12,"488 Valdez Drive, Philipshire, VA 38642",117517.1,inactive,2025-05-28
-226,Dennis,Mason,dennis.mason@yahoo.com,853-371-2948,1944-02-09,"282 Moore Port, Lake Jessica, MI 05798",129852.19,suspended,2020-12-03
 227,Jeffery,Freeman,jeffery.freeman@yahoo.com,944-874-9543,1942-02-21,"567 Keith Canyon, Dakotahaven, SC 36348",84961.93,suspended,2026-03-12
 228,Mary,Baker,mary.baker@gmail.com,262-690-7580,1976-04-29,"9184 Kaufman Fork Suite 557, Eatontown, NY 18715",112632.74,active,2026-05-01
 229,Scott,Hall,scott.hall@yahoo.com,763-816-6371,1974-03-18,"59136 Cortez Orchard, Mendozashire, GA 85338",217637.22,inactive,2021-03-07
@@ -216,7 +209,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 273,Misty,Wilkins,misty.wilkins@hotmail.com,305-551-2381,1938-08-27,"7053 James Pike Suite 879, Lake Holly, AK 49863",130009.88,active,2021-08-17
 274,Brandy,Alvarado,brandy.alvarado@gmail.com,453-924-8172,1940-10-06,"940 Pena Branch, South Donnastad, VI 14642",237998.9,inactive,2026-03-29
 275,Andrew,Dillon,andrew.dillon@gmail.com,824-362-6962,1983-10-15,"Unit 8157 Box 9812, DPO AE 66122",100773.14,inactive,2020-10-25
-276,Tammy,Castro,tammy.castro@gmail.com,618-993-6543,1988-04-06,"7620 Sutton Knoll Suite 384, Lake Jonathanfurt, FM 04363",168715.29,active,2022-05-03
 277,Sherry,Avery,sherry.avery@yahoo.com,256-400-9730,1953-09-11,"PSC 2168, Box 9363, APO AP 20522",141867.83,inactive,2022-12-05
 278,Ronald,Edwards,ronald.edwards@yahoo.com,458-941-3463,1980-08-29,"298 Michelle Inlet, South Wendy, WI 19526",92006.37,suspended,2023-06-30
 279,Diana,Cunningham,diana.cunningham@gmail.com,464-594-4097,1948-11-24,"52056 Turner Summit, Edwinborough, CT 17742",46627.27,suspended,2025-02-03
@@ -235,7 +227,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 295,Kevin,Rodriguez,kevin.rodriguez@gmail.com,647-293-4637,1993-05-29,"PSC 7807, Box 8235, APO AA 96503",199308.12,inactive,2025-01-10
 297,Katie,Reese,katie.reese@yahoo.com,283-583-4678,1939-04-10,"3344 Mejia Skyway, West Edwardview, DE 02500",24257.64,active,2022-05-08
 299,Daniel,Brown,daniel.brown@gmail.com,977-922-8685,1967-12-16,"545 Jennifer Skyway Apt. 792, Port Leahmouth, CT 60215",117589.53,active,2025-02-14
-300,Lance,Newman,lance.newman@yahoo.com,219-462-4533,1992-02-06,"94562 Mccormick Islands, Freemanland, NJ 15297",203361.81,suspended,2025-10-16
 301,Michael,Murray,michael.murray@yahoo.com,740-633-2821,1949-10-21,"161 Hawkins Cliffs, Amandafurt, OR 54691",190310.32,active,2019-11-08
 302,John,Sanchez,john.sanchez@yahoo.com,324-248-4906,1948-12-19,"96695 Gilbert Skyway Apt. 971, Nguyenville, GU 58856",111201.27,active,2023-04-21
 303,Gregory,Blanchard,gregory.blanchard@gmail.com,264-313-9189,1942-08-15,"7013 Paige Throughway Apt. 227, Petershire, NV 26147",150476.07,active,2021-07-21
@@ -243,7 +234,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 306,Angela,Bridges,angela.bridges@yahoo.com,736-569-2108,1963-04-05,"01027 Proctor Dale, East Dawnchester, VI 60273",229655.62,suspended,2025-09-20
 307,Patricia,Dominguez,patricia.dominguez@hotmail.com,674-962-4967,2003-09-24,"765 Jacob Rapids Apt. 973, Robertside, OK 48600",104680.73,inactive,2020-12-27
 308,Arthur,Johnson,arthur.johnson@yahoo.com,801-953-2664,1971-12-28,"128 Marshall Common Apt. 371, Chloemouth, ND 01914",74310.36,active,2026-03-11
-310,Claudia,Mitchell,claudia.mitchell@hotmail.com,990-795-6447,1943-07-15,"2944 Smith Creek Apt. 927, Lindseyview, WY 92352",47616.93,inactive,2025-07-08
 311,Joel,White,joel.white@gmail.com,546-858-3868,1975-02-14,"92766 Donna Stream, East Becky, MP 45730",202345.17,suspended,2020-07-22
 312,Brian,Baker,brian.baker@gmail.com,264-727-6151,1995-11-12,"4783 Vega Loaf Suite 428, Smithmouth, MS 89432",198152.49,active,2021-06-20
 313,Leslie,Moreno,leslie.moreno@gmail.com,237-500-4302,2005-07-18,"PSC 5694, Box 5441, APO AA 86267",27724.99,active,2021-07-19
@@ -251,7 +241,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 317,Wendy,Scott,wendy.scott@gmail.com,595-547-4060,1995-05-22,"96271 Amber Meadows Apt. 917, Dakotaland, CA 75388",128157.12,inactive,2021-09-30
 318,Jessica,Waters,jessica.waters@yahoo.com,731-473-2353,1939-01-04,"64256 Zachary Trail, Mendozafurt, PR 95890",179412.05,active,2022-07-24
 319,Kimberly,Floyd,kimberly.floyd@gmail.com,816-384-9937,1976-01-11,"98554 Brown Rue Apt. 585, Port Steveport, SD 27124",83216.15,active,2021-11-07
-320,Gregory,Williams,gregory.williams@gmail.com,535-876-5843,1964-12-14,"57173 Austin Burg Apt. 761, Victormouth, AK 05356",86042.08,suspended,2025-10-13
 321,Matthew,Morgan,matthew.morgan@yahoo.com,370-906-8272,1988-11-14,"829 Sandy Camp Apt. 707, East Jacquelineberg, AL 23078",96043.43,active,2021-11-25
 322,Cynthia,Conway,cynthia.conway@gmail.com,829-645-5498,1995-12-14,"111 Larson Ridges, North Linda, NE 44717",159962.19,active,2022-09-22
 324,Angela,Gonzales,angela.gonzales@gmail.com,231-346-8179,2003-05-27,"07100 Sara Squares Suite 672, East Danielle, NC 59538",25725.37,active,2024-11-19
@@ -290,7 +279,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 365,James,Reid,james.reid@gmail.com,582-547-6990,2006-11-03,"4049 Ballard Road, Lake Meganville, OR 44651",185602.27,active,2022-04-06
 366,Joshua,Knight,joshua.knight@yahoo.com,721-611-9193,1975-05-21,"484 Alvarado Island, South Richard, RI 68051",26936.59,active,2019-12-04
 367,Shawn,Hines,shawn.hines@gmail.com,255-264-6254,1950-07-02,"737 Giles Place, Michaelton, NC 26800",133291.86,active,2025-02-21
-370,Andrea,Newman,andrea.newman@hotmail.com,745-701-5911,1940-09-04,"15941 Mosley Skyway, South Sherryberg, IA 15172",123426.16,active,2020-12-18
 371,Ashley,Mason,ashley.mason@hotmail.com,539-889-2795,1946-03-30,"1391 Murphy Prairie Suite 363, North Gregory, KY 58103",235537.36,suspended,2022-07-20
 372,Ricky,Roy,ricky.roy@hotmail.com,942-904-1436,1941-08-25,"8673 Suarez Drive, Thomasstad, GU 40893",150513.93,inactive,2023-03-25
 373,Andrew,Rasmussen,andrew.rasmussen@hotmail.com,791-433-1841,1980-09-09,"348 Parker Squares, Rebeccaville, ND 31484",147542.17,active,2020-03-11
@@ -346,11 +334,9 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 437,Jason,Miller,jason.miller@hotmail.com,259-775-7761,1971-02-04,"685 Stone Fall, Jenniferhaven, UT 63847",232848.53,suspended,2021-06-27
 438,Jennifer,Simpson,jennifer.simpson@yahoo.com,337-597-4978,1956-09-23,"33736 Kevin Lane, Port Neil, OH 11610",74609.03,inactive,2020-09-26
 439,Dennis,Miller,dennis.miller@yahoo.com,660-579-2514,1969-03-28,"8956 Mcdonald Lodge, Lindamouth, KY 50619",136911.09,active,2025-10-17
-440,Angel,Alexander,angel.alexander@gmail.com,474-586-1647,1956-07-15,"8881 House Courts, North Michaelside, ID 44247",211943.74,active,2026-02-06
 441,James,Murphy,james.murphy@hotmail.com,941-887-4555,1959-03-04,"928 Smith Hills, Lynnfurt, MO 76516",124425.51,inactive,2020-02-03
 442,Katherine,Smith,katherine.smith@gmail.com,355-903-2371,1984-02-13,"37389 Sharp Mountain, Latoyamouth, PR 25122",231581.22,active,2023-04-13
 443,Roy,Mcmahon,roy.mcmahon@yahoo.com,448-912-4350,1967-05-02,"2924 Vincent Shoals, Matthewchester, NE 90385",106052.32,active,2021-04-23
-444,Karen,Farmer,karen.farmer@yahoo.com,529-994-5637,1986-09-15,"022 Carroll Union, Bairdborough, MO 08851",102506.91,suspended,2020-06-27
 446,Angela,Johnson,angela.johnson@yahoo.com,300-939-8692,1986-08-07,"64334 Shawn Land, East Markchester, MO 21083",187081.63,inactive,2021-06-15
 447,Veronica,Anderson,veronica.anderson@hotmail.com,579-520-7781,1967-05-21,"34672 Matthews Parkway, Hilltown, FL 58923",28148.83,active,2024-05-26
 449,Jessica,Ellis,jessica.ellis@gmail.com,865-590-7249,2002-05-07,"0324 Estrada Cliff, South Robert, WV 72960",128844.93,suspended,2022-12-24
@@ -476,7 +462,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 608,Leonard,Reed,leonard.reed@yahoo.com,425-727-9063,1949-06-08,"24491 Elizabeth Divide Apt. 388, North Carmen, AZ 71257",50927.88,suspended,2019-11-30
 609,Amanda,Lee,amanda.lee@gmail.com,720-722-8254,1972-05-08,"678 Mariah Hill Apt. 176, Bakerberg, KY 96397",28867.04,inactive,2023-11-24
 610,Elizabeth,Schmitt,elizabeth.schmitt@hotmail.com,378-231-7625,1994-09-26,"2854 Mccoy Passage, Lake Haileyton, NE 13665",207721.49,suspended,2023-10-06
-612,Jessica,Campbell,jessica.campbell@gmail.com,212-263-4641,1951-10-11,"USNS Smith, FPO AE 64816",47018.78,inactive,2025-04-26
 613,Angela,Clark,angela.clark@yahoo.com,902-845-2376,1950-04-29,"935 Moreno Falls Suite 347, Roblesfurt, PA 47310",147275.88,inactive,2022-07-04
 614,Amy,Phillips,amy.phillips@yahoo.com,222-266-4239,1953-03-22,"3612 Huber Shore Apt. 562, Larsenfort, PA 54503",218354.13,inactive,2025-11-02
 616,Kyle,Ortiz,kyle.ortiz@gmail.com,372-787-8096,1978-04-29,"952 Stephanie Brooks, Davismouth, PW 46730",200414.16,inactive,2026-02-10
@@ -502,14 +487,11 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 638,Courtney,Smith,courtney.smith@gmail.com,590-555-7972,1949-09-13,"1343 Lance Light Suite 242, Robertborough, KY 26613",102001.27,suspended,2019-10-19
 639,Gregory,Phillips,gregory.phillips@yahoo.com,330-381-1029,1987-03-16,"558 Gallegos Spur Apt. 096, New Ashley, UT 57367",228630.96,suspended,2023-05-18
 640,Michael,Cochran,michael.cochran@gmail.com,989-781-1530,1994-03-19,"83437 Johnson Crescent Apt. 727, Nathanfurt, TN 77622",58422.15,inactive,2022-04-16
-642,Scott,Jensen,scott.jensen@hotmail.com,828-838-4893,1979-10-28,"3459 Olson Locks Suite 038, South Ronaldview, OK 53028",94991.85,inactive,2022-12-19
-643,Brittany,Martin,brittany.martin@yahoo.com,410-598-1859,1949-06-28,"225 Tara Inlet, Port Michael, MO 22172",117151.85,inactive,2024-10-18
 644,Steven,Hopkins,steven.hopkins@gmail.com,455-909-2110,1951-11-28,"33613 Gail Vista, Adamburgh, MI 13596",95806.82,active,2024-04-30
 646,Joy,Willis,joy.willis@hotmail.com,704-587-6754,1953-06-02,"5580 Melendez Rue, East Vincent, AZ 28187",139217.32,active,2022-01-14
 647,Kevin,Davis,kevin.davis@gmail.com,862-331-3261,1964-12-11,"6704 White Locks Apt. 715, Lake Michelletown, GA 42316",54109.75,active,2021-04-21
 648,David,Hunter,david.hunter@gmail.com,501-220-6221,1986-05-28,"0464 Cassandra Unions Suite 857, Meganstad, DE 23941",75970.35,active,2026-04-22
 649,Tina,Schmidt,tina.schmidt@hotmail.com,223-290-2600,1964-11-26,"9438 Graham Mountain, Billfort, NH 48618",53720.8,active,2025-11-06
-650,Brendan,Greene,brendan.greene@yahoo.com,398-769-7261,1963-11-24,"84245 Smith Islands Suite 091, Jessicaside, WA 52433",174400.03,inactive,2020-07-18
 651,John,Miller,john.miller@hotmail.com,821-644-3573,1944-05-23,"4579 Samantha Village Suite 015, Benjaminville, MS 67692",29889.37,inactive,2024-10-30
 652,Tina,Miller,tina.miller@hotmail.com,394-619-9849,2003-07-12,"24161 Ashley Hollow Apt. 059, Lewischester, KY 98394",76888.78,inactive,2024-05-17
 653,Haley,Lopez,haley.lopez@gmail.com,443-298-1813,1973-04-16,"440 Clark Tunnel, Sandovalview, KY 61114",105224.29,suspended,2023-05-06
@@ -546,7 +528,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 691,Monica,Mcintyre,monica.mcintyre@yahoo.com,670-776-1782,1940-12-23,"10531 Mcneil Creek, Marshallchester, PR 70850",74030.68,inactive,2024-09-26
 692,Scott,Vincent,scott.vincent@gmail.com,438-515-8217,1995-02-23,"2585 Tim Summit Apt. 238, Port Sheri, IN 86904",119897.56,active,2023-08-05
 693,Christopher,Davis,christopher.davis@hotmail.com,509-893-9530,1966-05-08,"2457 Wolf Curve, Robertberg, OR 97023",200997.0,inactive,2021-06-12
-694,Sarah,Johnson,sarah.johnson@yahoo.com,304-207-9380,2002-01-02,"02032 Morris Ports, Webbstad, ID 82907",239873.32,inactive,2020-02-15
 695,Molly,Arellano,molly.arellano@gmail.com,862-808-5631,1966-06-24,"714 Rogers Ferry Suite 578, Alvaradomouth, WV 68536",84261.66,active,2020-05-20
 696,Jose,Casey,jose.casey@gmail.com,265-544-5529,1967-12-17,"Unit 2137 Box 1184, DPO AE 46064",160212.03,inactive,2021-04-11
 697,Kurt,Graham,kurt.graham@gmail.com,871-928-5895,2007-07-26,"Unit 8268 Box 3230, DPO AE 96630",59815.94,suspended,2023-10-02
@@ -621,7 +602,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 793,Joseph,Jarvis,joseph.jarvis@yahoo.com,877-508-9037,1982-04-10,"6512 David Trace Apt. 014, New Amandaberg, WY 13069",193359.62,active,2019-10-11
 795,Edward,Spencer,edward.spencer@gmail.com,748-944-5882,1960-03-01,"89021 Pacheco Crossing Apt. 363, South Chelsea, MH 23247",110336.74,suspended,2020-11-03
 796,Samantha,Ramirez,samantha.ramirez@hotmail.com,294-557-4624,1937-11-26,"3311 Marquez Mills Apt. 696, New Kathyborough, FM 88753",214114.08,suspended,2022-02-26
-797,Travis,Clarke,travis.clarke@yahoo.com,539-569-5809,1974-11-17,"9352 Carolyn Square Suite 263, West Michael, KY 33107",66494.85,suspended,2022-12-16
 798,Jennifer,Roach,jennifer.roach@yahoo.com,686-774-1144,1964-08-14,"USNS Brewer, FPO AE 59777",43468.27,inactive,2020-09-24
 800,Carol,Patrick,carol.patrick@yahoo.com,590-316-7322,1997-09-26,"21980 Miller Glens, Hernandezberg, PR 57634",74963.1,suspended,2023-01-30
 801,Joshua,Moon,joshua.moon@yahoo.com,707-714-1302,1953-12-10,"19092 Kelley Manors, East Andre, ID 79489",132176.61,suspended,2023-07-05
@@ -662,7 +642,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 846,Jacob,Oconnor,jacob.oconnor@yahoo.com,369-435-2263,1988-11-10,"369 Davis Mountains Apt. 350, Michaelbury, ND 44204",132228.16,active,2021-09-30
 847,Trevor,Jordan,trevor.jordan@hotmail.com,289-902-2054,1977-08-11,"60376 Curtis Plaza, Higginsbury, WA 28620",98413.49,suspended,2024-04-22
 848,Jeffery,Davis,jeffery.davis@hotmail.com,876-435-7793,1955-11-20,"973 Matthew Freeway Apt. 149, North Thomas, KY 71420",198080.32,suspended,2025-05-09
-849,Gary,Todd,gary.todd@yahoo.com,693-891-8844,1989-05-31,"5118 Sandy Harbors, South Heatherstad, WV 59792",124342.7,suspended,2025-05-29
 850,Angela,Martin,angela.martin@hotmail.com,851-498-9627,1990-02-20,"22302 Margaret Flat Apt. 470, Perezberg, AZ 15951",72094.81,active,2024-11-14
 852,Ryan,Lyons,ryan.lyons@hotmail.com,350-257-3725,1949-06-23,"2989 Stephanie Manors Apt. 974, Jorgeborough, VA 03126",75333.64,active,2020-04-05
 854,Regina,Carpenter,regina.carpenter@gmail.com,287-421-8359,1990-01-18,"323 William Rest, East Amberland, MA 69323",152648.75,inactive,2023-07-02
@@ -709,7 +688,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 899,Troy,Patel,troy.patel@gmail.com,359-997-2747,1964-12-22,"722 Black Flat Suite 085, South Dawnbury, MN 07299",44613.03,active,2022-09-08
 905,Laura,Miller,laura.miller@yahoo.com,668-323-9490,1963-07-16,"7155 Daniel Stream Apt. 593, Alvarezhaven, CT 31715",120135.67,suspended,2024-09-20
 906,Lauren,West,lauren.west@gmail.com,212-890-4452,1960-03-17,"USNV Cisneros, FPO AE 91874",102233.02,active,2026-08-02
-602,Melissa,Bailey,melissa.bailey@gmail.com,475-682-6621,1949-03-27,"USCGC Butler, FPO AA 76990",99235.16,inactive,2024-01-08
 909,William,Sparks,william.sparks@yahoo.com,415-629-7099,1969-08-12,"75854 Quinn Manors, Lauramouth, WY 93912",99047.31,inactive,2021-12-04
 911,Tricia,Johnson,tricia.johnson@gmail.com,302-938-5422,2003-11-22,"45393 Susan Curve, Port Markmouth, CA 27809",196507.44,suspended,2024-02-12
 912,Adam,Morgan,adam.morgan@gmail.com,590-400-3389,1940-01-29,"214 Mitchell Pike Suite 699, Thomasbury, NE 59352",195608.32,suspended,2021-10-31
@@ -738,12 +716,10 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 938,Caleb,Allen,caleb.allen@yahoo.com,466-359-5973,1947-06-29,"6661 Hanna Road, Port Carlosville, AR 59081",20343.39,suspended,2022-01-21
 940,Kristen,Williams,kristen.williams@hotmail.com,973-688-5908,1981-01-10,"976 Fowler Rue Apt. 379, Jenningschester, MS 79535",20027.44,inactive,2021-03-01
 941,Angela,Carter,angela.carter@yahoo.com,811-436-1118,1966-11-07,"USNS Robinson, FPO AA 06937",139703.11,active,2023-05-25
-942,Todd,Duncan,todd.duncan@gmail.com,774-647-7467,1955-04-21,"38994 Wendy Mission Apt. 142, Charlesberg, AK 28595",73476.94,suspended,2022-01-23
 943,Tanner,Robertson,tanner.robertson@hotmail.com,587-425-5308,1995-11-20,"60204 Melissa Plains, East Mikeshire, NY 78550",35584.56,suspended,2022-04-23
 945,Tara,Reilly,tara.reilly@yahoo.com,475-622-4080,2001-03-01,"75883 Compton Landing, Randolphside, HI 08590",207473.01,active,2020-09-18
 946,Lisa,Green,lisa.green@yahoo.com,496-313-8460,1941-01-01,"36914 Davis Rue, East Williamfort, TX 77889",155135.93,inactive,2025-02-23
 947,Joseph,Martin,joseph.martin@hotmail.com,703-392-6253,1985-04-11,"PSC 2769, Box 7040, APO AP 46984",22305.78,active,2019-09-12
-948,Jerome,Wilson,jerome.wilson@gmail.com,222-390-2675,2001-11-30,"56078 Gregory Haven Apt. 565, Port Sarahshire, AS 86829",80629.43,active,2020-09-05
 949,Elizabeth,Sanders,elizabeth.sanders@gmail.com,944-208-4814,1958-06-21,"496 Payne Stravenue Suite 960, Shawnport, FL 08989",38023.73,active,2021-10-06
 950,Scott,Hernandez,scott.hernandez@yahoo.com,422-550-7885,1961-09-04,"364 Aaron Ports Apt. 486, New Blake, NE 18518",87170.02,inactive,2021-02-22
 951,Traci,Foster,traci.foster@hotmail.com,674-913-1519,1948-06-03,"0911 Jones Village, New Paulabury, MI 87163",91315.2,active,2022-07-07
@@ -762,9 +738,7 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 966,Rachel,Sanders,rachel.sanders@hotmail.com,221-905-7189,1952-04-28,"2038 Cohen Viaduct, South Michaeltown, SD 71660",97513.18,active,2024-07-07
 967,Bruce,Bradford,bruce.bradford@yahoo.com,240-696-8168,1980-10-03,"USS Scott, FPO AP 83776",142103.5,suspended,2023-11-14
 968,James,Hughes,james.hughes@gmail.com,394-780-4057,2008-04-10,"9353 Smith Walks, New Cesarfurt, NV 62651",138683.76,inactive,2021-03-08
-969,William,Palmer,william.palmer@yahoo.com,481-813-3627,1942-06-07,"4454 Simmons Views, Port Amanda, MN 90735",33290.6,active,2021-06-05
 970,Cameron,Morrison,cameron.morrison@hotmail.com,502-469-9873,1953-02-11,"53912 Horne Passage, Morganfurt, AS 82040",99499.02,active,2021-08-22
-972,Benjamin,Davis,benjamin.davis@hotmail.com,994-835-4912,1989-06-06,"424 Rebecca Village Apt. 972, East Ashley, CT 20286",89194.09,active,2022-08-06
 973,Theresa,Galloway,theresa.galloway@yahoo.com,596-394-9586,1984-07-03,"328 Jennifer Point, East Dustin, AZ 15832",169675.77,suspended,2020-08-20
 974,Alexis,Hall,alexis.hall@gmail.com,827-489-6285,2000-10-17,"6610 William Roads Suite 610, Port Kennethstad, MS 12682",108976.61,inactive,2024-12-13
 975,Keith,Lowery,keith.lowery@hotmail.com,298-735-2092,1954-05-19,"319 Kristi Harbor Suite 823, Kyleshire, MD 89142",27718.55,active,2025-06-10
@@ -807,7 +781,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1016,Kimberly,Logan,kimberly.logan@gmail.com,957-255-4982,1959-01-05,"3493 Ashley Key Apt. 496, South James, PR 22644",228664.88,active,2025-06-02
 1017,Paul,Hamilton,paul.hamilton@gmail.com,766-205-2179,1996-11-22,"3625 Adams Drive, Lake Xavierhaven, SC 05650",85736.21,inactive,2023-06-15
 1018,Amanda,Vasquez,amanda.vasquez@hotmail.com,539-414-9814,2007-09-16,"34199 Baker Flats Suite 324, Dicksonburgh, FM 48425",65036.32,suspended,2026-06-04
-1020,Peter,Norris,peter.norris@yahoo.com,911-915-1301,1985-08-12,"9453 Rasmussen Mews Suite 974, Hugheshaven, MS 08834",101606.68,suspended,2025-02-04
 1021,Ryan,Bullock,ryan.bullock@gmail.com,424-649-4965,1946-08-28,"80959 Romero Via Suite 269, West Kristin, MN 75961",31344.43,active,2020-10-09
 1022,Patrick,Turner,patrick.turner@gmail.com,477-254-8617,1969-05-23,"74235 Joseph Lights, Port Justinview, SD 71864",163356.25,active,2019-10-01
 1024,Lynn,Gillespie,lynn.gillespie@gmail.com,310-219-5792,1947-10-07,"84523 Ochoa Shoals Suite 268, Greenfort, AR 15237",210565.12,suspended,2022-08-22
@@ -818,8 +791,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1031,Jeremiah,Perez,jeremiah.perez@hotmail.com,486-430-3485,1967-12-25,"6108 Williams Ferry, Lawsonville, WV 66779",93876.53,inactive,2020-06-15
 1032,Lindsay,Gallegos,lindsay.gallegos@gmail.com,289-947-7262,1951-11-15,"26158 Patricia Point Apt. 176, Amandaview, WI 53262",133599.36,suspended,2025-02-20
 1033,Timothy,Nguyen,timothy.nguyen@gmail.com,840-902-4726,1991-03-13,"222 Cynthia Throughway, Jonberg, MI 73929",110648.0,suspended,2019-10-24
-1034,Veronica,Hodge,veronica.hodge@hotmail.com,636-519-6395,1977-11-13,"56062 Clark Shoal, South Johnfort, VI 32566",117715.56,active,2024-12-19
-1035,Carl,Holland,carl.holland@yahoo.com,868-341-9869,1975-06-03,"1307 Perez Points Suite 185, North Pamela, CA 29304",169858.8,active,2024-05-12
 1037,Carlos,Miller,carlos.miller@yahoo.com,871-778-3589,2007-01-26,"6409 Barbara Lane Apt. 957, Howardburgh, AR 63043",88484.16,suspended,2025-01-19
 1038,Linda,Shepherd,linda.shepherd@gmail.com,936-321-4016,1938-12-19,"019 Davis Stream, East Kyleborough, OK 32436",88506.66,active,2020-09-13
 1040,Kathy,Stevens,kathy.stevens@hotmail.com,963-852-5485,1961-10-03,"USCGC Wong, FPO AA 46692",51734.47,active,2021-09-17
@@ -880,7 +851,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1112,Craig,Roberts,craig.roberts@hotmail.com,573-955-1697,1965-07-28,"377 Stephen Walk, New Brooke, WI 85718",154822.0,inactive,2024-09-02
 1113,Nicholas,Smith,nicholas.smith@yahoo.com,402-930-9740,2002-07-31,"4416 Austin Cove, Haleymouth, SC 27336",35437.12,inactive,2022-12-14
 1114,Matthew,Brennan,matthew.brennan@yahoo.com,334-295-8672,1982-10-01,"51038 Derek Forest Apt. 427, Clarkberg, PR 67231",39592.39,inactive,2020-04-24
-1116,Michelle,Hopkins,michelle.hopkins@hotmail.com,287-565-6258,1980-10-05,"PSC 9228, Box 8498, APO AA 35840",173314.45,suspended,2023-10-15
 1117,Monica,Webster,monica.webster@hotmail.com,532-664-8987,1962-07-28,"727 Shawn Flat Apt. 688, Port Danielfurt, MP 36020",24718.64,inactive,2022-12-22
 1118,Kimberly,Cannon,kimberly.cannon@yahoo.com,559-690-8556,1940-03-03,"USS Hunter, FPO AE 72377",205760.11,inactive,2025-05-31
 1119,Terry,Pearson,terry.pearson@hotmail.com,818-788-3087,1963-03-06,"64770 Davis Stravenue, New Alexanderville, MI 25798",130764.83,inactive,2022-10-09
@@ -942,7 +912,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1204,Heidi,Santos,heidi.santos@yahoo.com,545-955-7586,1997-02-24,"6605 Jeremy Gateway, Adamschester, OR 67242",89980.16,suspended,2021-11-25
 1205,John,Johnson,john.johnson@yahoo.com,758-340-6268,1971-12-22,"7182 Jessica Manor, Barronfort, PW 75819",203686.81,active,2020-03-21
 1206,Dawn,Parsons,dawn.parsons@hotmail.com,807-377-6496,1981-04-17,"3859 Paul Terrace Apt. 963, Erinburgh, UT 68007",32035.26,inactive,2026-03-03
-571,Heather,Oneill,heather.oneill@yahoo.com,975-625-3753,1973-06-10,"Unit 0550 Box 4922, DPO AE 91526",172577.66,suspended,2025-02-04
 1209,Paula,Smith,paula.smith@hotmail.com,585-996-3584,1951-04-15,"982 Wilson Drives, Parkborough, WI 31090",21469.93,inactive,2019-10-24
 1210,Steven,Ellis,steven.ellis@gmail.com,206-207-3939,2002-08-08,"426 Moore Ford Apt. 135, Gloriatown, DE 37499",223602.4,suspended,2025-10-10
 1211,Michael,Cunningham,michael.cunningham@yahoo.com,490-626-8798,2007-02-22,"219 Weiss Mill Apt. 054, West Jesse, PW 67692",171703.55,active,2020-01-09
@@ -950,14 +919,12 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1213,Allison,Shields,allison.shields@gmail.com,825-908-1616,1991-07-17,"281 Smith Mission Apt. 170, South Crystal, AZ 58994",150372.38,suspended,2024-09-21
 1214,Nichole,Harris,nichole.harris@hotmail.com,826-290-5934,1974-02-11,"2628 Caroline Mall, Lake Molly, LA 39710",95223.49,active,2021-01-27
 1215,Megan,Nguyen,megan.nguyen@hotmail.com,441-396-2925,2004-11-18,"88959 Darlene Mountain Suite 116, South Sharonville, VA 79123",237025.98,active,2020-06-04
-1216,Nicole,Cruz,nicole.cruz@yahoo.com,570-979-9842,1945-07-02,"80820 Colleen Motorway, Lake Katherineburgh, MT 26010",130674.05,inactive,2019-09-27
 1217,Emily,Khan,emily.khan@gmail.com,483-254-4173,1957-08-08,"245 Yoder Common Apt. 042, Francisstad, IL 53955",43014.77,active,2024-05-06
 1218,Candice,Richards,candice.richards@gmail.com,482-834-9871,2004-05-01,"USCGC Diaz, FPO AE 24439",166771.66,active,2021-05-11
 1219,Andrea,Adams,andrea.adams@hotmail.com,860-572-5670,1969-09-21,"702 Allen Island Apt. 405, Jeffreychester, KS 66198",64528.93,inactive,2026-01-27
 1220,Karen,Graves,karen.graves@yahoo.com,732-977-5006,1995-07-22,"036 Pittman Pass Apt. 159, Boltonbury, NC 48924",27616.48,suspended,2022-12-06
 1222,Lindsay,Munoz,lindsay.munoz@hotmail.com,999-859-6510,1982-01-18,"59497 Dennis Causeway, Jacobhaven, MS 24686",178151.48,suspended,2020-11-26
 1223,Gabriel,Jenkins,gabriel.jenkins@gmail.com,533-629-4256,1981-09-09,"79962 Patricia Lane Apt. 998, East Malik, OH 96813",183853.26,inactive,2020-03-06
-1171,Tim,Kaufman,tim.kaufman@yahoo.com,997-312-6343,1977-02-25,"256 Kevin Gateway Suite 820, Paulabury, CT 43410",68567.62,active,2024-02-06
 1225,James,Rice,james.rice@hotmail.com,404-584-4615,1951-02-20,"0001 Evans Shoal, Spearsberg, MP 81364",34323.6,suspended,2022-01-20
 1227,Antonio,Salazar,antonio.salazar@yahoo.com,382-596-7119,1968-07-19,"2240 Oliver Station Apt. 082, West Marie, AK 75241",48281.82,suspended,2021-07-30
 1228,Sarah,Holder,sarah.holder@gmail.com,784-687-5458,1968-01-28,"962 Deborah Walks Suite 682, North Thomasstad, IA 82807",62890.82,suspended,2024-07-02
@@ -976,7 +943,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1245,Bob,Foster,bob.foster@gmail.com,914-827-9887,1968-06-28,"816 Monroe Road, North Micheleshire, AZ 78143",145700.92,active,2023-08-27
 1246,David,Martin,david.martin@gmail.com,835-543-1898,1994-11-13,"2094 Moore Flats, Shermanshire, NH 91742",132271.5,suspended,2025-10-09
 1249,Kathleen,Sanders,kathleen.sanders@gmail.com,774-926-4354,1966-07-07,"17970 Lyons Light Apt. 361, Pittmanport, ND 55951",48726.09,inactive,2025-12-05
-1250,Anthony,Smith,anthony.smith@hotmail.com,752-316-8839,1969-07-20,"0235 Michael Lakes Apt. 153, North Scottland, NE 65650",181698.37,suspended,2024-01-02
 1252,Jenna,Schmitt,jenna.schmitt@yahoo.com,942-827-5314,1989-08-23,"790 Sharp Crossing Apt. 898, Grahamport, PR 94676",30090.12,inactive,2021-01-12
 1253,Richard,Lewis,richard.lewis@gmail.com,663-697-9215,1961-02-11,"9748 Foster Avenue, Gloriaton, WI 24845",134923.54,active,2022-10-22
 1254,Tara,Chaney,tara.chaney@yahoo.com,926-744-9730,1986-12-16,"430 Anne Estates, New Michaelfort, IA 28945",217678.17,inactive,2021-05-29
@@ -989,7 +955,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1262,Devin,Carroll,devin.carroll@yahoo.com,697-807-9686,1937-11-06,"36385 Ware Underpass, Sonyaland, LA 75693",204903.55,inactive,2023-01-08
 1263,Seth,Edwards,seth.edwards@hotmail.com,511-780-3161,1972-02-29,"979 Wilkinson Rapid, West Carolhaven, NE 05007",217418.59,inactive,2021-07-18
 1265,Amy,Padilla,amy.padilla@hotmail.com,351-561-5659,2000-03-12,"9485 John Avenue, East Ginachester, WA 92121",119215.69,active,2026-02-24
-1266,Vanessa,Liu,vanessa.liu@gmail.com,873-704-2668,1947-06-10,"4225 Espinoza Summit Suite 188, East Jamie, NC 84775",81324.74,active,2019-09-29
 1267,Amy,Webb,amy.webb@hotmail.com,365-443-2915,1961-02-04,"Unit 4168 Box 0613, DPO AP 95310",27135.62,inactive,2024-12-16
 1269,Randall,Wilson,randall.wilson@gmail.com,924-235-6192,1997-04-11,"1662 Corey Islands, Rachelmouth, TX 66897",235121.01,active,2020-05-16
 1270,Richard,Ramirez,richard.ramirez@hotmail.com,659-752-3663,1973-02-15,"USNV Murphy, FPO AA 65189",136468.74,active,2022-07-01
@@ -1001,10 +966,8 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1278,James,Collins,james.collins@gmail.com,223-285-9821,1940-07-30,"774 Stevens Ridge Suite 141, Rojashaven, VA 21337",206578.21,suspended,2024-06-26
 1279,James,Mason,james.mason@gmail.com,724-603-4185,1991-04-04,"868 Rodriguez Manor Apt. 332, Johnsonstad, VA 72411",126883.31,suspended,2025-09-13
 1280,Nicholas,Dean,nicholas.dean@yahoo.com,723-257-6915,1957-07-21,"8317 Holly Lights Suite 293, West Christopherhaven, MH 12340",106257.88,suspended,2019-11-23
-1281,Taylor,Mason,taylor.mason@gmail.com,578-595-7108,1958-08-13,"9469 Sarah Drives Apt. 272, Lake Thomas, NV 82378",20706.36,inactive,2021-11-19
 1282,Wayne,Riley,wayne.riley@gmail.com,515-656-2435,2007-04-23,"65487 Emily Plaza, Lisamouth, OR 42832",65884.32,inactive,2022-09-27
 1284,Brian,Carpenter,brian.carpenter@hotmail.com,342-801-2410,1963-12-02,"68384 Jenkins Pine Apt. 207, Millerbury, OR 52818",49887.92,inactive,2022-01-13
-1285,Erin,White,erin.white@hotmail.com,737-543-2083,2004-02-10,"188 Eric Port Suite 182, Lake Mariatown, PW 53164",225159.97,suspended,2021-05-10
 1286,Paul,Hodges,paul.hodges@gmail.com,290-206-7708,2006-03-31,"9237 Bridget Divide, Tranbury, IN 36532",159814.93,inactive,2022-06-19
 1287,Rebecca,Dixon,rebecca.dixon@yahoo.com,379-769-8571,2003-09-08,"35067 Stevens Ridges Suite 833, Michaelmouth, AL 64311",175674.84,active,2022-01-12
 1288,Scott,Singh,scott.singh@hotmail.com,620-777-3862,1992-01-23,"PSC 3155, Box 5057, APO AP 04791",140958.46,active,2024-06-11
@@ -1024,7 +987,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1308,Nathan,Baker,nathan.baker@gmail.com,255-698-7634,1987-11-09,"23028 Sawyer Rue, Reneetown, TX 43288",170746.47,inactive,2024-03-09
 1311,Jocelyn,Todd,jocelyn.todd@gmail.com,310-233-9412,1998-01-19,"433 James Row Apt. 528, Mosesville, WY 28639",149685.11,inactive,2024-06-23
 1312,Eric,Quinn,eric.quinn@yahoo.com,459-244-2085,1955-09-22,"34286 Barton Hills Suite 602, Brandychester, NE 25840",84965.37,active,2025-05-06
-8,Joseph,Mcgee,joseph.mcgee@hotmail.com,326-816-4365,1989-06-26,"USNS Kim, FPO AA 83948",148447.88,active,2025-08-06
 1314,Elizabeth,Weber,elizabeth.weber@gmail.com,886-559-1479,1999-03-27,"97356 Matthew Fall Suite 655, West Tonyfurt, GA 48962",38153.01,suspended,2024-08-10
 1315,Kristin,Brennan,kristin.brennan@hotmail.com,793-556-6770,1973-12-14,"PSC 6414, Box 7533, APO AA 76733",53643.73,suspended,2023-07-27
 1316,Helen,Moore,helen.moore@yahoo.com,447-717-2119,2000-01-11,"PSC 6653, Box 5389, APO AP 90862",40001.46,suspended,2019-10-22
@@ -1086,7 +1048,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1387,Tammy,Thompson,tammy.thompson@gmail.com,854-917-6945,1983-05-19,"58929 Christy Forks Apt. 437, Colemanbury, WI 55221",218500.88,suspended,2023-03-19
 1388,Phillip,Ferguson,phillip.ferguson@hotmail.com,747-442-8248,1983-04-24,"26815 Chan Square, Kaylatown, VI 46046, contact phillip.ferguson@gmail.com",104240.57,inactive,2025-04-24
 1389,Rhonda,Robinson,rhonda.robinson@gmail.com,508-292-4857,2008-03-20,"833 Michelle Meadows Suite 397, Tiffanyville, OH 77116",84027.88,active,2023-10-25
-1390,Vanessa,Burgess,vanessa.burgess@yahoo.com,846-524-7656,1947-08-12,"5016 Simmons Spurs Apt. 877, Kaneberg, TN 70070",193228.46,inactive,2021-10-04
 1392,Randy,Herring,randy.herring@yahoo.com,302-364-5275,2007-12-07,"4993 Cunningham Coves, West Matthew, NJ 63451",130406.26,inactive,2021-12-10
 1395,Michael,Davis,michael.davis@gmail.com,203-610-4278,1975-07-07,"600 Ayala Avenue Apt. 449, New Stacie, OH 64893",157481.77,inactive,2025-02-25
 1397,Peter,Garrett,peter.garrett@gmail.com,808-902-7722,1972-09-16,"9522 Jeremy Field, Jacobsville, SC 74005",193966.59,inactive,2025-03-22
@@ -1154,7 +1115,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1471,Deanna,Massey,deanna.massey@hotmail.com,626-889-6902,2008-02-13,"PSC 6647, Box 7413, APO AE 27181",194705.93,active,2022-04-21
 1472,Samantha,Jones,samantha.jones@gmail.com,412-489-2412,1985-07-22,"46581 Clark Road Suite 217, Matthewton, AS 76173",166086.53,active,2019-09-15
 1474,Christine,Lewis,christine.lewis@gmail.com,510-440-4431,1952-04-09,"918 Jessica Flat Apt. 463, Davidburgh, ME 21077",141616.37,active,2021-02-21
-1139,Curtis,Franklin,curtis.franklin@yahoo.com,467-565-3598,1963-12-12,"91218 Moore Fields, Christopherland, LA 95361",56786.68,suspended,2022-08-28
 1476,Richard,Gonzalez,richard.gonzalez@hotmail.com,201-507-1298,1943-08-19,"15303 Lindsey Hill, South Scottland, TN 93851",43301.18,active,2026-04-28
 1477,Cory,Williams,cory.williams@hotmail.com,775-429-8968,2008-08-31,"557 Figueroa Station Suite 345, Davidside, WA 24587",75236.52,inactive,2025-04-29
 1478,Carla,Garcia,carla.garcia@hotmail.com,304-457-7560,1966-07-19,"2064 Sarah Street Apt. 061, Hendrixfurt, UT 81222",216982.53,suspended,2022-09-11
@@ -1177,7 +1137,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1498,Christopher,Moore,christopher.moore@yahoo.com,599-942-3064,1950-08-17,"7844 Smith Points Apt. 751, New Williammouth, NJ 49606",133544.27,suspended,2022-12-05
 1499,Mitchell,Hernandez,mitchell.hernandez@yahoo.com,418-295-9383,1985-10-14,"253 Ruben Harbor Apt. 838, Elizabethfort, KY 58169",140496.46,suspended,2023-07-01
 1502,Brittney,Owens,brittney.owens@hotmail.com,949-261-7110,2008-04-05,"4773 Mendez Greens, Lake Charles, MH 86911",75665.93,suspended,2025-06-10
-1503,Jose,Herrera,jose.herrera@yahoo.com,326-248-3043,1947-02-26,"USCGC Hayden, FPO AA 53098",117619.59,suspended,2022-09-15
 1504,Jonathan,Walker,jonathan.walker@hotmail.com,664-547-4868,1956-11-15,"68557 Christine Island Apt. 328, Tammystad, OH 02814",196796.04,suspended,2026-08-15
 1505,Mary,Craig,mary.craig@yahoo.com,931-842-9737,1979-01-02,"5816 Williams Turnpike Suite 136, East Jason, WA 86379",205478.06,active,2020-05-03
 1506,Kristin,Little,kristin.little@yahoo.com,325-672-1416,1969-03-16,"6971 Blair Park, Lebury, LA 16817",176585.92,suspended,2022-10-02
@@ -1202,7 +1161,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1536,William,Sanchez,william.sanchez@gmail.com,986-291-3526,1988-06-21,"4885 Schmidt Tunnel Suite 311, West Garrettstad, ME 19266",86108.32,inactive,2023-10-25
 1537,Alyssa,Smith,alyssa.smith@yahoo.com,260-829-6329,1955-04-04,"55078 Pierce Route Suite 860, North Jeremy, OR 17548",58283.64,suspended,2024-10-12
 1538,Gary,Wright,gary.wright@yahoo.com,505-599-2617,1943-01-06,"586 Nielsen Ramp, New Lisa, OK 69246",89049.2,inactive,2026-01-09
-1539,Kimberly,Moore,kimberly.moore@yahoo.com,464-584-2981,2000-07-20,"2495 Thompson Viaduct, South Ruthshire, MO 41095",29516.94,active,2023-01-17
 1540,Kevin,Simmons,kevin.simmons@gmail.com,800-442-9076,1954-04-29,"0051 Harold Oval, Matthewland, FL 03280",130913.92,suspended,2019-12-26
 1542,Jodi,Chan,jodi.chan@yahoo.com,267-695-1473,1962-12-02,"4203 Brown Place Suite 483, North Ashley, MN 67044",108463.62,active,2022-02-11
 1543,Stephanie,Thomas,stephanie.thomas@hotmail.com,475-767-2663,1954-07-27,"0145 Levine Drives, East Richard, CA 35614",72682.17,suspended,2026-06-21
@@ -1274,7 +1232,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1626,Kendra,Scott,kendra.scott@hotmail.com,284-501-9220,1954-05-09,"90073 Matthews Ridges, Kimberlymouth, NH 90153",131839.6,suspended,2022-08-27
 1627,Rachel,Hopkins,rachel.hopkins@yahoo.com,483-433-2612,1999-06-01,"6926 Paul Trail, Justinbury, ME 59735",44326.51,inactive,2025-10-20
 1628,Maria,Holder,maria.holder@yahoo.com,759-405-6468,1945-06-04,"59839 Blevins Route Apt. 799, Coxmouth, NV 67004",61655.48,inactive,2026-04-02
-1629,Katelyn,Weeks,katelyn.weeks@yahoo.com,509-963-5496,1972-12-15,"7843 Byrd Overpass, North Wendy, SD 88309",60322.62,suspended,2023-11-16
 1630,Corey,Mcdaniel,corey.mcdaniel@yahoo.com,970-933-9898,1970-10-06,"0078 Paul Estate, East James, VT 66174",220548.92,active,2025-02-18
 1631,Marc,Smith,marc.smith@yahoo.com,488-554-7616,2001-11-16,"85023 Kathy Dam Suite 532, Youngmouth, AS 16082",227970.93,suspended,2023-04-28
 1633,Michael,Richardson,michael.richardson@gmail.com,433-432-4438,1987-01-05,"PSC 2006, Box 1741, APO AE 55301",123325.29,suspended,2022-03-22
@@ -1287,7 +1244,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1640,Melissa,Jones,melissa.jones@hotmail.com,506-533-1380,1980-01-06,"PSC 9210, Box 5307, APO AE 21422",144002.19,active,2020-08-25
 1641,Glenn,Butler,glenn.butler@hotmail.com,357-538-7404,1999-02-27,"377 White Tunnel, West Justinside, MD 64856",235598.21,active,2025-02-13
 1642,Jill,Nichols,jill.nichols@gmail.com,265-747-7331,1969-04-07,"63228 Susan Expressway, Cherryside, AR 38660",59811.19,active,2022-04-19
-1643,Jonathan,Padilla,jonathan.padilla@hotmail.com,783-662-5991,1963-08-23,"6096 Deborah Village Suite 724, Gregorymouth, IL 59882",38699.61,active,2022-12-29
 1644,Andrea,Neal,andrea.neal@hotmail.com,381-232-9005,1970-12-30,"PSC 4070, Box 9465, APO AA 61856",23958.15,active,2020-06-24
 1646,James,Vasquez,james.vasquez@yahoo.com,271-665-1941,1983-07-05,"688 Laura Club Suite 647, Cynthiaberg, NH 76867",99840.8,active,2020-10-19
 1647,Alexandra,Merritt,alexandra.merritt@yahoo.com,987-264-5391,2000-03-02,"54160 Barbara Corner Suite 808, Smithville, NJ 00654",52861.87,active,2024-10-02
@@ -1325,7 +1281,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1689,Daniel,Bowen,daniel.bowen@gmail.com,443-942-8270,1993-03-07,"4956 Susan Club, Patriciafort, WI 51729",182114.75,inactive,2026-04-03
 1691,Susan,Gordon,susan.gordon@hotmail.com,968-224-4752,1943-02-18,"Unit 0570 Box 3996, DPO AE 08421",206019.54,inactive,2023-06-12
 1693,Kimberly,Carpenter,kimberly.carpenter@gmail.com,903-912-4644,1999-03-18,"633 Javier Forge, Port Karenmouth, FM 70561",152990.03,inactive,2023-11-23
-1694,Kimberly,Carter,kimberly.carter@hotmail.com,529-387-8247,2000-04-11,"237 Greene Avenue, Lopezhaven, PR 43102",75000.0,active,2020-10-31
 1695,Robin,Roberson,robin.roberson@yahoo.com,271-397-1853,1947-09-19,"455 Jason Trafficway Apt. 960, West April, GA 98934",158829.46,active,2021-03-02
 1697,Zachary,Rojas,zachary.rojas@yahoo.com,719-280-7983,2004-09-06,"1206 Daniel Isle, Pamelashire, NV 63518",178947.58,inactive,2024-01-12
 1698,Reginald,Martinez,reginald.martinez@yahoo.com,981-735-7395,1963-02-14,"44157 Amy Squares, Jenniferfurt, MH 09471",112131.72,suspended,2024-11-02
@@ -1380,7 +1335,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1765,Jeanette,Patel,jeanette.patel@yahoo.com,556-975-7412,1976-01-16,"20753 Gabriella View Apt. 685, North Nathan, WV 93476",104816.01,suspended,2021-05-15
 1767,Kristina,Harper,kristina.harper@yahoo.com,299-334-6298,2003-10-22,"3319 Davis Crossing Suite 333, Kristenmouth, GA 82056",185003.16,suspended,2022-04-07
 1768,Ryan,Gilbert,ryan.gilbert@gmail.com,926-511-8496,1939-09-13,"434 Greene Parks, Joanneside, UT 47155",163328.74,suspended,2026-01-27
-1769,Lisa,Love,lisa.love@hotmail.com,652-912-8904,1982-03-10,"8602 Michael Ramp, South Catherine, IL 60314",82620.11,active,2025-02-19
 1770,Samuel,Hull,samuel.hull@yahoo.com,423-966-4205,1974-03-29,"PSC 9033, Box 1222, APO AE 79417",181240.8,active,2024-04-29
 1771,Marc,Hawkins,marc.hawkins@yahoo.com,943-789-2670,2003-08-31,"14836 Collins Mountains Suite 407, East Richardchester, VI 46802",168586.55,active,2022-08-14
 1772,Richard,Smith,richard.smith@yahoo.com,637-895-3756,2006-05-02,"USNS Martin, FPO AP 20771",223568.74,active,2022-06-16
@@ -1429,7 +1383,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1828,Thomas,Warner,thomas.warner@hotmail.com,236-674-8999,1962-08-16,"3583 Larry Ways, Lake Timothystad, DE 29445",30764.27,active,2020-11-24
 1830,Daniel,Murillo,daniel.murillo@gmail.com,939-390-7587,1954-08-30,"92743 Hayden Manors, Bellton, HI 29554",96706.18,active,2022-10-04
 1832,Richard,Snow,richard.snow@gmail.com,326-699-1113,1990-09-29,"00568 Williams Prairie Apt. 571, East Christopherhaven, CO 50710",52549.95,suspended,2022-01-27
-1837,Becky,Fernandez,becky.fernandez@yahoo.com,653-373-9875,1957-09-08,"77021 Smith Summit Suite 701, West Jane, VI 82080",218021.51,active,2025-03-07
 1838,Gene,Roach,gene.roach@gmail.com,690-881-5354,1996-12-09,"78568 Shawn Rapids Suite 505, South Stephaniebury, UT 74268",44371.89,inactive,2024-06-12
 1839,John,Gallagher,john.gallagher@gmail.com,707-898-3087,1942-08-04,"169 John Run Apt. 793, Robertsfort, AK 68544",90125.07,inactive,2020-07-05
 1840,Carrie,Velasquez,carrie.velasquez@gmail.com,943-959-7370,1988-12-27,"2593 Mcdonald Shore Suite 650, Philiptown, NJ 71015",47174.72,active,2021-01-19
@@ -1523,7 +1476,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1952,Justin,Short,justin.short@yahoo.com,651-575-9396,1942-04-19,"1757 Lee Throughway, Port Veronicastad, CT 96064",205553.51,inactive,2025-03-26
 1953,Megan,Porter,megan.porter@yahoo.com,285-898-7769,1978-01-25,"656 Bobby Route Apt. 375, East Ashley, MO 97070",130319.22,inactive,2022-06-28
 1954,Joseph,Scott,joseph.scott@gmail.com,835-859-1934,1947-08-06,"51455 Hardin Roads, Maryborough, NH 84540",182511.45,active,2026-03-15
-1955,David,Washington,david.washington@yahoo.com,208-358-2725,1967-01-06,"4302 Williams Club, Port Tommy, HI 77877",82526.65,active,2020-05-22
 1956,Anita,Martinez,anita.martinez@gmail.com,608-274-4654,1981-09-10,"3922 Johnson Stravenue, Ashleyberg, OH 34619",104185.51,inactive,2020-04-14
 1957,Anthony,Trujillo,anthony.trujillo@hotmail.com,782-233-8971,1985-09-26,"90878 Donna Shoals Suite 767, North Stephaniemouth, NY 20925",160631.56,inactive,2025-08-19
 1959,Matthew,White,matthew.white@yahoo.com,404-611-6385,1993-07-25,"66923 Mark Street Apt. 734, Weeksburgh, NJ 07690",32312.68,inactive,2021-10-27
@@ -1541,7 +1493,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 1974,Sean,Hall,sean.hall@yahoo.com,237-423-4074,1972-12-07,"08307 Nelson Hill Apt. 583, Marktown, CO 65715",111279.1,suspended,2025-08-02
 1975,Raven,Ramos,raven.ramos@hotmail.com,765-270-7123,1969-12-14,"Unit 3282 Box 9018, DPO AE 17597",95274.99,active,2024-10-25
 1977,Emily,Little,emily.little@yahoo.com,327-916-9177,1996-09-29,"0648 Crosby Walks, Knighthaven, OH 53655",162058.39,inactive,2021-01-18
-1978,Stephanie,Mccoy,stephanie.mccoy@yahoo.com,787-302-4077,1944-01-14,"904 Daniels Common Apt. 881, North Coryview, GU 44445",201857.26,inactive,2022-01-14
 1979,Holly,Porter,holly.porter@yahoo.com,983-543-2857,1987-01-14,"524 Rojas Court, Williamsberg, WY 12894",223649.45,inactive,2020-10-24
 1981,Michelle,Chandler,michelle.chandler@yahoo.com,875-905-8167,1941-11-21,"489 Bowers Lake, Thompsonmouth, GA 81686",158771.81,suspended,2023-06-26
 1984,Thomas,Cook,thomas.cook@gmail.com,302-848-8276,2007-04-21,"62016 Lee Groves Apt. 142, West Raymondborough, KS 90814",75000.0,active,2020-07-27
@@ -1592,7 +1543,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2046,Brooke,Schneider,brooke.schneider@hotmail.com,991-948-8908,1956-08-01,"5571 Sandra Haven, Woodsview, UT 48144",68134.38,inactive,2023-01-26
 2047,Cody,Mcgee,cody.mcgee@yahoo.com,928-284-6783,1960-02-21,"7448 Tonya Islands, Lake Robert, MP 79608",141990.38,active,2023-05-11
 2048,Ashley,Williams,ashley.williams@hotmail.com,546-459-7183,1945-08-31,"15673 Amy Key, West Steveport, WA 55611",233731.88,active,2024-05-15
-2049,Troy,Johnson,troy.johnson@hotmail.com,213-886-4541,1963-10-29,"838 Victoria Wall, West Ryan, UT 08435",121929.39,inactive,2024-04-18
 2050,Gregory,Washington,gregory.washington@yahoo.com,699-307-6577,1973-10-29,"563 Melissa Tunnel Apt. 349, Devonmouth, NV 07526",64322.84,suspended,2024-07-28
 2051,Matthew,Stewart,matthew.stewart@yahoo.com,422-990-6655,2000-03-15,"3880 Linda Grove, South Christopher, DE 87676",175289.74,suspended,2020-10-05
 2052,Alicia,Powers,alicia.powers@hotmail.com,226-366-2335,1992-07-21,"USCGC Carpenter, FPO AA 96948",66570.23,inactive,2024-12-14
@@ -1666,7 +1616,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2140,Stephanie,Ray,stephanie.ray@gmail.com,517-532-8455,1998-10-13,"81915 Howard Oval Suite 387, West Valerie, AR 42854",114361.99,suspended,2023-06-22
 2141,Tamara,Wilson,tamara.wilson@yahoo.com,288-796-1397,1958-04-03,"PSC 0472, Box 6097, APO AP 74382",157663.68,suspended,2024-07-10
 2142,Ronald,Larson,ronald.larson@hotmail.com,850-884-4820,1956-10-28,"6098 Carpenter Rest, South Karenfort, VA 30889",216310.6,inactive,2025-08-07
-2143,Paul,Diaz,paul.diaz@hotmail.com,854-980-8740,1981-04-09,"748 Leach Well Suite 713, Port Crystalside, KS 34900",93637.91,suspended,2022-02-07
 2145,Sean,Reyes,sean.reyes@hotmail.com,560-565-3258,1995-07-13,"5798 David Ferry Apt. 005, West Justinville, NV 30662, tel 331-412-4349",195954.29,inactive,2021-01-23
 2147,Jimmy,Pace,jimmy.pace@yahoo.com,505-303-2932,2002-04-23,"3597 Cantu View, New Randyburgh, NY 24867",128714.12,active,2020-11-17
 2148,Jessica,Wilson,jessica.wilson@gmail.com,753-538-1369,1966-04-25,"578 Kimberly Turnpike Suite 376, North Brianna, NJ 60224",67732.71,inactive,2019-12-08
@@ -1725,7 +1674,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2217,Olivia,Dalton,olivia.dalton@hotmail.com,320-283-7692,1971-05-15,"137 Tracey Knoll, Benjaminborough, NJ 81499",111467.02,active,2023-02-28
 2218,Gavin,Perez,gavin.perez@yahoo.com,935-506-8820,2007-10-15,"60809 Sean Landing, New Jessemouth, MP 71732",217771.69,inactive,2020-03-21
 2219,Kevin,Klein,kevin.klein@gmail.com,370-323-7858,1976-05-02,"4738 Cody Underpass, South Bruce, KS 75849, SSN 229-87-2335",76469.5,suspended,2026-07-04
-2220,Joseph,Jackson,joseph.jackson@yahoo.com,960-303-3070,1997-06-25,"0053 Morris Parkways Apt. 348, Lake Davidhaven, AK 88024",211019.85,inactive,2021-05-30
 2221,Angela,White,angela.white@gmail.com,906-370-2196,1983-12-18,"28477 Suzanne Passage Suite 537, West Ronaldport, CT 42591",47387.86,suspended,2026-05-30
 2222,Nicole,Roman,nicole.roman@hotmail.com,632-562-3088,1954-05-09,"6670 Lewis Fort, North Ashleyland, VT 56960",107314.49,suspended,2022-04-30
 2223,Heidi,Duarte,heidi.duarte@hotmail.com,929-500-2950,2007-11-30,"93731 Jonathan Centers, South Trevor, CA 61647",92771.44,inactive,2023-12-22
@@ -1747,14 +1695,12 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2241,Laura,Gross,laura.gross@yahoo.com,664-502-2795,1983-12-24,"7771 Johnson Valley Suite 702, Wendytown, UT 11714",177007.7,active,2025-04-07
 2242,Michael,Estes,michael.estes@yahoo.com,642-705-5309,1955-11-10,"5256 Tracy Grove Suite 555, Myerschester, IL 32223",37283.77,active,2021-09-11
 2243,Maria,Vaughn,maria.vaughn@gmail.com,949-884-2908,2006-08-29,"95307 Thomas Street Suite 282, Pricemouth, TX 67021",232993.59,active,2023-07-23
-2244,Nicole,Jimenez,nicole.jimenez@hotmail.com,944-276-6359,2004-11-24,"66036 Shepherd Plains Apt. 276, Josephburgh, SD 79152",52793.44,inactive,2024-03-08
 2245,Sydney,Brock,sydney.brock@hotmail.com,664-845-9402,1957-12-12,"9616 Walker Park, Beckerview, DC 36964",75000.0,active,2023-08-02
 2247,Timothy,Hicks,timothy.hicks@yahoo.com,394-771-1583,1952-06-16,"133 Summers Prairie, East Jasonfort, ME 30870",228718.52,suspended,2023-02-13
 2248,Gregory,Archer,gregory.archer@hotmail.com,451-340-7163,1978-06-13,"418 Christopher Light Suite 991, Lake Heathershire, PR 39891",211609.49,active,2026-08-04
 2250,Victoria,Morrison,victoria.morrison@yahoo.com,489-334-4253,1964-12-30,"39438 Jennifer Knolls Suite 288, Paulfort, VA 63329",158919.54,active,2021-02-09
 2252,Michael,Moore,michael.moore@hotmail.com,771-825-4416,1969-03-02,"837 Ralph Point Suite 793, Michelleland, AS 22975",175617.89,active,2021-03-06
 2253,Melissa,Ponce,melissa.ponce@hotmail.com,904-469-7230,1969-02-02,"8691 Kelly Mills Suite 296, Edwardsport, CT 97973",158087.86,active,2021-12-28
-2254,Levi,Robinson,levi.robinson@gmail.com,695-743-3950,1984-12-11,"41071 Dennis Trail Suite 337, East Robertmouth, NC 13567",212891.5,active,2022-10-08
 2255,Kelly,Foster,kelly.foster@yahoo.com,884-696-9031,1994-07-03,"3110 Jennifer Pass, Mikemouth, MP 30024",194877.65,inactive,2023-05-28
 2256,Stephanie,Davis,stephanie.davis@gmail.com,596-899-4442,1953-03-21,"749 Christopher Mission, Roberttown, AS 65993",83582.62,active,2019-12-23
 2257,Yolanda,Smith,yolanda.smith@hotmail.com,973-982-5706,2004-09-06,"USCGC Lewis, FPO AE 31440",111149.87,inactive,2025-06-02
@@ -1807,7 +1753,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2314,Sarah,Fernandez,sarah.fernandez@yahoo.com,531-279-1855,1993-04-20,"731 Alexandra Cliffs, Port Charlesfurt, ME 84044",48408.43,inactive,2026-09-04
 2316,Andrew,Morales,andrew.morales@hotmail.com,773-602-7181,1946-12-02,"2432 Cook Drives Apt. 798, West Joanneton, NJ 67796",189810.16,suspended,2023-12-24
 2317,Christy,Moody,christy.moody@gmail.com,563-519-9552,1997-11-12,"5239 Houston Fields Suite 918, Michaelview, CT 89480",88367.77,active,2021-05-11
-2319,Robert,Hardin,robert.hardin@hotmail.com,652-701-5104,1945-02-09,"74787 Michael Isle Apt. 331, Andrewsbury, CA 87682",170151.6,suspended,2020-05-24
 2320,Jason,Evans,jason.evans@yahoo.com,867-556-3916,1972-10-30,"176 Mccoy Divide Apt. 000, South Allison, ME 87390",23615.61,inactive,2021-10-18
 2321,Cheryl,Hart,cheryl.hart@hotmail.com,989-886-6668,2000-09-17,"05125 William Run Apt. 631, West Rachelfort, MP 50711",179725.11,active,2021-06-14
 2322,Valerie,Clark,valerie.clark@yahoo.com,773-395-7266,1989-07-09,"746 Harold Passage, Stewartland, CA 98393",101073.7,suspended,2019-10-05
@@ -1839,7 +1784,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2354,Stephanie,Barrett,stephanie.barrett@hotmail.com,234-530-2713,1975-04-04,"62986 Kevin Ferry, Hunterfort, WY 14369",157742.8,active,2020-01-30
 2355,Karen,Sanchez,karen.sanchez@hotmail.com,752-868-3751,1983-11-23,"562 Sims Spur Suite 941, East Luis, OH 69798",92741.15,active,2024-11-24
 2358,Charles,Nielsen,charles.nielsen@yahoo.com,948-608-8759,1941-07-27,"309 Hudson Oval Suite 684, North Angela, OH 04819",203169.4,inactive,2021-10-20
-2359,Cameron,Fox,cameron.fox@yahoo.com,406-367-4798,1990-09-15,"311 Tamara Knolls, Parkertown, IL 08006",168639.4,inactive,2022-06-30
 2362,Caleb,Sanders,caleb.sanders@gmail.com,811-914-9586,1982-12-03,"37020 Marissa Inlet, North Michelleview, MS 81258",62058.6,suspended,2023-04-23
 2363,Paul,Grimes,paul.grimes@yahoo.com,346-420-4764,1954-06-13,"2720 Diaz Square Apt. 635, East Susan, MN 04069",193062.41,active,2025-02-11
 2365,Jeffrey,Martinez,jeffrey.martinez@yahoo.com,369-671-1013,1979-09-09,"0741 Matthew Roads, Perrybury, IA 74355",164211.11,active,2022-03-29
@@ -1862,14 +1806,12 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2389,Larry,Ramirez,larry.ramirez@yahoo.com,671-575-1820,2006-02-18,"7311 Hunt Islands Apt. 663, Walshtown, AL 71992",215394.84,suspended,2021-03-10
 2392,Stephen,Duran,stephen.duran@gmail.com,532-504-1583,1968-06-27,"181 Shannon Dale, New Joanna, NC 98074",150262.92,inactive,2021-09-02
 2393,Wendy,Torres,wendy.torres@gmail.com,333-395-6587,1938-02-27,"9116 Henry Glens, Lake Thomas, OH 90998",73195.13,active,2026-04-09
-2394,Terri,Peters,terri.peters@gmail.com,750-601-6293,1944-06-23,"PSC 7227, Box 8181, APO AA 45767",158508.25,inactive,2020-09-05
 2395,Rachael,Hopkins,rachael.hopkins@hotmail.com,553-669-4999,1950-11-04,"21367 Ricky Run, East William, CA 95655",221968.08,suspended,2023-08-07
 2397,Robert,Herrera,robert.herrera@hotmail.com,350-823-2656,1950-01-02,"398 Bullock Port Apt. 082, Port Shane, NC 13137",102784.68,suspended,2026-04-02
 2400,Robert,Mitchell,robert.mitchell@hotmail.com,717-551-4972,1969-05-17,"78861 Mcintosh Unions, Port Shannon, MT 03821",238871.89,suspended,2025-05-17
 2401,Jade,Mccann,jade.mccann@hotmail.com,752-449-1800,1951-01-16,"368 Ronald Trail, Carterchester, OR 72430",101080.48,inactive,2020-11-30
 2402,John,Robinson,john.robinson@yahoo.com,932-249-1540,2000-09-15,"USNS Lowe, FPO AA 97669",183805.09,active,2024-04-07
 2403,Mary,Watson,mary.watson@hotmail.com,713-887-1749,1993-02-18,"7777 Hart Spurs, Tamarahaven, IN 54764",152226.21,active,2023-07-30
-2404,Charles,Dudley,charles.dudley@hotmail.com,479-205-7671,2003-08-17,"PSC 3744, Box 8923, APO AP 49958",63984.27,inactive,2023-06-26
 2406,Brianna,Smith,brianna.smith@hotmail.com,299-426-4683,1996-11-23,"Unit 0437 Box 4126, DPO AP 72449",22012.19,inactive,2023-02-10
 2407,Sharon,Hunt,sharon.hunt@yahoo.com,265-826-5715,1964-04-29,"619 Hardin Alley, Charleshaven, IL 82374",179652.4,suspended,2024-03-14
 2408,Krystal,Gregory,krystal.gregory@hotmail.com,802-630-6386,1954-05-10,"759 White Canyon, South Nathanielstad, MN 42357",138203.66,inactive,2021-07-07
@@ -1961,7 +1903,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2524,Mary,Carter,mary.carter@gmail.com,517-781-6935,1978-02-24,"64041 Charles Mount, Lake Melanieborough, CA 04331",45018.23,active,2020-12-30
 2525,Lauren,Wood,lauren.wood@gmail.com,700-958-6871,1938-05-05,"506 Smith Meadows Suite 514, West Alexandrastad, CA 44034",184429.54,inactive,2025-05-01
 2526,Richard,Knight,richard.knight@hotmail.com,395-415-2487,1946-03-25,"0215 Amber Crescent Apt. 511, Lake Ryanfort, PR 13112",195553.65,inactive,2022-01-09
-2529,Emily,Livingston,emily.livingston@hotmail.com,377-790-2853,1979-01-09,"91400 Fred Stravenue, Davidville, WY 77470",114381.05,suspended,2022-09-14
 2530,Derek,Haynes,derek.haynes@gmail.com,882-791-7427,1993-12-10,"1594 Lauren Greens Apt. 450, South Ronald, SD 23269",162396.05,inactive,2023-04-23
 2531,Timothy,Patel,timothy.patel@hotmail.com,216-481-6296,1988-01-29,"4811 Matthew Trafficway Apt. 927, Port Joseph, AK 96960",28072.03,active,2021-05-24
 2532,Ronald,Ruiz,ronald.ruiz@gmail.com,778-209-3096,1981-07-10,"8107 William Dale Suite 089, Lake Michael, VT 91545",133134.09,active,2024-09-09
@@ -2075,7 +2016,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2678,Mike,Trujillo,mike.trujillo@hotmail.com,337-610-8953,1980-02-27,"Unit 5335 Box 8499, DPO AP 79530",71668.91,suspended,2022-04-30
 2680,Karen,Ellis,karen.ellis@gmail.com,985-393-4447,1992-01-28,"36098 Sarah Center Suite 045, Reidville, RI 86275",178930.05,active,2021-01-12
 2682,Alvin,Hicks,alvin.hicks@gmail.com,558-673-4287,1958-07-31,"654 Marissa Plaza, Thompsonmouth, AZ 93049",218146.94,active,2024-09-17
-2683,Nathaniel,Wilson,nathaniel.wilson@gmail.com,589-356-5780,2008-02-27,"5770 Clayton Prairie, Sandovaltown, PR 89861",130242.0,active,2022-04-17
 2685,Robert,Harvey,robert.harvey@gmail.com,651-271-5026,1947-01-03,"6949 Ryan Brooks, South Roger, AK 01912",151568.53,inactive,2026-05-25
 2686,Gene,Perez,gene.perez@hotmail.com,364-346-9964,1995-06-29,"9691 Lynn Mountains Apt. 494, New Michael, SC 87067",232047.19,active,2020-06-08
 2687,Rodney,Harris,rodney.harris@hotmail.com,901-266-7716,1963-02-18,"138 Zamora Pines Suite 018, Lake Kristaland, DE 94985",133006.5,active,2025-06-06
@@ -2108,7 +2048,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2721,Matthew,Robinson,matthew.robinson@gmail.com,386-658-1325,2001-07-24,"959 Lee Cliffs, Bellton, MN 27227",233405.87,suspended,2020-04-07
 2722,Lisa,Williams,lisa.williams@yahoo.com,552-547-2392,1988-09-05,"44641 Moore Port, Chadton, IL 56517",214800.94,active,2020-04-28
 2723,Trevor,Schmidt,trevor.schmidt@hotmail.com,338-839-5916,1938-09-08,"89401 Stephen Village, North Karen, VT 64010",168376.84,active,2024-09-10
-2725,Chelsea,Henry,chelsea.henry@gmail.com,275-785-3141,1967-01-21,"9774 Aaron Spurs, Brownhaven, IL 17837",156053.41,suspended,2022-09-14
 2726,Mitchell,Lowe,mitchell.lowe@yahoo.com,373-573-5140,1993-03-27,"061 Alisha Junction, Port Shawn, AL 65988",60629.14,inactive,2021-12-29
 2728,Kathleen,Barry,kathleen.barry@hotmail.com,917-513-5310,2002-03-12,"9106 Graham Path, Cameronton, MP 14903",117662.7,inactive,2024-01-01
 2730,Paul,Reynolds,paul.reynolds@gmail.com,322-775-3535,1948-01-13,"PSC 7025, Box 4496, APO AA 43340",181090.36,active,2020-06-30
@@ -2116,7 +2055,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2734,Gregory,Reese,gregory.reese@yahoo.com,765-397-9008,1977-01-21,"PSC 9004, Box 9630, APO AP 76340",80524.33,active,2023-09-30
 2736,Vanessa,Cordova,vanessa.cordova@yahoo.com,331-980-2753,1982-12-21,"7713 Rodriguez Flat Suite 278, Lake Megan, NC 61352",71937.35,active,2026-06-03
 2737,Kayla,Thomas,kayla.thomas@gmail.com,266-357-4882,1993-04-09,"5484 Victor Inlet Suite 645, Deborahborough, MH 96123",190910.62,active,2022-06-29
-2732,Anthony,Johnson,anthony.johnson@yahoo.com,940-213-6589,1983-05-07,"9453 Tonya Forge Apt. 345, East Michael, MT 67963",211175.43,suspended,2026-07-28
 2739,Lisa,Odom,lisa.odom@hotmail.com,359-796-8549,1992-08-24,"7549 Elizabeth Turnpike Apt. 980, East Jessemouth, SC 52499",158082.65,inactive,2025-11-21
 2740,Charles,Carr,charles.carr@hotmail.com,827-324-1920,2001-08-04,"41115 Dana Villages, East Chad, IA 80396",174320.77,active,2025-06-29
 2741,Joshua,Dunn,joshua.dunn@hotmail.com,390-293-2500,1945-09-17,"0916 Rachel Mission Suite 057, North Monica, MN 08936, contact joshua.dunn@gmail.com",18852.73,suspended,2025-10-08
@@ -2130,7 +2068,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2754,Randy,Rivera,randy.rivera@yahoo.com,894-267-5299,1998-10-28,"331 Christopher Light Suite 402, Goodmanberg, CT 68382",179427.06,inactive,2019-11-21
 2755,Blake,Moran,blake.moran@gmail.com,566-960-8871,1984-04-11,"23518 Camacho Drive Apt. 656, East Heatherton, MP 58200",100238.43,inactive,2021-08-16
 2756,Jessica,Allen,jessica.allen@yahoo.com,520-759-4117,1981-09-15,"454 Bradshaw Flat Apt. 074, Lisamouth, WA 64549",68640.78,active,2021-03-12
-2757,Taylor,Carter,taylor.carter@yahoo.com,907-561-7713,1983-09-15,"PSC 5183, Box 1633, APO AE 48589",121217.75,inactive,2026-03-15
 2758,Jeffrey,Glover,jeffrey.glover@hotmail.com,612-674-8608,2000-10-15,"7578 Powell Centers, Keyburgh, GU 44614",118383.16,active,2023-01-16
 2759,Andrew,Ball,andrew.ball@yahoo.com,862-402-8808,1964-10-14,"508 Joseph Meadow Apt. 068, Watsonborough, DC 51028",192994.9,inactive,2022-05-10
 2760,Kathryn,Scott,kathryn.scott@gmail.com,548-717-3646,1956-12-05,"24043 Meyer Passage Apt. 596, North Adamland, OH 87019",114432.64,active,2025-01-02
@@ -2155,7 +2092,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2784,Terri,Flores,terri.flores@yahoo.com,736-716-5627,1981-01-04,"5706 Howe Place, Maxwellchester, GA 28573",73106.28,inactive,2024-06-29
 2786,Aaron,Jackson,aaron.jackson@yahoo.com,225-229-7904,1968-10-25,"5278 Rush Alley Apt. 398, Masonton, MT 38097",35473.55,inactive,2023-05-12
 2787,Rodney,Lynn,rodney.lynn@yahoo.com,657-840-7259,1996-11-09,"868 Burke Pass, Terryborough, UT 23886",141268.69,suspended,2025-01-09
-2788,Adrian,Griffith,adrian.griffith@yahoo.com,976-521-2765,1947-09-15,"703 Richardson Street Suite 854, Timothyfurt, FM 43007",225992.46,inactive,2021-09-12
 2791,Dustin,Sandoval,dustin.sandoval@yahoo.com,688-577-3322,1972-07-24,"807 Bruce Divide, Lesliehaven, TX 99839",87989.66,suspended,2020-06-25
 2792,Roy,Wilson,roy.wilson@hotmail.com,763-226-8114,1970-04-29,"793 Katelyn Ridge Apt. 383, New Sean, NE 73103",161484.89,inactive,2022-06-22
 2793,William,Arnold,william.arnold@hotmail.com,534-827-1565,1994-03-24,"8173 Rasmussen Cove, Baileyberg, IA 44098",160883.86,inactive,2024-09-06
@@ -2171,7 +2107,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2804,Michelle,English,michelle.english@gmail.com,219-722-5745,1948-10-22,"5652 Hunter Court Suite 894, Katieborough, RI 75449",127274.45,suspended,2022-03-29
 2805,Autumn,Rios,autumn.rios@yahoo.com,506-774-8663,2002-04-14,"03815 Silva Radial, South Alexanderchester, PA 48910",62427.62,active,2022-01-10
 2806,Jeanette,Smith,jeanette.smith@gmail.com,435-796-9052,1968-04-22,"128 Carter Squares, North Shawnborough, AK 90525",19587.83,suspended,2024-05-03
-2807,Nicholas,Norton,nicholas.norton@hotmail.com,795-576-9341,1953-12-13,"2878 Taylor Ports Apt. 028, Brianberg, CA 66359",217484.53,active,2025-10-10
 2808,Michael,Flores,michael.flores@hotmail.com,417-355-9785,1999-01-18,"USS Duncan, FPO AE 86040",19631.69,suspended,2022-03-24
 2809,Ricky,Baker,ricky.baker@yahoo.com,796-621-3596,1989-06-23,"4981 Nelson Bridge Apt. 865, Stephenburgh, MH 65981",131415.28,active,2019-09-12
 2810,Darlene,Mcmahon,darlene.mcmahon@yahoo.com,333-554-2306,1986-06-24,"8705 James Fork Apt. 056, New Deborahport, KY 82571",92255.83,inactive,2024-06-02
@@ -2192,12 +2127,10 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2832,Michael,Murphy,michael.murphy@yahoo.com,936-690-4321,1947-09-05,"9305 Susan Port Suite 345, East Ericastad, AS 81054",196030.91,active,2023-07-10
 2833,Brenda,Phillips,brenda.phillips@hotmail.com,504-395-6008,1967-07-22,"098 Moore Glens, Lake Leonview, SD 92148",197898.57,suspended,2023-08-19
 2834,John,Rangel,john.rangel@gmail.com,776-645-9004,1965-02-19,"365 Collins Causeway, Lake Michael, LA 23220",193815.96,suspended,2026-03-09
-2835,Ronnie,Williams,ronnie.williams@hotmail.com,493-572-2448,1946-09-15,"38435 Lynch Ridges, New Debbie, MD 75621",150766.9,inactive,2026-02-24
 2836,Kevin,Liu,kevin.liu@gmail.com,844-550-5985,1977-08-07,"747 Thompson Groves, Ellisfurt, MN 41747",164209.5,inactive,2021-05-19
 2837,Curtis,Robertson,curtis.robertson@hotmail.com,753-349-6254,1992-11-03,"3836 Russell Key Suite 031, North Garyland, IA 29926",181213.28,inactive,2020-07-02
 2838,Dawn,Cantu,dawn.cantu@yahoo.com,378-794-7582,2006-03-28,"421 Mitchell Pass, Port Laura, LA 89092",100608.4,inactive,2022-02-11
 2839,Kimberly,Rivera,kimberly.rivera@yahoo.com,351-888-9102,1993-05-09,"683 Michael Landing, Jasonborough, MA 90842",168007.77,inactive,2023-05-27
-2840,John,Campos,john.campos@gmail.com,642-288-5148,1949-12-14,"46606 Teresa Glens Suite 157, Robertville, AK 72006",214419.46,inactive,2022-08-22
 2841,Brandon,Kent,brandon.kent@gmail.com,860-677-8385,1940-06-09,"12395 Rodriguez Court, Carlsonbury, DC 25539",185322.14,suspended,2022-08-28
 2842,Eric,Kelly,eric.kelly@yahoo.com,243-551-9296,1956-02-04,"Unit 2632 Box 6214, DPO AA 42369, tel 311-611-8467",221862.31,suspended,2024-11-02
 2843,James,Wells,james.wells@gmail.com,813-549-9850,1961-07-16,"678 Snyder Parkway, Port Marialand, TX 16840",158458.83,suspended,2025-01-19
@@ -2216,7 +2149,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2860,Samantha,Pierce,samantha.pierce@yahoo.com,970-751-2605,1950-06-18,"2015 John Burg, East Saraburgh, MA 50675",111839.77,suspended,2022-05-18
 2861,Barbara,Morton,barbara.morton@yahoo.com,559-901-9033,1956-12-17,"PSC 1331, Box 1519, APO AA 66450",238809.71,inactive,2019-09-22
 2862,Jeremy,Roberts,jeremy.roberts@hotmail.com,699-977-2422,1975-12-22,"6315 Ware Brook, East Dawnport, UT 75001",123421.54,suspended,2026-03-31
-2863,David,Jones,david.jones@hotmail.com,284-451-2540,1995-12-19,"7136 Barnes Squares Apt. 514, Garyhaven, WV 84244",118940.34,suspended,2025-08-24
 2864,Derek,Taylor,derek.taylor@gmail.com,447-818-8688,1960-10-05,"297 Jennifer Ranch Suite 577, Andreabury, MI 23606",25623.96,inactive,2022-11-24
 2865,David,Lawson,david.lawson@hotmail.com,514-428-9495,1937-09-08,"4123 Marcus Canyon, West Jose, NH 66435",66075.29,inactive,2020-06-25
 2866,James,Stephenson,james.stephenson@yahoo.com,210-900-3103,1969-10-22,"27034 Johnny Way Apt. 526, Harrischester, ME 22407",149741.25,suspended,2025-08-13
@@ -2241,7 +2173,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2894,Matthew,Mejia,matthew.mejia@gmail.com,795-628-1828,2004-09-29,"70180 Garrett Trafficway, Port Michael, NE 64796",184191.09,active,2022-06-28
 2895,Crystal,Stokes,crystal.stokes@yahoo.com,231-938-1816,1994-10-06,"57615 Jennifer Vista Apt. 359, Amandahaven, MT 09096",161421.09,suspended,2021-04-21
 2896,William,Chambers,william.chambers@hotmail.com,447-813-9540,1985-03-10,"43422 Fernandez Forge, Port Miranda, UT 90931",81853.34,active,2024-11-30
-2897,Aaron,Joseph,aaron.joseph@hotmail.com,814-231-7837,1953-03-24,"90400 Tracy Via, Cooperport, MP 96886",32726.14,active,2021-10-29
 2898,Samantha,Douglas,samantha.douglas@gmail.com,991-856-1654,1984-08-20,"56502 Cole Overpass Apt. 909, Cherylberg, TX 60918",100033.69,inactive,2025-01-17
 2900,Dean,Willis,dean.willis@gmail.com,493-209-2078,2005-01-16,"7717 Flores Rapid, Baldwinshire, VT 39711",131539.67,inactive,2019-11-22
 2901,Sarah,Kramer,sarah.kramer@hotmail.com,911-773-3248,1986-08-05,"897 Emily Greens Apt. 245, Port Sean, GU 62408",122190.84,active,2020-01-26
@@ -2261,7 +2192,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2924,Paul,Benjamin,paul.benjamin@gmail.com,408-754-1285,1954-11-24,"09274 Gina Views Apt. 981, East Devonburgh, WV 10198",229893.08,active,2022-05-20
 2925,Matthew,Davis,matthew.davis@hotmail.com,371-615-7257,1947-07-06,"68405 Larsen Stravenue, Caldwellburgh, IN 64536",197720.17,active,2020-04-10
 2926,Alan,Miranda,alan.miranda@yahoo.com,452-616-4620,1998-09-17,"90032 Tamara Meadows Apt. 734, Hicksport, IA 21572",71729.44,suspended,2025-08-10
-2927,Ronald,Friedman,ronald.friedman@yahoo.com,377-425-5578,2000-03-16,"03233 Shepherd Gardens, Espinozafort, IA 07726",41839.89,active,2024-10-27
 2928,Julie,Kelley,julie.kelley@gmail.com,997-910-3267,1975-11-18,"9968 Dillon Ford Apt. 212, Stephaniestad, NY 66275",117048.68,active,2023-03-22
 2930,Jade,Cross,jade.cross@hotmail.com,829-968-7228,1988-10-09,"5475 Jones Fort Apt. 568, Clarkton, DC 39623",23111.9,inactive,2022-05-15
 2931,Eric,Brock,eric.brock@hotmail.com,889-703-8154,1960-03-16,"468 Watson Forest, Port Alexandershire, AL 25716",193288.48,suspended,2024-05-18
@@ -2291,19 +2221,15 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2961,Laura,Sims,laura.sims@yahoo.com,370-715-9187,1938-10-16,"233 Young Fork Apt. 474, Lake Jenniferchester, NM 74214",46025.24,active,2022-02-09
 2962,Vincent,Cabrera,vincent.cabrera@yahoo.com,447-311-2862,1969-07-17,"6052 Teresa Wells Apt. 213, North Danielle, NY 58017",204912.02,active,2024-05-11
 2963,Erin,Silva,erin.silva@hotmail.com,622-591-7159,1994-05-27,"29557 Montgomery Forge, New Alexandraborough, NM 90112",84492.99,active,2019-11-26
-2965,Kyle,Horn,kyle.horn@hotmail.com,660-804-3291,1937-11-23,"Unit 4867 Box 1172, DPO AA 80408",162093.83,inactive,2025-01-11
 2966,Allison,Stewart,allison.stewart@gmail.com,450-345-1268,1979-04-08,"0941 Mahoney Roads Suite 724, New Catherineburgh, OH 87628",217911.79,inactive,2022-03-27
 2967,Travis,Miller,travis.miller@gmail.com,698-608-8640,1988-04-29,"6701 William Crest Suite 104, Jennifershire, AS 78958",176261.64,inactive,2023-11-05
 2968,Eric,Zamora,eric.zamora@gmail.com,674-333-7812,1971-07-01,"PSC 9802, Box 2131, APO AP 76866",231035.28,inactive,2024-05-20
-2969,Deborah,Johnson,deborah.johnson@yahoo.com,388-386-7488,1940-02-28,"3417 Pruitt Harbors, Houstonstad, MN 39826",101035.91,inactive,2025-01-17
 2971,Kyle,Ross,kyle.ross@yahoo.com,724-764-8816,1939-01-12,"USNV Clark, FPO AE 42060",26996.42,active,2022-09-13
 2972,Melanie,Smith,melanie.smith@gmail.com,560-539-4169,2007-06-12,"4706 Austin Vista, Washingtonville, GU 27759, tel 312-489-8323",86895.87,suspended,2025-12-02
 2974,Kelli,Brown,kelli.brown@gmail.com,261-225-9347,1995-12-08,"043 Navarro Club, Benjaminfurt, IL 78957",66550.02,suspended,2023-08-28
-2975,Eric,Dawson,eric.dawson@yahoo.com,224-659-7609,1982-11-26,"71004 Michelle Meadow, Tiffanybury, NC 35271",92157.09,active,2022-07-08
 2976,Katelyn,Dawson,katelyn.dawson@hotmail.com,555-836-6350,1989-09-17,"050 Victoria Walks, East Ashley, WA 20345",81253.83,active,2021-07-08
 2979,Ashley,Snyder,ashley.snyder@hotmail.com,267-464-9050,1966-01-28,"79117 Chloe Way Apt. 335, East Jessicastad, IL 11290",60000.0,suspended,2021-01-02
 2980,Rebecca,Wright,rebecca.wright@hotmail.com,949-939-5376,1968-05-02,"245 Kelsey Stravenue Apt. 941, Laurafort, CO 99597",49957.23,active,2021-09-30
-2981,Marissa,Pierce,marissa.pierce@hotmail.com,831-593-5518,1975-06-10,"244 Kelley Via, South Jamesberg, PA 64491",52000.0,active,2025-08-20
 2982,Adam,Mills,adam.mills@yahoo.com,510-212-3178,1998-04-05,"22322 Moore Meadows Apt. 783, Huntland, GA 45118",61177.54,suspended,2026-03-09
 2983,John,Carter,john.carter@hotmail.com,627-355-7994,2008-08-15,"5904 Owens Square Apt. 764, West Joseph, AL 45613",139446.43,inactive,2024-07-04
 2984,Stephen,Evans,stephen.evans@yahoo.com,631-785-1208,1989-08-29,"3293 Joseph Village, Elizabethbury, KY 95773",208662.62,inactive,2024-04-26
@@ -2312,7 +2238,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 2987,James,Wall,james.wall@gmail.com,945-581-8682,1969-03-03,"724 Silva Curve Suite 152, North Marcus, NE 72530",230158.39,inactive,2019-10-06
 2990,Robin,Jackson,robin.jackson@gmail.com,431-222-8108,1980-02-11,"988 Mason Ridge Suite 326, East Gregoryburgh, ME 06945",125313.9,inactive,2023-12-06
 2991,Andrea,Foley,andrea.foley@hotmail.com,507-710-7630,1970-11-22,"8171 Williams Light, Eddiefurt, AL 66856",29385.62,suspended,2020-12-21
-2992,William,Lutz,william.lutz@yahoo.com,463-309-3424,1994-03-17,"085 Sophia Corner, East Debbie, NY 55111",141213.13,active,2023-04-24
 2995,Gwendolyn,Weaver,gwendolyn.weaver@hotmail.com,283-448-3661,1984-07-25,"2959 Pratt Common Suite 770, South Traciland, WA 84938",156318.91,suspended,2023-04-29
 2998,Alejandra,Mason,alejandra.mason@hotmail.com,515-441-8971,1994-11-24,"265 Wilson Ford, South Destiny, NE 40539",213161.5,inactive,2025-05-09
 2999,Ana,Ramirez,ana.ramirez@yahoo.com,802-419-7640,1943-12-10,"PSC 0019, Box 8011, APO AE 54222",113483.45,active,2022-03-27
@@ -2331,12 +2256,10 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3018,Madison,Koch,madison.koch@yahoo.com,946-801-5956,1961-06-03,"51218 Sydney Square, West Alexis, SD 10718",226110.84,active,2020-06-27
 3019,Taylor,Reeves,taylor.reeves@yahoo.com,871-234-6967,1979-10-10,"576 Reilly Throughway Suite 253, Hayesville, CT 64137",52749.87,active,2021-05-16
 3020,David,Taylor,david.taylor@yahoo.com,267-250-1514,1953-11-16,"417 James Wall Apt. 300, East Kelly, HI 17417",204728.94,inactive,2022-10-23
-99,Jerry,Moyer,jerry.moyer@yahoo.com,692-688-2350,1944-03-06,"351 Sims Estate, North Caseyberg, RI 21694",164149.14,inactive,2022-04-24
 3024,Brandon,Rivera,brandon.rivera@gmail.com,625-295-8977,1983-09-16,"6865 Andrew Plaza Suite 372, South Kendra, WI 69877",212365.65,inactive,2023-11-14
 3025,Jerry,Berry,jerry.berry@hotmail.com,455-809-1325,1950-08-24,"24488 Travis Lodge Suite 577, Edwardsborough, OK 46704",131838.14,inactive,2025-01-07
 3027,Lindsay,Stephens,lindsay.stephens@hotmail.com,928-551-7111,2005-01-09,"44944 Mccormick Shores, Amandahaven, MI 87644",92853.92,active,2022-08-20
 3030,Scott,Combs,scott.combs@yahoo.com,826-401-8126,1938-06-04,"309 Hoffman Garden Apt. 468, Martinfort, MA 28301",188876.03,suspended,2019-10-24
-3031,Anna,Montoya,anna.montoya@hotmail.com,665-936-9964,1943-11-14,"289 William Stravenue, Lake Luke, NV 31464",82422.91,inactive,2026-03-28
 3032,Cindy,Turner,cindy.turner@yahoo.com,491-540-1293,1983-01-06,"68151 Joseph Dale Suite 856, Martinfort, VT 99268",108428.66,suspended,2026-03-07
 3033,Philip,Martin,philip.martin@hotmail.com,685-627-8594,1970-06-26,"144 Ortiz Views, Christopherview, OR 79476",220931.36,suspended,2025-12-22
 3034,Shaun,Harris,shaun.harris@yahoo.com,436-522-4651,1940-02-28,"84554 Marsh Corners, Lake Douglas, CA 81381",117738.24,inactive,2020-04-07
@@ -2393,7 +2316,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3098,Jessica,Morris,jessica.morris@yahoo.com,490-486-3900,1963-07-07,"562 Morales Throughway, New Brianstad, DC 59561",112605.81,active,2025-02-06
 3099,Valerie,Matthews,valerie.matthews@hotmail.com,980-742-2069,1939-07-24,"16460 Cantrell Locks Suite 932, South Matthew, UT 71113",148199.55,inactive,2021-05-16
 3100,Jason,Meyer,jason.meyer@gmail.com,466-874-1860,1989-03-15,"9325 Dixon Ports, New Laurie, SC 23288",62605.13,inactive,2023-04-13
-3101,Julie,Everett,julie.everett@yahoo.com,490-380-5072,1994-12-18,"7971 Ashley Brooks, Port Amanda, CO 00516",124637.76,inactive,2021-05-01
 3104,Michelle,Mcgee,michelle.mcgee@yahoo.com,734-460-2619,2002-02-24,"338 Daniel Skyway, Port Karenton, DE 57979",78342.29,suspended,2022-07-10
 3106,Susan,Walker,susan.walker@hotmail.com,447-489-5130,1998-07-06,"2174 Danielle Villages Apt. 751, Danielview, OH 96554",197755.65,suspended,2025-06-24
 3107,Jillian,Neal,jillian.neal@hotmail.com,828-788-9682,1975-03-09,"732 Rice Bypass, Port Alicia, UT 82341",222645.7,suspended,2020-06-11
@@ -2407,7 +2329,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3119,David,Russell,david.russell@hotmail.com,211-801-7703,1969-01-02,"16609 Thompson Pass, West Chelseamouth, CA 90816",44701.6,inactive,2023-10-21
 3120,Keith,Francis,keith.francis@hotmail.com,660-414-2531,1989-08-04,"7793 Gregory Causeway Suite 938, Dawsonborough, MS 19709",93660.77,active,2020-01-29
 3121,Karen,Vang,karen.vang@yahoo.com,321-295-5101,2002-12-28,"73477 Robinson Well, Floresside, MI 67253",193624.1,suspended,2019-10-27
-3122,Douglas,Khan,douglas.khan@yahoo.com,245-687-5539,1968-04-14,"915 Robinson Burgs Apt. 785, West Elizabethport, SC 17131",138118.68,suspended,2023-12-23
 3123,Sheryl,Warren,sheryl.warren@yahoo.com,701-421-7747,1988-02-21,"90750 Foster Courts Suite 551, South Sarahside, DE 74216",215017.96,active,2026-08-10
 3124,Adriana,Pope,adriana.pope@yahoo.com,347-941-2002,1980-09-08,"8890 Tony Street, Bassshire, NH 01528",223308.06,inactive,2025-09-07
 3126,Alex,Baker,alex.baker@gmail.com,643-653-6958,1961-05-15,"194 Miller Street, Lake Davidbury, HI 65590",182035.96,suspended,2020-06-10
@@ -2438,7 +2359,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3157,Amanda,Cole,amanda.cole@hotmail.com,888-317-9257,1974-12-01,"1865 Stephen Lodge, Lake Dwayneview, MP 54736",161324.76,inactive,2022-06-06
 3159,Jerry,Wheeler,jerry.wheeler@hotmail.com,300-426-5034,2006-09-05,"48793 Sharp Throughway, East Jessemouth, WI 59136",127032.9,active,2020-03-20
 3160,Martha,Carroll,martha.carroll@gmail.com,379-981-5734,2003-10-30,"590 Guy Curve Apt. 920, East Jasontown, WA 37962",129314.22,active,2024-12-28
-2146,Manuel,Wells,manuel.wells@gmail.com,588-680-1661,1956-08-23,"74911 Cassandra Plain Apt. 369, Goodmanbury, ND 19870",130585.9,inactive,2023-02-27
 3164,Charles,Sanders,charles.sanders@hotmail.com,481-742-3456,2005-07-13,"223 Julia Overpass, Jenniferhaven, OR 28071",107950.7,suspended,2020-11-22
 3165,Dawn,Thomas,dawn.thomas@gmail.com,692-438-5542,1942-03-29,"Unit 8981 Box 0723, DPO AE 95833",195089.43,suspended,2025-04-20
 3166,Lauren,Valdez,lauren.valdez@hotmail.com,529-578-1802,2000-04-17,"PSC 7478, Box 3019, APO AA 35557",99298.76,active,2024-02-15
@@ -2446,9 +2366,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3169,Jane,Thompson,jane.thompson@yahoo.com,771-671-6817,2005-07-15,"PSC 0242, Box 5059, APO AP 51624",192608.16,active,2019-10-17
 3170,James,Brown,james.brown@gmail.com,389-328-2057,1964-05-30,"1877 Flowers Plains Suite 176, Milesshire, MT 16929",31478.01,active,2020-10-13
 3171,Jennifer,Smith,jennifer.smith@hotmail.com,454-844-4411,1949-10-04,"14100 Maurice Ramp, East Brandon, MI 13173",45586.71,suspended,2025-04-22
-3172,Darrell,Gutierrez,darrell.gutierrez@yahoo.com,956-205-5286,1949-02-10,"PSC 5288, Box 0049, APO AA 03728",156878.41,inactive,2020-09-29
-3173,Madison,Hill,madison.hill@yahoo.com,760-685-9166,1977-09-18,"951 Goodman Bridge Suite 204, Clarktown, FM 69145",213460.79,active,2024-09-09
-3176,James,Ballard,james.ballard@yahoo.com,833-894-5835,1998-10-02,"157 Patricia Walks Apt. 286, West Codyville, ME 29959",179169.69,suspended,2022-03-12
 3177,Matthew,Ramirez,matthew.ramirez@yahoo.com,860-885-6038,1995-02-03,"892 Summers Shores, Shaunport, SD 55645",108496.35,active,2020-04-09
 3179,David,Hernandez,david.hernandez@hotmail.com,641-419-2705,2005-03-15,"194 Scott Flat Apt. 312, Lake Alyssa, WA 46749",86727.88,inactive,2020-10-02
 3180,Matthew,Parsons,matthew.parsons@hotmail.com,673-241-7392,1961-11-21,"08053 Campos Viaduct, South Brooke, CA 28334",82740.82,suspended,2025-10-04
@@ -2561,15 +2478,12 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3322,Courtney,Bass,courtney.bass@yahoo.com,382-551-7374,1992-12-20,"3493 Christine Loop Suite 349, South Nicholaston, MN 97813",55224.81,suspended,2021-04-05
 3325,William,Galvan,william.galvan@gmail.com,773-927-7409,1996-02-06,"833 Elizabeth Overpass, Port Kelly, WA 06345",99969.38,active,2025-06-27
 3326,Daniel,Durham,daniel.durham@yahoo.com,731-469-7328,1941-07-18,"6989 Mendoza Gardens, Johnmouth, GU 28638",228806.11,suspended,2021-03-10
-3327,Meredith,Thompson,meredith.thompson@hotmail.com,216-824-6250,1963-10-09,"58496 Michelle Camp Apt. 230, North Daniel, VA 80234",185829.31,suspended,2023-01-16
 3328,Derek,Douglas,derek.douglas@yahoo.com,467-429-1124,2005-10-28,"3855 Cox Causeway, Codyside, CO 92783, tel 547-722-1363",61103.42,suspended,2023-06-17
 3329,Sarah,Owens,sarah.owens@yahoo.com,322-891-9393,1985-09-15,"USS Turner, FPO AA 55459",201000.94,active,2019-09-10
 3330,Dillon,Torres,dillon.torres@yahoo.com,692-813-8933,1966-12-03,"1108 Brian Fall, Englishville, ID 42656",54588.91,active,2025-05-30
 3331,Diana,Woods,diana.woods@hotmail.com,921-541-4866,1997-08-28,"2527 Garner Course Suite 791, West Kimberlymouth, HI 47440",77747.7,active,2020-10-30
 3332,Robert,Cruz,robert.cruz@yahoo.com,572-415-7463,2001-03-04,"48891 Anthony Village Apt. 024, North Robin, CA 17874",86282.87,inactive,2025-09-18
 3334,Colton,Dennis,colton.dennis@yahoo.com,573-933-8087,1959-09-25,"274 Christian Station Suite 047, East Ryanville, NE 09688",99276.45,active,2025-06-23
-3335,Crystal,Warren,crystal.warren@hotmail.com,687-945-9593,1958-08-05,"263 Shannon Ranch, Christopherstad, SD 45610",39617.89,inactive,2021-12-22
-3336,Aaron,Owens,aaron.owens@gmail.com,523-334-1151,1999-09-12,"870 Melissa Passage, Lake Joshua, GA 78155",231075.65,inactive,2021-08-30
 3337,Amy,Brady,amy.brady@yahoo.com,913-858-2787,1972-11-28,"4463 Reyes Orchard, Ashleymouth, OK 16391",80932.29,active,2024-12-31
 3338,John,Miller,john.miller@yahoo.com,994-562-3905,1942-09-03,"181 Ware Prairie, Sharonside, CA 21990",119372.52,suspended,2026-04-14
 3339,James,Salinas,james.salinas@hotmail.com,324-912-9580,1989-05-19,"823 Joel Landing, North Johnshire, MA 93603",122981.07,active,2020-09-29
@@ -2594,7 +2508,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3362,Ryan,Johnson,ryan.johnson@hotmail.com,292-732-5009,1944-10-24,"116 Stephen Fall, North Breannafurt, RI 85607",110211.7,inactive,2026-08-03
 3363,Roberta,Martin,roberta.martin@gmail.com,408-934-8588,1989-10-11,"2020 Lee Tunnel Suite 109, West Jonathan, HI 77193",94591.58,suspended,2024-11-19
 3364,Michael,Leach,michael.leach@hotmail.com,985-682-7619,1958-10-09,"642 Mcgee Station Suite 247, Port Travis, IL 09451",133147.25,active,2024-10-29
-1905,Michael,Jones,michael.jones@hotmail.com,567-883-7881,1982-01-10,"42142 Cory Burg Suite 813, Alvaradoport, PA 17786",125411.0,inactive,2023-10-05
 3368,Robert,Stephenson,robert.stephenson@gmail.com,994-885-8431,1941-03-13,"41434 Patterson Lodge Suite 397, Port Vincentland, DC 96459",102895.64,suspended,2020-12-13
 3369,Samantha,Cruz,samantha.cruz@yahoo.com,446-947-2675,1954-10-15,"497 Kline Mount Suite 646, Crawfordfurt, NV 33999",105134.02,suspended,2020-06-20
 3370,Tamara,Klein,tamara.klein@hotmail.com,935-650-2981,1953-04-12,"403 Kevin Divide Apt. 164, Jamesberg, VI 89576",161283.31,active,2024-08-22
@@ -2650,7 +2563,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3438,Holly,Vasquez,holly.vasquez@hotmail.com,281-248-5714,2004-07-22,"Unit 6790 Box 8213, DPO AP 49054",98168.89,active,2022-12-15
 3440,Jamie,Burke,jamie.burke@gmail.com,920-401-1406,1996-02-12,"986 Evan Walks, New Anne, TN 87518",21869.37,inactive,2025-05-26
 3441,Jessica,Fields,jessica.fields@yahoo.com,740-901-6787,1976-06-01,"862 Nicole Land Apt. 588, Tuckershire, NE 66069",168153.28,inactive,2024-08-22
-3442,Barry,Russell,barry.russell@gmail.com,920-639-5157,1972-10-26,"4423 Donovan Pines Suite 484, Lake Jessicashire, HI 90467",128150.66,active,2021-11-26
 3443,Kendra,Johnson,kendra.johnson@gmail.com,774-205-6468,1947-12-28,"2248 Christopher Mountain Suite 898, Port Richard, SD 88729",62170.18,suspended,2025-04-30
 3444,Catherine,Rodriguez,catherine.rodriguez@yahoo.com,810-246-6742,2001-04-06,"8140 Mary Plain Suite 545, South Shawn, GU 25179",200613.97,inactive,2024-06-07
 3445,Denise,Jackson,denise.jackson@gmail.com,236-876-7255,1967-04-04,"81175 Russell Corners Suite 466, Aprilview, OR 08188",200748.86,active,2023-10-30
@@ -2672,14 +2584,12 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3470,Jennifer,Molina,jennifer.molina@hotmail.com,272-759-7537,1946-04-10,"858 Justin Ferry, Hallton, HI 18523",216504.32,inactive,2026-05-03
 3472,Zoe,Tyler,zoe.tyler@hotmail.com,725-955-4819,1995-05-29,"351 Watts Crossing Suite 981, Russelltown, TN 14408",144781.45,inactive,2020-10-29
 3473,Brooke,Rios,brooke.rios@gmail.com,560-630-5632,1998-02-21,"16701 Rodriguez Alley Suite 882, South Josestad, MS 19590",137680.15,active,2020-12-29
-3474,Deborah,Johnson,deborah.johnson@hotmail.com,465-753-1767,1939-07-01,"736 Thomas Spurs, New Stanley, MN 84136",110970.84,inactive,2026-05-23
 3475,Jessica,Martinez,jessica.martinez@hotmail.com,882-295-3946,1990-06-14,"7916 Shah Cliffs Apt. 794, Janetville, IN 03349",204950.37,inactive,2021-05-16
 3477,Mary,Carey,mary.carey@gmail.com,361-723-9186,1978-06-16,"285 Williams Bridge, South Karen, NE 51641",167703.58,suspended,2025-09-26
 3478,Kristen,Meyer,kristen.meyer@hotmail.com,369-814-7938,1955-10-31,"2258 Holmes Road Apt. 604, Mariaside, HI 93100",142250.94,suspended,2023-08-25
 3479,Scott,Brown,scott.brown@gmail.com,674-943-7424,2001-08-07,"9717 Bonnie Extension Suite 981, Madisonbury, KY 47600",146448.31,suspended,2024-12-28
 3482,Holly,Parsons,holly.parsons@gmail.com,633-315-6809,1992-05-21,"492 Brittany Harbors Suite 549, East Karenborough, CA 13332, SSN 514-90-8750",112827.22,inactive,2020-03-01
 3484,Mary,Young,mary.young@hotmail.com,771-429-6460,1981-12-26,"2796 Adam Harbors Suite 509, Teresaside, SD 88840",60000.0,inactive,2020-06-23
-3373,Nancy,James,nancy.james@gmail.com,819-631-5637,1955-01-18,"USCGC Good, FPO AA 48891",203389.23,inactive,2026-03-04
 3487,Maria,Massey,maria.massey@hotmail.com,759-454-5338,1965-05-19,"04335 Christian Locks, Alexanderstad, MP 99690, contact maria.massey@gmail.com",225693.54,inactive,2022-05-18
 3490,Madison,Stevens,madison.stevens@gmail.com,564-793-4983,1965-05-18,"9623 Campbell Manors, New Rebekah, CO 45676",201265.4,inactive,2024-11-20
 3491,Robert,Reeves,robert.reeves@yahoo.com,755-759-3048,1952-04-26,"7417 Jeffrey Gateway Suite 010, Frychester, NJ 50714",18076.21,active,2023-08-05
@@ -2741,11 +2651,9 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3563,Michael,Simmons,michael.simmons@gmail.com,467-468-8004,2001-05-13,"Unit 7106 Box 1042, DPO AE 33254",29874.16,suspended,2022-08-25
 3566,Candice,Cooper,candice.cooper@hotmail.com,893-404-2628,1979-03-22,"334 Avery Island, Rachelshire, WA 81398",50652.55,inactive,2023-02-01
 3569,Brandon,Moody,brandon.moody@gmail.com,995-358-1998,1980-09-17,"509 Ortiz Lights, Smithtown, MT 68252",85948.66,inactive,2020-11-28
-3570,Ashley,Mayer,ashley.mayer@yahoo.com,792-919-3176,2001-06-12,"897 Steve Points, Anthonytown, KS 15579",203927.32,active,2021-04-13
 3573,Christopher,Deleon,christopher.deleon@hotmail.com,707-904-8881,2006-07-26,"1565 Jeffery Mountains Apt. 500, Scotthaven, IN 67432",218812.0,suspended,2023-11-06
 3575,Ashley,Joseph,ashley.joseph@hotmail.com,305-354-2846,1972-08-21,"725 Lindsay Mews Suite 365, Langshire, KS 77760",236743.37,suspended,2020-04-23
 3576,Heather,York,heather.york@gmail.com,711-230-7420,1984-06-16,"08178 Christian Forks, Meganland, PW 81606",222229.04,active,2020-07-07
-3577,Brian,Barker,brian.barker@yahoo.com,415-376-9471,1986-11-04,"6588 Alicia Pass, Port Steven, MS 03317",210459.36,active,2020-04-29
 3578,Robert,Santos,robert.santos@gmail.com,806-364-7810,1969-09-04,"USNV Barker, FPO AA 45616",50346.66,active,2020-03-13
 3579,Amber,Berry,amber.berry@hotmail.com,215-389-4768,1980-12-12,"4083 Velazquez Groves, Jamieton, HI 68326",57011.87,active,2025-05-14
 3580,Alejandra,Watts,alejandra.watts@hotmail.com,580-489-9970,1998-02-01,"87717 Calderon Lane, West Tracy, AL 26017",103678.64,inactive,2026-07-01
@@ -2761,7 +2669,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3591,Tammy,Gonzalez,tammy.gonzalez@hotmail.com,347-468-1943,2004-06-08,"187 Lawson Center, Wayneport, DE 77017",34389.32,suspended,2022-04-22
 3592,Kathleen,Todd,kathleen.todd@gmail.com,579-506-2417,1959-09-04,"118 Mary Stream Suite 670, South Danielchester, PA 28647",175388.85,suspended,2022-04-10
 3594,Justin,Romero,justin.romero@hotmail.com,583-497-6521,1960-11-16,"5240 Charles Lakes, Angelshire, TN 31716",189478.56,inactive,2022-03-17
-3595,Mark,Kelley,mark.kelley@gmail.com,224-873-1947,1958-03-01,"USCGC Johnson, FPO AP 47783",99537.1,suspended,2026-03-18
 3596,John,Haley,john.haley@hotmail.com,640-629-9982,1974-08-29,"PSC 8392, Box 9123, APO AP 88595",62911.06,suspended,2024-06-30
 3597,David,Santana,david.santana@yahoo.com,586-747-7639,1984-03-31,"74326 Amanda Stream, Jasonbury, TN 64248",53365.85,suspended,2025-02-06
 3598,Patrick,Krueger,patrick.krueger@gmail.com,215-740-4835,1982-06-30,"94424 Jackson Dam Apt. 647, New Michelle, SD 32609",137865.71,suspended,2021-07-13
@@ -2780,7 +2687,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3622,Amber,Young,amber.young@hotmail.com,934-663-4938,1981-07-01,"USNS Wolfe, FPO AP 03998",37999.86,inactive,2023-09-29
 3623,John,Garcia,john.garcia@yahoo.com,598-755-7113,1980-08-11,"68748 Rodriguez Road, South Margaretchester, TN 94016",19386.83,active,2025-11-13
 3624,Jacqueline,Wilson,jacqueline.wilson@hotmail.com,559-775-1966,1957-07-31,"976 Turner Meadow Apt. 659, East Andreaburgh, NJ 60131",38305.63,inactive,2026-01-07
-3627,Brandon,Roberts,brandon.roberts@gmail.com,419-213-4312,1990-10-08,"USNV Moore, FPO AP 65054",200221.04,active,2022-08-12
 3628,Daisy,Hooper,daisy.hooper@yahoo.com,454-738-4600,1995-03-05,"9830 Dustin Summit Apt. 304, East Brandon, WY 64177",33735.4,inactive,2024-06-10
 3629,Steven,Larsen,steven.larsen@hotmail.com,521-896-1240,1988-12-16,"3238 Brown Port, Mitchelltown, AS 56766",19021.98,inactive,2020-01-09
 3630,Martha,Washington,martha.washington@gmail.com,917-869-2419,1977-03-27,"854 Reese Center, Pricefurt, KY 93042",212750.96,suspended,2023-10-21
@@ -2811,7 +2717,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3670,Sherri,Webb,sherri.webb@hotmail.com,869-544-3855,1993-06-13,"846 Thompson Parks Apt. 457, Leestad, NY 96097",231085.45,inactive,2024-03-13
 3671,Stephen,Davis,stephen.davis@gmail.com,724-834-9135,1943-09-29,"8674 Russell Highway, Yvonneville, IL 21995",219865.17,suspended,2022-10-19
 3672,Regina,Rodriguez,regina.rodriguez@yahoo.com,548-350-1748,1990-08-12,"233 Cindy Bypass Suite 608, Paulmouth, ME 04897",98218.81,active,2020-04-27
-3673,Theodore,Roberts,theodore.roberts@gmail.com,260-617-8977,1992-10-30,"799 Garcia Oval, New Laurenside, CO 42271",144405.58,suspended,2026-04-22
 3674,Sarah,Zhang,sarah.zhang@hotmail.com,859-219-7517,1972-06-26,"275 Steven Street Apt. 613, North Kevin, AS 52634",144804.84,suspended,2026-07-14
 3675,Maureen,Hampton,maureen.hampton@gmail.com,275-759-7338,1997-04-16,"979 Lauren Turnpike, East Anthonybury, MT 51296",177202.6,inactive,2026-01-08
 3676,Christopher,Molina,christopher.molina@yahoo.com,245-996-4958,1980-04-01,"796 Warren Light, South Noah, CT 99813",239137.73,suspended,2023-09-25
@@ -2834,8 +2739,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3699,Andrew,Fry,andrew.fry@hotmail.com,734-786-9009,1981-07-30,"60518 Guerra Street Suite 413, Thomasside, CT 14328",178459.25,suspended,2025-04-14
 3700,David,Clark,david.clark@hotmail.com,779-296-8106,1959-03-10,"6802 Richardson Plains, Karinashire, VT 97926",41624.35,active,2022-07-29
 3701,Veronica,Chen,veronica.chen@yahoo.com,647-416-9774,1980-01-09,"5700 Jenkins Pine, Justinborough, FM 19640",100457.1,suspended,2021-01-14
-3703,Laura,Smith,laura.smith@gmail.com,371-920-2543,1992-03-28,"20969 Johnson Square, Owensmouth, NV 12722",102741.78,suspended,2021-05-28
-3704,Michael,Hartman,michael.hartman@gmail.com,925-251-6565,1961-02-23,"Unit 3947 Box 6469, DPO AE 97058",221611.26,inactive,2026-03-07
 3705,Julian,Rogers,julian.rogers@yahoo.com,983-916-4538,1973-11-26,"519 Brenda Ranch, West Nicholasborough, GU 17299",32911.46,inactive,2020-09-05
 3707,Robert,Buckley,robert.buckley@hotmail.com,847-613-1912,1967-06-03,"064 Brian Center Apt. 072, Simpsonburgh, LA 69600",163933.15,suspended,2023-08-02
 3708,Matthew,Wilson,matthew.wilson@yahoo.com,372-939-8811,1997-08-13,"3491 Roman Club, North Jesusmouth, GU 65033",54078.01,active,2025-02-17
@@ -2849,7 +2752,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3718,Isaac,Mccoy,isaac.mccoy@yahoo.com,581-591-8669,1971-01-26,"8629 Romero Field, Lake William, LA 42854",214766.57,inactive,2021-01-13
 3719,James,Wilson,james.wilson@hotmail.com,605-401-1047,1949-06-06,"0400 Jessica Plains Suite 017, North Stephanie, UT 11879",169444.39,active,2023-11-02
 3720,Amanda,Baker,amanda.baker@yahoo.com,932-809-4781,1994-02-21,"USNV Green, FPO AE 08639",225548.41,inactive,2022-10-26
-3721,Bruce,King,bruce.king@hotmail.com,670-564-7518,2007-04-04,"26492 Eric Expressway, Cynthiastad, VI 04981",218486.73,active,2021-07-22
 3722,Natasha,Walker,natasha.walker@gmail.com,750-429-3163,1978-09-19,"499 White Field Apt. 537, Brewerburgh, GA 84453",188474.94,suspended,2019-10-29
 3723,Robert,Ramos,robert.ramos@hotmail.com,867-365-2468,1964-09-06,"45462 Williams Junctions Apt. 855, Ambermouth, OK 77775",110287.75,suspended,2026-06-04
 3724,Corey,Winters,corey.winters@hotmail.com,680-505-7195,1982-11-03,"47744 Floyd Point, Jasonville, DE 99252",210071.99,active,2025-11-06
@@ -2929,7 +2831,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3817,Billy,Wallace,billy.wallace@yahoo.com,459-372-8120,1951-03-19,"1441 Timothy Track Suite 798, East Stephenberg, AR 81011",234759.56,suspended,2026-06-23
 3820,James,Barnes,james.barnes@gmail.com,969-933-8045,1940-03-05,"53527 Brandon Stream, Rickyton, NY 70333",219118.0,suspended,2023-12-13
 3821,Ricky,Hartman,ricky.hartman@yahoo.com,941-272-5002,2005-04-23,"84194 Gonzales Loaf Apt. 579, East Gary, VA 08764",108128.32,suspended,2022-02-26
-3822,Kelli,Gonzalez,kelli.gonzalez@yahoo.com,685-420-2215,1960-07-31,"89335 Martinez Grove Apt. 951, Mckeeside, MO 31270",54624.16,inactive,2020-10-23
 3824,Carly,Fritz,carly.fritz@gmail.com,891-982-1463,1968-08-31,"48786 Kidd Well Apt. 105, Lake Christopherport, AS 18683",120204.86,inactive,2022-04-25
 3825,Doris,Brock,doris.brock@gmail.com,743-747-8784,2003-03-19,"05835 Fields Trail, Lake Amandastad, DC 49836",162022.13,inactive,2020-03-18
 3826,Melissa,Barber,melissa.barber@hotmail.com,442-852-4407,1969-06-15,"PSC 2760, Box 6706, APO AE 48494",226836.43,suspended,2022-09-23
@@ -2979,7 +2880,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3883,Benjamin,Long,benjamin.long@gmail.com,405-336-9524,1991-10-18,"1867 Miller Summit Suite 418, West Samanthaton, KS 87266",238671.61,suspended,2024-06-13
 3884,Emily,Lane,emily.lane@hotmail.com,209-339-1266,1948-06-04,"PSC 6322, Box 8029, APO AA 79266",47846.13,inactive,2024-01-22
 3885,Linda,Smith,linda.smith@gmail.com,310-420-4349,2004-07-24,"2096 Odonnell Plain Suite 675, New Ryanborough, NV 51346",212874.87,active,2020-03-31
-3886,Veronica,Haney,veronica.haney@hotmail.com,424-402-5155,1954-11-19,"4991 Hall Plains, New Stephanie, TX 42345",108640.71,inactive,2026-06-08
 3888,Charles,Bernard,charles.bernard@hotmail.com,573-210-8168,1976-01-03,"0322 Bowen Ridge, East Nicholasport, FM 26095",208010.42,active,2021-07-25
 3889,Shane,Cooper,shane.cooper@yahoo.com,522-587-3343,1969-07-24,"408 Ashley Curve, Riverahaven, WY 36424",184700.64,inactive,2021-04-25
 3890,Jenna,Moon,jenna.moon@yahoo.com,943-697-7704,1972-05-17,"227 Christopher Ramp Apt. 467, Cherylfort, MP 81236",79714.67,inactive,2023-11-20
@@ -2992,7 +2892,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3899,Alexis,Mercado,alexis.mercado@yahoo.com,308-837-3996,1990-11-26,"USS Solomon, FPO AE 86020",223496.37,active,2022-01-14
 3900,Mark,Lopez,mark.lopez@yahoo.com,568-855-9873,1980-09-07,"5433 Lynch Spur, East Deanna, CO 23184",68480.58,inactive,2022-05-07
 3901,Erica,Gonzalez,erica.gonzalez@yahoo.com,893-680-3430,1938-03-12,"03613 Donald Overpass, Grosstown, MH 33958",93364.2,active,2024-12-13
-3902,Lynn,Nunez,lynn.nunez@hotmail.com,359-524-1657,1972-01-04,"309 David Burgs Suite 808, Barnesfurt, NJ 69662",196191.51,suspended,2024-08-30
 3903,Kevin,Harris,kevin.harris@yahoo.com,594-603-9745,2003-07-09,"357 Robinson Canyon, Lake Charleston, ID 26425",80547.93,inactive,2022-10-31
 3905,Erin,Hayes,erin.hayes@yahoo.com,842-392-8395,2005-06-25,"3034 Lindsay Tunnel, East Scottbury, HI 17327",145295.56,active,2023-11-20
 3907,Joseph,Smith,joseph.smith@hotmail.com,743-668-9413,1992-12-09,"8956 Merritt Knoll Apt. 713, East Eugeneshire, FL 74007",27315.93,suspended,2025-05-05
@@ -3065,7 +2964,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 3995,Amy,Russo,amy.russo@hotmail.com,411-608-9788,2007-03-26,"442 Peterson Groves Suite 453, Hansenport, MD 14463",197470.85,active,2022-10-30
 3996,George,Rivera,george.rivera@yahoo.com,499-995-9744,1950-04-13,"15525 Davis Mountain Apt. 211, South Stephanie, CT 72956",24205.87,inactive,2022-05-30
 3998,Gregory,Torres,gregory.torres@hotmail.com,210-534-3800,1952-04-21,"05251 Phillip Mountains Apt. 586, New Ivanland, SC 34187",44255.4,active,2022-04-04
-3999,Alex,Dunn,alex.dunn@hotmail.com,608-342-8515,2006-03-20,"61547 Laurie Cliff Suite 275, Mccoybury, MH 93445",26676.76,inactive,2024-11-03
 4001,Mary,Moore,mary.moore@hotmail.com,477-747-5139,1960-04-30,"638 Tara Shoal Suite 607, Brandyland, MO 98487",97602.38,active,2024-09-02
 4002,Tara,Boyd,tara.boyd@yahoo.com,200-769-9841,1946-06-22,"96047 Pruitt Crescent, West Jackberg, MD 73439",145235.84,active,2024-03-12
 4003,Jordan,Brooks,jordan.brooks@hotmail.com,417-270-1356,2004-12-03,"7176 Lee View, Brittanyview, AK 69086",166020.12,suspended,2026-03-21
@@ -3085,7 +2983,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4023,Natasha,Perry,natasha.perry@hotmail.com,811-428-8161,2004-12-09,"4814 Montoya Run Apt. 352, West Richardberg, IL 88496",90429.18,active,2022-07-03
 4024,Cynthia,Jackson,cynthia.jackson@yahoo.com,747-430-6120,2000-05-06,"792 Miller Keys Suite 137, East Jacquelineshire, NV 79072",19355.67,active,2024-01-30
 4025,Stephen,Davenport,stephen.davenport@gmail.com,494-541-6696,2007-07-01,"78679 Christina Forge Suite 939, Joannashire, TN 43661",66431.82,active,2025-02-21
-4026,Lisa,Lopez,lisa.lopez@gmail.com,877-683-5403,1946-12-29,"PSC 2104, Box 8114, APO AA 69823",105553.79,suspended,2019-12-31
 4028,Catherine,Freeman,catherine.freeman@gmail.com,848-674-9104,1994-10-02,"PSC 1762, Box 8510, APO AE 85670",52865.75,inactive,2025-01-27
 4029,Adam,Floyd,adam.floyd@yahoo.com,665-943-5386,1995-09-10,"403 Molina Shoals, Andersonville, NC 73351",155081.78,suspended,2020-09-01
 4030,Andrew,Austin,andrew.austin@hotmail.com,929-891-6263,1957-04-25,"8219 Gene Lane, Port Susan, LA 08853",141019.93,active,2023-01-30
@@ -3187,7 +3084,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4158,Jennifer,Walker,jennifer.walker@yahoo.com,614-975-5678,1975-06-07,"USS Richardson, FPO AP 60592",180616.52,suspended,2020-08-14
 4160,Thomas,Maddox,thomas.maddox@gmail.com,329-419-8595,1970-08-10,"49487 Roger Throughway, Lake Emilyberg, PA 66721",102219.96,active,2021-12-15
 4161,Kevin,Schneider,kevin.schneider@yahoo.com,712-738-5411,1963-11-16,"146 Steven Street, Port Melissa, AK 11443",87255.46,inactive,2026-07-28
-4162,Angela,Wilson,angela.wilson@yahoo.com,723-967-4780,1974-03-07,"72836 Ryan Light, Allisonhaven, WV 36325",115307.48,suspended,2026-06-01
 4163,Kimberly,Gardner,kimberly.gardner@hotmail.com,290-778-2794,1979-04-11,"32206 Joshua Station Apt. 727, Jayhaven, TX 48126",144958.93,suspended,2020-06-05
 4164,Patrick,Lewis,patrick.lewis@gmail.com,834-780-3140,1994-02-21,"434 Monica Center Suite 024, Port Brandytown, MI 05881",37037.4,inactive,2023-05-30
 4165,Anita,Clark,anita.clark@hotmail.com,237-654-9647,1998-04-11,"73509 Nicole Run, Bartlettshire, HI 45455",225190.37,active,2026-03-11
@@ -3213,7 +3109,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4196,Mary,Lam,mary.lam@hotmail.com,678-432-6873,1967-07-23,"73996 Cruz Ports, New Carlosmouth, LA 09315",159452.51,active,2025-02-26
 4197,Mary,Gardner,mary.gardner@hotmail.com,519-363-4641,1952-07-07,"PSC 1756, Box 7350, APO AP 70397",94465.86,inactive,2022-01-24
 4198,Gregory,Benson,gregory.benson@hotmail.com,208-501-2428,1938-05-20,"19249 Melinda Harbors, West Corey, OH 28459",53402.42,active,2026-06-26
-4199,Danielle,Robinson,danielle.robinson@gmail.com,342-764-6439,1967-06-11,"901 Fletcher Fork, Judithberg, NH 23177",41794.6,active,2020-05-26
 4201,Sonya,Castillo,sonya.castillo@yahoo.com,778-218-5699,1966-10-18,"52359 Toni Circle Apt. 901, Baldwinfurt, MN 14330",165754.02,inactive,2022-10-19
 4203,Malik,Taylor,malik.taylor@yahoo.com,470-636-7691,1994-02-22,"30758 Ortiz Shores Apt. 963, Port Mackenzie, OR 82399",23224.02,active,2026-01-22
 4204,Sydney,Franklin,sydney.franklin@hotmail.com,775-448-9558,2007-10-29,"3433 Jones Gardens Suite 306, New Jeffreymouth, VT 87904",49817.99,active,2025-03-31
@@ -3278,10 +3173,8 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4291,Ashley,Baker,ashley.baker@yahoo.com,692-880-2002,1958-08-17,"8194 Gibson Island, Jacquelinestad, GA 29344",66065.89,inactive,2024-02-07
 4292,Leslie,Mullins,leslie.mullins@gmail.com,514-433-9684,1980-05-31,"0552 Jones Alley Suite 154, Port Marieshire, GA 23118",21539.96,active,2023-02-11
 4293,Christina,Cohen,christina.cohen@yahoo.com,503-274-5943,1951-07-14,"54835 Norton Stravenue Suite 726, West April, MN 44510",129722.58,active,2021-09-20
-4295,Danielle,Davies,danielle.davies@yahoo.com,540-465-7462,1953-03-23,"01301 John Loaf, East Carla, OH 54213",170125.76,inactive,2024-09-28
 4296,Zachary,Vargas,zachary.vargas@hotmail.com,661-390-9457,1967-12-06,"8153 Ian Common, West Jamesfurt, AZ 42012",203127.02,active,2025-01-09
 4297,Robert,Brown,robert.brown@yahoo.com,357-690-7357,1991-07-23,"446 Turner Rue Apt. 106, Smithton, MN 27864",48215.7,inactive,2021-08-25
-4298,Cynthia,Johnson,cynthia.johnson@hotmail.com,664-879-2515,1949-10-28,"87104 Erica Inlet Suite 646, New Barbara, OR 20362",124168.13,active,2022-06-13
 4299,Donald,Parker,donald.parker@yahoo.com,546-413-9986,2008-06-13,"057 Mark Circle Suite 416, North William, VT 21470",232650.72,inactive,2024-05-13
 4300,Rebecca,Ramos,rebecca.ramos@gmail.com,627-908-3266,1963-01-15,"53900 Calhoun Station, Oconnellfort, VT 93254",97505.87,active,2021-05-05
 4301,Virginia,Saunders,virginia.saunders@hotmail.com,741-641-9256,2003-06-08,"USS Schroeder, FPO AA 80983",203568.82,suspended,2024-03-27
@@ -3301,7 +3194,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4321,Loretta,Green,loretta.green@hotmail.com,640-206-6984,1940-04-19,"PSC 9426, Box 7363, APO AE 43235",111751.24,active,2023-09-01
 4322,Rachel,Lang,rachel.lang@gmail.com,661-675-1316,1962-11-02,"308 Kelly Forges Apt. 002, Chelseaport, NV 49266",222593.24,active,2025-11-17
 4324,Douglas,Rodriguez,douglas.rodriguez@gmail.com,233-498-4248,2005-09-03,"98783 Jesus Centers Suite 559, Wiseland, IA 47138",64326.64,suspended,2026-07-23
-4325,Matthew,Mccarthy,matthew.mccarthy@gmail.com,387-459-5581,1938-01-01,"PSC 7961, Box 7700, APO AE 23065",101635.2,active,2021-07-14
 4326,Amanda,Arnold,amanda.arnold@yahoo.com,651-363-5565,1992-12-28,"94889 Jeffrey Square Apt. 198, Piercestad, ME 04918",191719.38,inactive,2025-05-30
 4327,Micheal,Byrd,micheal.byrd@yahoo.com,772-856-2659,1983-04-17,"56432 Brandon Plaza Suite 091, Victorburgh, NM 43239",67348.91,suspended,2023-12-21
 4329,James,Hansen,james.hansen@yahoo.com,434-527-8577,1974-07-11,"418 Phillips Meadows, Port Bradley, PR 25059",42137.11,active,2022-10-04
@@ -3317,7 +3209,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4342,Norman,Stewart,norman.stewart@hotmail.com,755-786-1566,1938-01-25,"9087 Jacobs Crest, Stevenside, WV 04417",147821.51,active,2023-10-10
 4344,Eric,Fuentes,eric.fuentes@gmail.com,914-801-4079,1989-05-25,"934 Kimberly Parks, Rebeccamouth, NY 39250",27043.61,inactive,2024-10-18
 4346,Jamie,Davis,jamie.davis@gmail.com,545-490-6383,1941-10-02,"759 Vazquez Falls, Peterhaven, PW 48016",194759.65,suspended,2024-02-22
-4348,Vanessa,King,vanessa.king@gmail.com,968-469-7441,1989-03-23,"893 Boyd Lakes, North Scott, GU 71902",185621.77,active,2023-06-27
 4350,Kyle,Cox,kyle.cox@gmail.com,636-335-1118,1969-02-10,"23550 Torres Square Apt. 571, Port Mariachester, DC 04732",198229.75,active,2020-01-15
 4352,Christy,Dodson,christy.dodson@gmail.com,329-475-5427,1939-11-23,"2617 Zachary Square Apt. 702, Hahnberg, MN 74428",38083.42,suspended,2025-04-22
 4353,David,Gonzales,david.gonzales@yahoo.com,654-998-6461,1972-08-02,"USNV Williams, FPO AA 14881",184801.22,inactive,2026-01-13
@@ -3458,7 +3349,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4538,Luis,Baker,luis.baker@yahoo.com,990-743-9961,1977-08-07,"Unit 0346 Box 8673, DPO AE 33691",127530.87,active,2020-07-06
 4540,Paul,Kidd,paul.kidd@hotmail.com,968-283-9622,2005-03-20,"Unit 8441 Box 4253, DPO AP 30811",109805.63,active,2023-02-22
 4541,Robert,Bartlett,robert.bartlett@yahoo.com,273-682-1558,2002-02-23,"5787 Sheila Ramp Suite 463, Grantstad, IN 46513",234995.46,suspended,2019-11-10
-4542,Thomas,Harrington,thomas.harrington@gmail.com,999-565-2471,1967-12-01,"Unit 6527 Box 3596, DPO AA 47184",125297.32,active,2020-06-06
 4543,Eric,Cunningham,eric.cunningham@gmail.com,751-807-6687,1940-12-17,"Unit 7696 Box 6671, DPO AA 54169",35417.45,inactive,2024-10-24
 4544,Emily,Gonzalez,emily.gonzalez@hotmail.com,397-461-1606,1938-12-30,"257 Mcdonald Lights Suite 800, East Shaneville, IA 61466",152314.12,active,2022-05-19
 4545,Devin,Barnes,devin.barnes@gmail.com,562-721-1023,1961-03-27,"Unit 5585 Box 7992, DPO AA 17598",94437.52,suspended,2020-06-02
@@ -3490,7 +3380,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4576,Brian,Barnes,brian.barnes@hotmail.com,882-269-4737,1948-12-13,"357 Jennifer Prairie, South Luisshire, DC 78994",69523.79,active,2020-03-20
 4577,Abigail,Parks,abigail.parks@hotmail.com,967-593-2207,1966-05-09,"2701 Heather Harbor, Lake Dannychester, SC 61762",182249.62,inactive,2025-02-18
 4579,Donald,Gardner,donald.gardner@yahoo.com,383-551-3292,1992-11-06,"270 Ortega Trail, Lake Patrick, MO 14302",107085.22,inactive,2026-08-12
-4580,Dwayne,Lyons,dwayne.lyons@gmail.com,602-442-1680,1945-11-07,"281 Barker Pike Apt. 229, Lake Joy, WA 67714",105962.31,active,2026-02-05
 4582,Crystal,Warner,crystal.warner@gmail.com,862-848-8027,2003-09-02,"44633 Christopher Club, Timothyland, VI 09771",77047.98,active,2025-09-11
 4583,Troy,Hernandez,troy.hernandez@hotmail.com,758-801-2977,2001-11-16,"901 Stephen Mews, East Travis, NY 49528",20430.68,active,2019-09-07
 4585,George,Kim,george.kim@hotmail.com,854-229-3345,2001-12-27,"328 Phillips Loop Suite 126, Wrightmouth, OR 54487",98993.69,active,2024-01-08
@@ -3540,14 +3429,12 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4639,Megan,Turner,megan.turner@hotmail.com,543-829-6131,1984-12-18,"25390 Rich Forge, Port Sarah, FM 47139",55621.39,suspended,2026-04-17
 4640,Jennifer,Harper,jennifer.harper@yahoo.com,315-318-2218,1964-11-14,"24517 Brittany Hills Suite 528, Lake Renee, MA 30496",36828.78,active,2023-04-08
 4641,Nicole,Shaw,nicole.shaw@gmail.com,925-504-1878,1966-11-16,"Unit 0528 Box 2275, DPO AE 36663",47365.37,inactive,2021-05-17
-4642,Leah,Vazquez,leah.vazquez@hotmail.com,427-426-1759,1960-10-03,"7443 Richmond Estate Apt. 503, Lake Melody, MO 59812",123059.91,inactive,2023-08-26
 4644,Kaitlyn,Barker,kaitlyn.barker@yahoo.com,202-640-3619,2007-09-04,"5979 Perez Trail, North Cesar, MH 13320",21062.13,active,2020-04-18
 4645,Emily,Rodriguez,emily.rodriguez@gmail.com,923-614-4127,1999-10-25,"372 Brown Shoal, Lake Kevin, WY 26259",196676.76,suspended,2023-12-07
 4646,Sharon,Huynh,sharon.huynh@yahoo.com,849-613-5298,1994-01-27,"36739 Pham Mews, Franklinmouth, OH 59446",227981.87,suspended,2022-09-05
 4648,Vanessa,Sanchez,vanessa.sanchez@yahoo.com,463-224-9515,1966-04-16,"9018 William Brook, North Crystal, MI 08408",41196.16,active,2021-03-26
 4651,William,White,william.white@gmail.com,637-235-6160,1961-04-11,"109 Cardenas Way, Gregoryfort, MT 11992",198678.61,active,2021-01-02
 4652,Cassandra,Warner,cassandra.warner@hotmail.com,811-919-4400,1976-02-12,"74341 Martinez Grove Apt. 504, Port Kimberlyport, ND 46408",49728.78,inactive,2023-07-08
-4653,Jesse,Sutton,jesse.sutton@gmail.com,503-421-3089,2000-04-26,"249 Joshua Fork Suite 257, Gonzalezchester, IN 72709",47256.95,active,2021-10-14
 4654,Nathaniel,Fields,nathaniel.fields@hotmail.com,463-590-2661,1964-10-05,"063 Martin Junctions, Atkinsonfort, NV 21782",47029.23,active,2020-01-22
 4655,Nicholas,Cooper,nicholas.cooper@yahoo.com,799-920-9743,1992-01-17,"248 Andrea Hills Suite 537, West Kendra, AZ 07778",196839.11,active,2020-07-14
 4656,Chelsea,Rubio,chelsea.rubio@hotmail.com,287-541-6198,1988-04-08,"PSC 9528, Box 0707, APO AP 87431",142849.44,inactive,2025-07-05
@@ -3563,7 +3450,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4670,Jane,Howell,jane.howell@yahoo.com,556-808-1914,1956-07-21,"Unit 2534 Box 6058, DPO AP 87177",145412.48,active,2025-05-05
 4673,Allison,Gonzalez,allison.gonzalez@hotmail.com,616-484-6415,1963-07-17,"51609 Burgess Roads Suite 548, North Jodi, ND 57644",128836.22,suspended,2020-12-31
 4675,Patricia,Thompson,patricia.thompson@yahoo.com,376-460-8704,1953-04-03,"Unit 1606 Box 3025, DPO AP 31705",113671.65,active,2025-07-23
-4676,Sabrina,Hancock,sabrina.hancock@yahoo.com,253-595-9581,1988-08-29,"406 Joanna Roads, Port Justin, NE 56064",117103.2,suspended,2026-08-08
 4677,Carl,Burns,carl.burns@yahoo.com,743-335-5770,2003-03-26,"7989 Mccoy Hollow Suite 331, West Joshua, TX 49652",169691.12,inactive,2022-01-10
 4678,Oscar,Arnold,oscar.arnold@hotmail.com,624-591-6781,1939-02-24,"2241 Gaines Cliffs Apt. 025, South Kimberlymouth, ID 58078",74688.59,active,2025-11-17
 4681,Sara,Johnson,sara.johnson@yahoo.com,741-616-9755,1995-07-06,"6902 Burke Light, South Ronaldtown, CO 64332",239580.76,active,2024-06-02
@@ -3602,7 +3488,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4722,John,Lewis,john.lewis@hotmail.com,673-726-2086,1980-12-28,"PSC 1869, Box 6750, APO AA 39787",96308.8,active,2024-04-28
 4723,Robert,Nelson,robert.nelson@hotmail.com,705-816-1951,1986-07-04,"07802 Heather Street Apt. 980, Jeremiahmouth, ME 59040",141837.45,inactive,2023-02-01
 4724,Jennifer,Price,jennifer.price@yahoo.com,274-748-1109,1952-05-21,"05837 Burke Ville Suite 005, Donaldland, NC 67733",55217.92,suspended,2022-07-15
-1061,Ryan,Stone,ryan.stone@hotmail.com,837-527-6647,1941-04-09,"7884 Betty View, Dianatown, WA 99286",116411.24,active,2024-04-28
 4726,Stephanie,Macias,stephanie.macias@hotmail.com,223-359-1276,2003-11-29,"0265 Nicole Well, Armstrongton, FM 42552",170125.02,inactive,2020-10-16
 4728,Billy,Gonzales,billy.gonzales@yahoo.com,846-883-1456,2006-02-13,"16996 Chase Stream, New Gregory, ND 16218",158311.73,inactive,2025-05-24
 4729,Richard,Miller,richard.miller@hotmail.com,760-759-2634,2006-08-23,"429 Alexandra Trail, Teresachester, LA 43851",52340.36,suspended,2025-09-09
@@ -3652,12 +3537,9 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4781,Laura,Bradley,laura.bradley@gmail.com,426-631-8999,1976-12-31,"2348 Ramos Terrace, East Joseshire, NJ 63811",97494.52,active,2020-06-20
 4783,Erik,Williams,erik.williams@hotmail.com,850-511-5523,1981-02-27,"31854 Kristine Plain Apt. 625, Kristenside, MH 87991",198764.05,active,2024-12-31
 4784,Jake,Waters,jake.waters@yahoo.com,500-227-3690,1982-02-28,"9579 Woods Lock, Rossburgh, WI 37639",64906.1,inactive,2023-08-09
-4785,Juan,York,juan.york@yahoo.com,668-511-7479,1943-02-04,"4880 Patricia Expressway, South Laurenhaven, PR 57957",219568.38,inactive,2025-12-23
 4786,Angelica,Phillips,angelica.phillips@hotmail.com,343-585-1860,1990-09-28,"286 Victoria Mountains Suite 852, Stevensstad, MA 37909",42429.7,inactive,2023-03-27
 4788,Ashley,White,ashley.white@yahoo.com,798-968-6844,1953-12-16,"121 Ashley Walk, North Richardborough, NV 34775",181184.23,suspended,2020-04-25
-4791,Nicole,Hernandez,nicole.hernandez@gmail.com,505-822-1736,1998-07-31,"424 Armstrong Fords, Davisshire, GU 77201",23844.33,suspended,2025-08-22
 4792,Rebecca,Morales,rebecca.morales@gmail.com,202-383-6480,1994-06-17,"8819 David Tunnel Apt. 919, Morrowview, VI 19530",94207.06,suspended,2023-01-20
-4793,Ronnie,Nelson,ronnie.nelson@gmail.com,477-998-5727,2000-03-04,"46603 Ashley Crossing, Port Craig, CT 68952",223429.83,inactive,2024-05-05
 4794,Theresa,Davis,theresa.davis@yahoo.com,608-692-3304,1941-08-20,"47921 Jeffrey Drive, Chanville, NJ 11017",58086.08,suspended,2020-07-08
 4795,William,Price,william.price@hotmail.com,212-423-9645,1964-08-27,"981 Meadows Squares Apt. 201, Lake Taylorbury, WI 88860",122078.48,active,2024-02-12
 4796,Michael,Kelly,michael.kelly@gmail.com,267-458-6917,1951-07-19,"PSC 0621, Box 2889, APO AP 15244",79270.52,suspended,2024-01-23
@@ -3667,12 +3549,10 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4805,Bruce,Garcia,bruce.garcia@gmail.com,532-294-2063,1992-02-14,"362 Castro Valleys, Lake Kellyshire, ID 33072",73537.88,inactive,2025-09-25
 4806,Melissa,Harris,melissa.harris@gmail.com,747-622-3798,1998-03-10,"287 Kayla Plain, Richardmouth, MO 55479",158150.23,active,2021-04-13
 4807,Micheal,Lowe,micheal.lowe@gmail.com,761-279-9991,1967-10-18,"69580 Alexander Ways Suite 891, Grantstad, OH 88376",119255.89,active,2021-03-25
-4808,Isabella,Brown,isabella.brown@hotmail.com,674-641-2705,1967-03-12,"PSC 1639, Box 9319, APO AA 32661",89058.54,inactive,2019-10-13
 4809,Sarah,Perez,sarah.perez@hotmail.com,538-979-8440,1999-09-25,"939 Snyder Square Apt. 425, New Briannaburgh, OR 07440",204246.8,inactive,2025-03-27
 4810,John,Butler,john.butler@yahoo.com,867-202-3339,1980-10-13,"597 Fuentes Crescent Suite 518, Robinsonstad, CT 49449",209746.92,suspended,2020-07-14
 4811,Michelle,Palmer,michelle.palmer@gmail.com,450-938-2181,1994-07-02,"21348 Brian Harbors, Robinsonhaven, FM 31684",100647.88,inactive,2024-06-17
 4812,Henry,Brown,henry.brown@yahoo.com,923-960-4214,1976-11-23,"94117 Kathryn Village Apt. 784, Adrianamouth, OH 50751",20716.7,active,2024-09-01
-4814,Stephanie,Brown,stephanie.brown@yahoo.com,543-862-6490,1951-01-06,"3398 Christine Mountain Suite 043, North Michael, OK 75699",220009.7,active,2021-11-02
 4815,Cindy,Barr,cindy.barr@yahoo.com,341-372-5723,1983-11-25,"81593 Katie Lane Apt. 011, Harmonchester, KY 11434",182479.9,active,2023-01-07
 4816,Patrick,Hughes,patrick.hughes@hotmail.com,357-227-7614,1993-12-13,"763 Susan Port Suite 921, Port Christopher, MT 05421",108766.4,active,2023-06-09
 4817,William,Owens,william.owens@gmail.com,522-277-5195,1963-03-16,"638 Everett Heights Suite 726, Carpenterton, IL 42521",88986.39,suspended,2025-07-10
@@ -3712,7 +3592,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4868,Melissa,Howard,melissa.howard@gmail.com,558-991-1451,1961-07-23,"5483 Leslie Tunnel, Lake Donald, IL 05405",43216.66,suspended,2024-10-10
 4869,Monica,Rodriguez,monica.rodriguez@yahoo.com,781-816-5458,1972-05-14,"45085 Hanson Club Apt. 486, Castroton, UT 08136",180366.72,active,2023-11-29
 4870,Daniel,Meadows,daniel.meadows@yahoo.com,399-431-4794,1954-06-21,"14389 Jennifer Stravenue Suite 463, Amandaberg, CO 12265",78422.93,inactive,2025-10-07
-4871,Rebecca,Martinez,rebecca.martinez@hotmail.com,683-899-9547,1998-01-08,"77057 Leach Drive, Brooksbury, IL 84509",202977.23,suspended,2024-04-06
 4872,Mark,Diaz,mark.diaz@gmail.com,902-480-9740,1951-07-15,"12884 Lopez Terrace Suite 933, Victorburgh, NE 77315",194393.63,inactive,2024-05-18
 4873,Melinda,Mendoza,melinda.mendoza@hotmail.com,776-758-5346,1971-04-23,"087 Jamie Station Apt. 816, Gregoryton, NV 74025",37671.62,active,2026-03-03
 4874,Jeremy,Palmer,jeremy.palmer@hotmail.com,644-705-4547,1967-05-14,"991 Megan Hills Suite 652, New Ashley, MA 29874",26368.79,active,2025-11-18
@@ -3722,7 +3601,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4879,Paula,Brown,paula.brown@gmail.com,407-285-3814,1975-03-26,"PSC 0381, Box 0741, APO AE 57323",72711.41,active,2025-11-13
 4882,Rachael,Welch,rachael.welch@yahoo.com,651-435-7992,1973-03-11,"29899 Knight Coves Apt. 762, West Summerhaven, NJ 31077",112453.7,suspended,2024-04-30
 4883,Christopher,Flores,christopher.flores@gmail.com,980-497-9925,1940-07-17,"2352 Gonzalez Falls, North Angela, TX 12484",125817.29,suspended,2021-04-26
-4884,Jacob,Jimenez,jacob.jimenez@hotmail.com,410-756-7261,1996-03-04,"190 Joan Trail, North Davidview, WV 07590",31044.87,inactive,2025-07-24
 4885,Kimberly,Cervantes,kimberly.cervantes@gmail.com,301-918-2415,1972-11-11,"7795 Kathy Plaza Apt. 826, Port Leahview, FL 31617",193538.88,active,2021-04-16
 4886,Amy,Aguilar,amy.aguilar@hotmail.com,352-388-1043,1979-09-10,"PSC 8049, Box 1981, APO AA 00977",147418.62,inactive,2024-05-26
 4889,Barbara,Lynn,barbara.lynn@gmail.com,746-670-5900,1957-12-31,"2584 Gregory Rapid, East Jenniferfort, VI 73211",88399.26,inactive,2025-03-12
@@ -3750,7 +3628,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4915,Joshua,Wilson,joshua.wilson@yahoo.com,324-559-3643,1982-06-08,"45158 Julia Inlet, Port Philip, NE 66920",49081.55,active,2025-06-07
 4916,Jennifer,Le,jennifer.le@yahoo.com,351-385-3867,1991-10-09,"3027 Christian Stream Suite 561, Calebtown, MN 34837",141446.74,inactive,2020-06-27
 4918,Mary,Mitchell,mary.mitchell@hotmail.com,397-566-5868,2005-06-12,"784 Ortiz Keys Apt. 547, Simpsonview, SD 44625",25092.85,inactive,2020-10-12
-4919,Jason,Sanchez,jason.sanchez@yahoo.com,239-943-5390,1994-06-21,"62784 Cynthia View, Bateston, MD 83093, tel 251-821-4626",118426.39,active,2025-08-24
 4921,Amy,Sandoval,amy.sandoval@yahoo.com,992-521-4182,1954-12-10,"2756 Beth Drive, Lake Mary, LA 17081",88747.94,inactive,2026-05-07
 4923,Sean,Delgado,sean.delgado@gmail.com,496-320-6888,1943-01-10,"240 Ronald Flat, Smithberg, NJ 68320",230343.56,suspended,2021-10-13
 4924,Daniel,Pope,daniel.pope@yahoo.com,844-605-6345,1969-03-19,"875 Tyler Valleys Apt. 810, North Christina, SD 30072",134370.37,active,2026-03-22
@@ -3789,7 +3666,6 @@ customer_id,first_name,last_name,email,phone,date_of_birth,address,income,accoun
 4969,Tyrone,Stein,tyrone.stein@gmail.com,202-922-4119,1983-07-22,"6067 Andres Street Apt. 280, East Kevinland, PR 73408",30905.93,active,2025-09-23
 4970,Lisa,Bentley,lisa.bentley@hotmail.com,925-795-6596,1938-10-04,"Unit 5334 Box 3659, DPO AP 38030",113523.7,inactive,2024-08-14
 4971,Seth,White,seth.white@yahoo.com,388-548-7169,1946-06-06,"5956 Wolfe Ports, Brownchester, NY 99094",176850.34,suspended,2025-01-15
-4974,Scott,Morgan,scott.morgan@gmail.com,346-432-1007,1979-01-23,"6863 Schultz Lake Suite 372, Aliciashire, IA 87929",81415.34,inactive,2019-09-16
 4977,Claudia,Juarez,claudia.juarez@hotmail.com,651-951-5717,1951-06-19,"744 Decker Estates Suite 742, South Lacey, HI 04524",204006.43,inactive,2023-06-07
 4978,Jorge,Young,jorge.young@yahoo.com,957-321-5844,1953-02-19,"519 Myers Plain, Millsmouth, UT 15327",227785.76,inactive,2026-07-15
 4979,Vicki,Jensen,vicki.jensen@gmail.com,893-829-2710,2003-12-27,"3366 Nielsen Path Apt. 932, New Petermouth, FM 85350",222239.27,suspended,2024-06-25

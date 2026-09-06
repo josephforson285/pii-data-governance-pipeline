@@ -4,8 +4,10 @@ DETECTION SCORECARD
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 5,000
-Generated  : 2026-09-05T13:28:58Z
+Generated  : 2026-09-06T15:12:50Z
 Pipeline   : v0.1.0
+Rules      : v2
+Reference  : 2026-09-06 (today (not pinned))
 
 Measured against the generator's manifest of planted defects.
 Nothing in the pipeline reads that manifest: a detector with sight
@@ -20,11 +22,14 @@ ATTRIBUTION the specific check expected to catch it is the one that
             fired. A miss here means the diagnosis was wrong, even
             though the row was handled.
 
+Recall alone is not a quality score: a pipeline that quarantined
+every row would score 100%. Read it against the retention figure in
+cleaning_log.txt, which is what that pipeline would drive to zero.
+
 ------------------------------------------------------------------------------
 2. PER-DEFECT RESULTS
 ------------------------------------------------------------------------------
 DEFECT                            COLUMN           PLANTED   RECALL   ATTRIB
-duplicate_customer_id             customer_id           50    72.0%    72.0%
 income_non_numeric                income                50   100.0%     0.0%
 address_too_short                 address               60   100.0%    16.7%
 dob_invalid_value                 date_of_birth         50   100.0%    78.0%
@@ -46,55 +51,39 @@ first_name_dirty                  first_name           250   100.0%   100.0%
 last_name_dirty                   last_name            200   100.0%   100.0%
 pii_leaked_in_address             address               40   100.0%   100.0%
 age_impossible                    date_of_birth         20   100.0%   100.0%
+duplicate_customer_id             customer_id           50   100.0%   100.0%
 ------------------------------------------------------------------------------
-TOTAL                                                 3670    99.6%    96.4%
+TOTAL (micro)                                         3670   100.0%    96.8%
+TOTAL (macro, per defect class)                         22   100.0%    90.0%
 
-------------------------------------------------------------------------------
-3. WHERE RECALL AND ATTRIBUTION DIVERGE
-------------------------------------------------------------------------------
-Every divergence below was investigated. None is a missed defect.
-
-duplicate_customer_id - recall 72%, attribution 72%
-income_non_numeric - recall 100%, attribution 0%
-address_too_short - recall 100%, attribution 17%
-dob_invalid_value - recall 100%, attribution 78%
-phone_unparseable - recall 100%, attribution 85%
-
-income_non_numeric   values like '$52,000' and '75k' are repaired,
-                     not rejected, so the unparseable check never
-                     fires. Handled, differently than expected.
-
-address_too_short    planted values include 'N/A' and 'unknown',
-                     which the pipeline reads as missing rather than
-                     as short. Both classifications are defensible;
-                     the row is rejected either way.
-
-dob_invalid_value    same cause: 'unknown' is a sentinel null before
-phone_unparseable    it is an unparseable value.
+Micro totals weight by planted volume, so frequent defects dominate.
+Macro totals weight each defect class equally, so a rare broken rule
+stays visible.
 
 ------------------------------------------------------------------------------
-4. THE ONE REAL GAP
+3. DEFECTS NOT FULLY RECALLED
 ------------------------------------------------------------------------------
-duplicate_customer_id is the only defect below 100% recall.
+None: every planted defect was acted on.
 
-13 rows carrying a planted duplicate id reached the output without
-the dedup check firing. The cleaned file nonetheless contains zero
-duplicate ids, because the other row holding each id had already
-been quarantined for an unrelated reason - so no collision existed
-for the check to find.
+------------------------------------------------------------------------------
+4. RECALL AND ATTRIBUTION DIVERGENCE
+------------------------------------------------------------------------------
+The row was handled, but by a different check than expected.
+This is usually classification ambiguity rather than a defect:
+a planted value that is both malformed and sentinel-null is
+legitimately reportable as either.
 
-The output is correct, but the property is fragile: dedup recall
-depends on how much the preceding stage happened to quarantine.
-Relaxing nullability as section 4 of the cleaning log describes
-would keep those rows and surface 13 genuine collisions that
-currently never meet. Uniqueness must therefore be enforced at the
-output, which post-validation does, and not left to a scan whose
-reach shifts with upstream policy.
+DEFECT                               RECALL   ATTRIB    DIFF
+income_non_numeric                   100.0%     0.0%      50
+address_too_short                    100.0%    16.7%      50
+dob_invalid_value                    100.0%    78.0%      11
+phone_unparseable                    100.0%    85.0%       6
 
 ------------------------------------------------------------------------------
 SUMMARY
 ------------------------------------------------------------------------------
-Defects planted                  3,670
-Handled                          3,656   99.6%
-Correctly attributed             3,539   96.4%
+Defect classes measured                 22
+Defects planted                      3,670
+Handled                              3,670   100.0%
+Correctly attributed                 3,553   96.8%
 

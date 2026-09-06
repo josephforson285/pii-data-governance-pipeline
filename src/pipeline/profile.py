@@ -9,10 +9,14 @@ from typing import Any
 
 import pandas as pd
 
+from pipeline.config import Config
+
 # Values that mean "missing" without being null. Counted separately from true
 # nulls because they survive dropna() and silently pollute downstream stats.
 SENTINELS = {"", "null", "n/a", "na", "none", "nan", "unknown", "-", "not disclosed"}
 
+# Human-readable expected types, for the report's schema-conformance section.
+# The authoritative types are in config/rules.yml.
 EXPECTED_DTYPES = {
     "customer_id": "integer", "first_name": "string", "last_name": "string",
     "email": "string", "phone": "string", "date_of_birth": "date",
@@ -20,9 +24,7 @@ EXPECTED_DTYPES = {
     "created_date": "date",
 }
 
-VALID_STATUSES = {"active", "inactive", "suspended"}
-MAX_PLAUSIBLE_AGE = 120
-INCOME_CAP = 10_000_000
+
 
 
 @dataclass
@@ -50,6 +52,7 @@ class QualityProfile:
     format_inventory: dict[str, list[tuple[str, int, str]]]
     invalid_values: dict[str, dict[str, Any]]
     status_counts: dict[str, int]
+    permitted_statuses: list[str]
 
     @property
     def pct_missing(self) -> dict[str, float]:
@@ -106,8 +109,10 @@ def _as_date(v: Any) -> date | None:
         return None
 
 
-def profile(df: pd.DataFrame) -> QualityProfile:
+def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
     n = len(df)
+    today = cfg.reference_date
+    max_age, cap = cfg.max_age, cfg.income_cap
     columns = []
     for name in df.columns:
         s = df[name]
@@ -125,7 +130,6 @@ def profile(df: pd.DataFrame) -> QualityProfile:
     dup_counts = df["customer_id"].value_counts()
     duplicates = {int(k): int(v) for k, v in dup_counts[dup_counts > 1].items()}
 
-    today = date.today()
     ages = [(today.year - d.year) for d in (_as_date(v) for v in df["date_of_birth"]) if d]
     incomes = [x for x in (_as_number(v) for v in df["income"]) if x is not None]
 
@@ -143,8 +147,8 @@ def profile(df: pd.DataFrame) -> QualityProfile:
             "examples": _examples(str(v) for v in df["income"] if not is_missing(v) and _as_number(v) is None),
         },
         "negative_income": {"count": sum(1 for x in incomes if x < 0), "examples": _examples(x for x in incomes if x < 0)},
-        "income_above_cap": {"count": sum(1 for x in incomes if x > INCOME_CAP), "examples": _examples((x for x in incomes if x > INCOME_CAP), 3)},
-        "implausible_age": {"count": sum(1 for a in ages if a > MAX_PLAUSIBLE_AGE or a < 0), "examples": _examples(sorted(a for a in ages if a > MAX_PLAUSIBLE_AGE))},
+        "income_above_cap": {"count": sum(1 for x in incomes if x > cap), "examples": _examples((x for x in incomes if x > cap), 3)},
+        "implausible_age": {"count": sum(1 for a in ages if a > max_age or a < 0), "examples": _examples(sorted(a for a in ages if a > max_age))},
         "future_created_date": {
             "count": sum(1 for v in df["created_date"] if (d := _as_date(v)) and d > today),
             "examples": _examples((str(v) for v in df["created_date"] if (d := _as_date(v)) and d > today), 3),
@@ -153,7 +157,7 @@ def profile(df: pd.DataFrame) -> QualityProfile:
 
     status_counts = Counter(str(v) for v in df["account_status"])
 
-    expected = set(EXPECTED_DTYPES)
+    expected = set(cfg.schema)
     return QualityProfile(
         n_rows=n,
         columns=columns,
@@ -167,4 +171,5 @@ def profile(df: pd.DataFrame) -> QualityProfile:
         },
         invalid_values=invalid,
         status_counts=dict(status_counts.most_common()),
+        permitted_statuses=cfg.permitted_statuses,
     )

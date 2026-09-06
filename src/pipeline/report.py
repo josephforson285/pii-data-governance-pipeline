@@ -11,22 +11,27 @@ from pathlib import Path
 
 import pandas as pd
 
-from pipeline.clean import NON_CRITICAL, CleaningLog, policy_sensitivity
-from pipeline.mask import MASKERS, MaskResult
+from pipeline.clean import CleaningLog, policy_sensitivity
+from pipeline.config import Config
+from pipeline.mask import MaskResult
 from pipeline.pii import DETECTORS, PIIReport, redact
-from pipeline.profile import QualityProfile, VALID_STATUSES
+from pipeline.profile import QualityProfile
 from pipeline.run import RunResult
 from pipeline.score import ScoreCard
 from pipeline.validate import ValidationResult
 
-# Columns whose sample values identify a person. Examples drawn from these are
-# redacted: a quality report that quotes raw PII is a disclosure of its own.
-SENSITIVE_COLUMNS = {"first_name", "last_name", "email", "phone", "date_of_birth", "address"}
-SENSITIVE_CHECKS = {"unparseable_date_of_birth"}
+def _safe(value: object, sensitive: bool) -> str:
+    """Redact a value if it comes from an identifying column.
 
-
-def _safe(value: str, sensitive: bool) -> str:
+    A report that quotes raw PII is a disclosure of its own, so this is
+    applied to every sample and every failing value the reports render.
+    """
     return redact(str(value)) if sensitive else str(value)
+
+
+def _sensitive_check(name: str, cfg: Config) -> bool:
+    """A profiler check name is sensitive when it names a sensitive column."""
+    return any(col in name for col in cfg.sensitive_columns)
 
 VERSION = "0.1.0"
 WIDTH = 78
@@ -37,8 +42,15 @@ def file_digest(path: Path) -> str:
     return h[:16]
 
 
-def header(title: str, source: Path, n_rows: int) -> list[str]:
+def header(title: str, source: Path, n_rows: int, cfg: Config | None = None) -> list[str]:
     """Provenance block. Lets two reports be proven to describe the same run."""
+    extra = []
+    if cfg is not None:
+        pinned = "pinned" if cfg.reference_date_is_pinned else "today (not pinned)"
+        extra = [
+            f"Rules      : v{cfg.version}",
+            f"Reference  : {cfg.reference_date.isoformat()} ({pinned})",
+        ]
     return [
         "=" * WIDTH,
         title.upper(),
@@ -48,6 +60,7 @@ def header(title: str, source: Path, n_rows: int) -> list[str]:
         f"Rows       : {n_rows:,}",
         f"Generated  : {datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}",
         f"Pipeline   : v{VERSION}",
+        *extra,
         "",
     ]
 
@@ -56,8 +69,8 @@ def _section(title: str) -> list[str]:
     return ["-" * WIDTH, title, "-" * WIDTH]
 
 
-def render_quality_report(p: QualityProfile, source: Path) -> str:
-    out = header("Data Quality Report", source, p.n_rows)
+def render_quality_report(p: QualityProfile, source: Path, cfg: Config) -> str:
+    out = header("Data Quality Report", source, p.n_rows, cfg)
 
     out += _section("1. SCHEMA CONFORMANCE")
     out.append(f"Missing columns    : {', '.join(p.missing_columns) or 'none'}")
@@ -100,7 +113,7 @@ def render_quality_report(p: QualityProfile, source: Path) -> str:
     for col, shapes in p.format_inventory.items():
         out.append("")
         out.append(f"{col}  ({len(shapes)} shapes)")
-        sensitive = col in SENSITIVE_COLUMNS
+        sensitive = col in cfg.sensitive_columns
         out.append(f"  {'SHAPE':<24}{'COUNT':>7}   EXAMPLE")
         for sig, n, ex in shapes:
             # For identifying columns the shape already carries the format, so a
@@ -112,15 +125,16 @@ def render_quality_report(p: QualityProfile, source: Path) -> str:
     out += _section("5. INVALID VALUES")
     out.append(f"{'CHECK':<28}{'COUNT':>7}   EXAMPLES")
     for name, info in p.invalid_values.items():
-        sensitive = name in SENSITIVE_CHECKS
+        sensitive = _sensitive_check(name, cfg)
         ex = ", ".join(_safe(e, sensitive) for e in info["examples"])[:38]
         out.append(f"{name:<28}{info['count']:>7}   {ex}")
     out.append("")
 
     out += _section("6. CATEGORICAL VALIDITY - account_status")
-    valid = {k: v for k, v in p.status_counts.items() if k in VALID_STATUSES}
-    invalid = {k: v for k, v in p.status_counts.items() if k not in VALID_STATUSES}
-    out.append(f"Permitted: {', '.join(sorted(VALID_STATUSES))}")
+    permitted = set(p.permitted_statuses)
+    valid = {k: v for k, v in p.status_counts.items() if k in permitted}
+    invalid = {k: v for k, v in p.status_counts.items() if k not in permitted}
+    out.append(f"Permitted: {', '.join(sorted(permitted))}")
     out.append("")
     out.append(f"{'VALUE':<20}{'COUNT':>8}   STATUS")
     for k, v in sorted(valid.items(), key=lambda x: -x[1]):
@@ -142,8 +156,8 @@ def render_quality_report(p: QualityProfile, source: Path) -> str:
     return "\n".join(out) + "\n"
 
 
-def render_pii_report(r: PIIReport, source: Path) -> str:
-    out = header("PII Detection Report", source, r.n_rows)
+def render_pii_report(r: PIIReport, source: Path, cfg: Config) -> str:
+    out = header("PII Detection Report", source, r.n_rows, cfg)
 
     out += _section("1. DECLARED PII INVENTORY")
     out.append("What each column holds by design. Governance metadata, not inference.")
@@ -184,9 +198,14 @@ def render_pii_report(r: PIIReport, source: Path) -> str:
     total_hits = sum(f.row_count for f in r.findings) + sum(f.row_count for f in r.suppressed)
     kept = sum(f.row_count for f in r.findings)
     out.append("")
-    out.append(f"Raw hits {total_hits:,} -> confirmed {kept:,} ({100 * kept / total_hits:.1f}% precision).")
-    out.append("Scanning recall-first and suppressing afterwards is deliberate: a")
-    out.append("missed identifier is a breach, a false positive is review effort.")
+    out.append(f"Raw hits {total_hits:,} -> confirmed {kept:,} "
+               f"({100 * kept / total_hits:.1f}% confirmation rate).")
+    out.append("")
+    out.append("This is a confirmation rate, not precision. Precision would need")
+    out.append("each match labelled true or false against ground truth; these are")
+    out.append("regex hits filtered by declared policy. Scanning recall-first and")
+    out.append("suppressing afterwards is deliberate: a missed identifier is a")
+    out.append("breach, a false positive is review effort.")
     out.append("")
 
     out += _section("5. UNDECLARED PII - LEAKAGE")
@@ -206,7 +225,9 @@ def render_pii_report(r: PIIReport, source: Path) -> str:
     out.append("")
 
     out += _section("6. BREACH EXPOSURE")
-    out.append(f"Records containing personal data : {r.rows_with_pii:,} of {r.n_rows:,} (100%)")
+    pct_exposed = 100 * r.rows_with_pii / r.n_rows if r.n_rows else 0.0
+    out.append(f"Records containing personal data : {r.rows_with_pii:,} of "
+               f"{r.n_rows:,} ({pct_exposed:.1f}%)")
     out.append("")
     out.append("Every record carries a name, an identifier and contact details, so")
     out.append("exposure is total: there is no subset of this file that is safe to")
@@ -214,13 +235,16 @@ def render_pii_report(r: PIIReport, source: Path) -> str:
     out.append("")
     ssn = sum(f.row_count for f in r.findings if f.detector == "us_ssn")
     out.append("If this file were disclosed:")
-    out.append(f"  - Direct identifiers  name, email, phone" + (f", and {ssn} leaked SSNs" if ssn else ""))
+    out.append("  - Direct identifiers  name, email, phone" + (f", and {ssn} leaked SSNs" if ssn else ""))
     out.append("  - Financial data      income for every data subject")
     out.append("  - Location            home address for every data subject")
     out.append("")
-    out.append("GDPR Art. 33 requires notifying the supervisory authority within 72")
-    out.append("hours where a breach is likely to risk data subjects' rights. Volume")
-    out.append("and the presence of financial data put this well above that bar.")
+    out.append("Where GDPR applies, Art. 33 requires notifying the supervisory")
+    out.append("authority within 72 hours of becoming aware of a breach likely to")
+    out.append("result in a risk to data subjects' rights. Whether that threshold is")
+    out.append("met is a formal risk assessment, not a determination this pipeline")
+    out.append("can make; the volume, the financial data and the presence of national")
+    out.append("identifiers are the factors that assessment would weigh.")
     out.append("")
 
     out += _section("7. RE-IDENTIFICATION RISK")
@@ -246,9 +270,9 @@ def render_pii_report(r: PIIReport, source: Path) -> str:
     return "\n".join(out) + "\n"
 
 
-def render_validation_report(pre: ValidationResult, source: Path,
+def render_validation_report(pre: ValidationResult, source: Path, cfg: Config,
                              post: ValidationResult | None = None) -> str:
-    out = header("Validation Results", source, pre.n_rows)
+    out = header("Validation Results", source, pre.n_rows, cfg)
     out.append("Engine: pandera, lazy=True - every rule is evaluated against every")
     out.append("row so one bad value cannot hide the rest.")
     out.append("")
@@ -265,7 +289,9 @@ def render_validation_report(pre: ValidationResult, source: Path,
     out.append("")
     out.append(f"{'COLUMN':<20}{'UNCOERCIBLE':>13}   EXAMPLES")
     for col, n in pre.coercion_by_column.items():
-        ex = ", ".join(dict.fromkeys(str(f.failure_case) for f in pre.coercion if f.column == col))[:36]
+        sensitive = col in cfg.sensitive_columns
+        ex = ", ".join(dict.fromkeys(
+            _safe(f.failure_case, sensitive) for f in pre.coercion if f.column == col))[:36]
         out.append(f"{col:<20}{n:>13}   {ex}")
     out.append(f"{'TOTAL':<20}{len(pre.coercion):>13}")
     out.append("")
@@ -299,12 +325,14 @@ def render_validation_report(pre: ValidationResult, source: Path,
 
     out += _section("4. FAILURE DETAIL")
     out.append("First 40 failures, with the row and the offending value.")
+    out.append("Values from identifying columns are redacted.")
     out.append("")
     out.append(f"{'ROW':>7}   {'COLUMN':<16}{'CHECK':<26}VALUE")
     shown = (post or pre).failures[:40]
     for f in shown:
         row = str(f.index) if f.index is not None else "-"
-        out.append(f"{row:>7}   {f.column:<16}{f.check[:25]:<26}{str(f.failure_case)[:24]}")
+        value = _safe(f.failure_case, f.column in cfg.sensitive_columns)[:24]
+        out.append(f"{row:>7}   {f.column:<16}{f.check[:25]:<26}{value}")
     out.append("")
 
     out += _section("SUMMARY")
@@ -317,8 +345,8 @@ def render_validation_report(pre: ValidationResult, source: Path,
     return "\n".join(out) + "\n"
 
 
-def render_cleaning_log(log: CleaningLog, source: Path) -> str:
-    out = header("Cleaning Log", source, log.rows_in)
+def render_cleaning_log(log: CleaningLog, source: Path, cfg: Config) -> str:
+    out = header("Cleaning Log", source, log.rows_in, cfg)
 
     out += _section("1. NORMALISATIONS APPLIED")
     out.append("Repairs made where the intended value is unambiguous.")
@@ -361,12 +389,12 @@ def render_cleaning_log(log: CleaningLog, source: Path) -> str:
     out.append("")
 
     out += _section("4. POLICY SENSITIVITY")
-    s = policy_sensitivity(log)
+    s = policy_sensitivity(log, cfg.non_critical)
     out.append("config/rules.yml declares every column non-nullable, so a record is")
     out.append("rejected for a blank optional field as readily as for a corrupt one.")
     out.append("That is a governance choice, not a fact about the data.")
     out.append("")
-    out.append(f"Treated as optional: {', '.join(sorted(NON_CRITICAL))}")
+    out.append(f"Treated as optional: {', '.join(sorted(cfg.non_critical))}")
     out.append("")
     out.append(f"{'Quarantined under current policy':<42}{s['quarantined']:>8}")
     out.append(f"{'Failing only on a blank optional field':<42}{s['recoverable_under_tiered_policy']:>8}")
@@ -383,8 +411,8 @@ def render_cleaning_log(log: CleaningLog, source: Path) -> str:
 
 
 def render_masked_sample(r: MaskResult, original: "pd.DataFrame", source: Path,
-                         n: int = 6) -> str:
-    out = header("Masked Sample - Before / After", source, len(r.masked))
+                         cfg: Config, n: int = 6) -> str:
+    out = header("Masked Sample - Before / After", source, len(r.masked), cfg)
     out.append("HANDLING: this artifact shows unmasked values by design - it is the")
     out.append("evidence the control works. It is committed only because the dataset")
     out.append("is synthetic. Against production data it would be classified")
@@ -392,18 +420,9 @@ def render_masked_sample(r: MaskResult, original: "pd.DataFrame", source: Path,
     out.append("")
 
     out += _section("1. MASKING RULES")
-    out.append(f"{'COLUMN':<16}{'RULE':<34}RATIONALE")
-    rules = {
-        "first_name": ("John -> J***", "Initial only; length not preserved"),
-        "last_name": ("Doe -> D***", "Initial only; length not preserved"),
-        "email": ("j.doe@gmail.com -> j***@gmail.com", "Domain kept: analytic, not identifying"),
-        "phone": ("555-123-4567 -> ***-***-4567", "Last four for support verification"),
-        "address": ("-> [MASKED ADDRESS]", "Free text; replaced wholesale"),
-        "date_of_birth": ("1985-03-15 -> 1985-**-**", "Year kept for age analysis"),
-        "income": ("52000 -> 50000-74999", "Banded to break uniqueness"),
-    }
-    for col, (rule, why) in rules.items():
-        out.append(f"{col:<16}{rule:<34}{why}")
+    out.append(f"{'COLUMN':<16}{'STRATEGY':<14}{'RULE':<34}RATIONALE")
+    for rule in cfg.mask_rules:
+        out.append(f"{rule.column:<16}{rule.strategy:<14}{rule.description:<34}{rule.rationale}")
     out.append("")
     out.append(f"Untouched: {', '.join(r.columns_untouched)}")
     out.append("customer_id is left intact so the extract still joins, which means it")
@@ -417,7 +436,7 @@ def render_masked_sample(r: MaskResult, original: "pd.DataFrame", source: Path,
         out.append(f"  {'FIELD':<16}{'BEFORE':<40}AFTER")
         for col in r.masked.columns:
             b, a = str(before[col])[:38], str(after[col])[:30]
-            marker = " " if col not in MASKERS else "*"
+            marker = "*" if col in r.columns_masked else " "
             out.append(f" {marker}{col:<16}{b:<40}{a}")
         out.append("")
     out.append("* masked field")
@@ -433,6 +452,12 @@ def render_masked_sample(r: MaskResult, original: "pd.DataFrame", source: Path,
     out.append("Group sizes on the quasi-identifiers, before and after. Larger groups")
     out.append("mean each person is hidden among more people.")
     out.append("")
+    out.append(f"Before : {', '.join(r.quasi_before)}")
+    out.append(f"After  : {', '.join(r.quasi_after)}")
+    out.append("The two sets differ because masking removed dimensions. The after")
+    out.append("set covers every attribute actually released, including columns")
+    out.append("left unmasked - scoring only the masked ones would flatter it.")
+    out.append("")
     total = len(r.masked)
     out.append(f"{'GROUP SIZE':<16}{'BEFORE':>10}{'AFTER':>10}")
     for label in ["k=1 (unique)", "k=2", "k=3-5", "k>5"]:
@@ -446,9 +471,12 @@ def render_masked_sample(r: MaskResult, original: "pd.DataFrame", source: Path,
     out.append("the birth date to a year and banding income. Masking names and emails")
     out.append("alone would have left the figure unchanged.")
     out.append("")
-    out.append(f"{r.unique_after} records remain unique and are still re-identifiable by")
-    out.append("anyone holding a second dataset with birth year and income. The extract")
-    out.append("is pseudonymous, not anonymous, and stays personal data under GDPR.")
+    out.append(f"{r.unique_after} records remain unique on the released attributes.")
+    out.append("k-anonymity is a risk indicator, not proof of anonymity: it measures")
+    out.append("uniqueness only over the quasi-identifiers chosen, says nothing about")
+    out.append("attribute disclosure within a group, and an attacker may hold")
+    out.append("attributes not modelled here. The extract is pseudonymous, not")
+    out.append("anonymous, and remains personal data under GDPR.")
     out.append("")
 
     out += _section("5. UTILITY RETAINED")
@@ -541,8 +569,8 @@ def render_execution_report(r: RunResult) -> str:
     return "\n".join(out) + "\n"
 
 
-def render_scorecard(card: ScoreCard, source: Path, n_rows: int) -> str:
-    out = header("Detection Scorecard", source, n_rows)
+def render_scorecard(card: ScoreCard, source: Path, n_rows: int, cfg: Config) -> str:
+    out = header("Detection Scorecard", source, n_rows, cfg)
     out.append("Measured against the generator's manifest of planted defects.")
     out.append("Nothing in the pipeline reads that manifest: a detector with sight")
     out.append("of the answer key measures nothing.")
@@ -555,6 +583,10 @@ def render_scorecard(card: ScoreCard, source: Path, n_rows: int) -> str:
     out.append("            fired. A miss here means the diagnosis was wrong, even")
     out.append("            though the row was handled.")
     out.append("")
+    out.append("Recall alone is not a quality score: a pipeline that quarantined")
+    out.append("every row would score 100%. Read it against the retention figure in")
+    out.append("cleaning_log.txt, which is what that pipeline would drive to zero.")
+    out.append("")
 
     out += _section("2. PER-DEFECT RESULTS")
     out.append(f"{'DEFECT':<34}{'COLUMN':<16}{'PLANTED':>8}{'RECALL':>9}{'ATTRIB':>9}")
@@ -562,61 +594,61 @@ def render_scorecard(card: ScoreCard, source: Path, n_rows: int) -> str:
         out.append(f"{s_.defect:<34}{s_.column:<16}{s_.planted:>8}"
                    f"{100 * s_.recall:>8.1f}%{100 * s_.attribution:>8.1f}%")
     out.append("-" * WIDTH)
-    out.append(f"{'TOTAL':<50}{card.planted:>8}"
+    out.append(f"{'TOTAL (micro)':<50}{card.planted:>8}"
                f"{100 * card.recall:>8.1f}%{100 * card.attribution:>8.1f}%")
+    out.append(f"{'TOTAL (macro, per defect class)':<50}{len(card.scores):>8}"
+               f"{100 * card.macro_recall:>8.1f}%{100 * card.macro_attribution:>8.1f}%")
+    out.append("")
+    out.append("Micro totals weight by planted volume, so frequent defects dominate.")
+    out.append("Macro totals weight each defect class equally, so a rare broken rule")
+    out.append("stays visible.")
     out.append("")
     if card.unmeasured:
         out.append(f"Unmeasured defects: {', '.join(card.unmeasured)}")
         out.append("")
 
-    out += _section("3. WHERE RECALL AND ATTRIBUTION DIVERGE")
-    out.append("Every divergence below was investigated. None is a missed defect.")
-    out.append("")
-    for s_ in card.scores:
-        if s_.attribution < 1.0:
-            out.append(f"{s_.defect} - recall {100 * s_.recall:.0f}%, "
-                       f"attribution {100 * s_.attribution:.0f}%")
-    out.append("")
-    out.append("income_non_numeric   values like '$52,000' and '75k' are repaired,")
-    out.append("                     not rejected, so the unparseable check never")
-    out.append("                     fires. Handled, differently than expected.")
-    out.append("")
-    out.append("address_too_short    planted values include 'N/A' and 'unknown',")
-    out.append("                     which the pipeline reads as missing rather than")
-    out.append("                     as short. Both classifications are defensible;")
-    out.append("                     the row is rejected either way.")
-    out.append("")
-    out.append("dob_invalid_value    same cause: 'unknown' is a sentinel null before")
-    out.append("phone_unparseable    it is an unparseable value.")
+    out += _section("3. DEFECTS NOT FULLY RECALLED")
+    misses = [s_ for s_ in card.scores if s_.recall < 1.0]
+    if not misses:
+        out.append("None: every planted defect was acted on.")
+    else:
+        out.append("A row here reached the output without the pipeline acting on that")
+        out.append("column. These are the findings that need investigation.")
+        out.append("")
+        out.append(f"{'DEFECT':<34}{'COLUMN':<16}{'PLANTED':>8}{'MISSED':>8}")
+        for s_ in misses:
+            out.append(f"{s_.defect:<34}{s_.column:<16}{s_.planted:>8}"
+                       f"{s_.planted - s_.handled:>8}")
     out.append("")
 
-    out += _section("4. THE ONE REAL GAP")
-    out.append("duplicate_customer_id is the only defect below 100% recall.")
-    out.append("")
-    out.append("13 rows carrying a planted duplicate id reached the output without")
-    out.append("the dedup check firing. The cleaned file nonetheless contains zero")
-    out.append("duplicate ids, because the other row holding each id had already")
-    out.append("been quarantined for an unrelated reason - so no collision existed")
-    out.append("for the check to find.")
-    out.append("")
-    out.append("The output is correct, but the property is fragile: dedup recall")
-    out.append("depends on how much the preceding stage happened to quarantine.")
-    out.append("Relaxing nullability as section 4 of the cleaning log describes")
-    out.append("would keep those rows and surface 13 genuine collisions that")
-    out.append("currently never meet. Uniqueness must therefore be enforced at the")
-    out.append("output, which post-validation does, and not left to a scan whose")
-    out.append("reach shifts with upstream policy.")
+    out += _section("4. RECALL AND ATTRIBUTION DIVERGENCE")
+    diverged = [s_ for s_ in card.scores if s_.attribution < s_.recall]
+    if not diverged:
+        out.append("None: every handled defect was caught by the expected check.")
+    else:
+        out.append("The row was handled, but by a different check than expected.")
+        out.append("This is usually classification ambiguity rather than a defect:")
+        out.append("a planted value that is both malformed and sentinel-null is")
+        out.append("legitimately reportable as either.")
+        out.append("")
+        out.append(f"{'DEFECT':<34}{'RECALL':>9}{'ATTRIB':>9}{'DIFF':>8}")
+        for s_ in diverged:
+            out.append(f"{s_.defect:<34}{100 * s_.recall:>8.1f}%"
+                       f"{100 * s_.attribution:>8.1f}%{s_.handled - s_.attributed:>8}")
     out.append("")
 
     out += _section("SUMMARY")
-    out.append(f"{'Defects planted':<30}{card.planted:>8,}")
-    out.append(f"{'Handled':<30}{card.handled:>8,}   {100 * card.recall:.1f}%")
-    out.append(f"{'Correctly attributed':<30}{card.attributed:>8,}   {100 * card.attribution:.1f}%")
+    out.append(f"{'Defect classes measured':<34}{len(card.scores):>8,}")
+    out.append(f"{'Defects planted':<34}{card.planted:>8,}")
+    out.append(f"{'Handled':<34}{card.handled:>8,}   {100 * card.recall:.1f}%")
+    out.append(f"{'Correctly attributed':<34}{card.attributed:>8,}   {100 * card.attribution:.1f}%")
     out.append("")
     return "\n".join(out) + "\n"
 
 
 def write(path: Path, content: str) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content)
+    # Explicit encoding: reports carry names in any script, and the default
+    # depends on the host locale.
+    path.write_text(content, encoding="utf-8")
     return path

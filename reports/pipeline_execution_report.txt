@@ -4,28 +4,28 @@ PIPELINE EXECUTION REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 5,000
-Generated  : 2026-09-05T13:28:57Z
+Generated  : 2026-09-06T15:12:49Z
 Pipeline   : v0.1.0
 
-Started    : 2026-09-05T13:28:56Z
+Started    : 2026-09-06T15:12:48Z
 Status     : SUCCESS
-Duration   : 0.72s
+Duration   : 0.73s
 
 ------------------------------------------------------------------------------
 1. STAGE TIMELINE
 ------------------------------------------------------------------------------
 #  STAGE                 IN     OUT  SECONDS  STATUS  DETAIL
 1  load                   0    5000     0.04  ok      10 columns
-2  profile             5000    5000     0.05  ok      948 invalid values
-3  detect_pii          5000    5000     0.11  ok      7 findings, 40 leaked rows
+2  profile             5000    5000     0.04  ok      948 invalid values
+3  detect_pii          5000    5000     0.12  ok      7 findings, 40 leaked rows
 4  validate_pre        5000    5000     0.15  ok      3510 rule failures
-5  clean               5000    3808     0.26  ok      1192 quarantined, reconciled
-6  validate_post       3808    3808     0.08  ok      0 rule failures
-7  mask                3808    3808     0.02  ok      unique 3808 -> 44
+5  clean               5000    3684     0.27  ok      1316 quarantined, reconciled
+6  validate_post       3684    3684     0.07  ok      0 rule failures
+7  mask                3684    3684     0.03  ok      unique 3684 -> 1775
 ------------------------------------------------------------------------------
-   TOTAL                                0.72
+   TOTAL                                0.73
 
-Slowest stage: clean (0.26s, 37% of runtime)
+Slowest stage: clean (0.27s, 38% of runtime)
 
 ------------------------------------------------------------------------------
 2. STAGE ORDER
@@ -41,8 +41,8 @@ data is clean; the pre/post delta is what shows remediation worked.
 3. ROW ACCOUNTING
 ------------------------------------------------------------------------------
 Rows read                              5,000
-Rows cleaned                           3,808
-Rows quarantined                       1,192
+Rows cleaned                           3,684
+Rows quarantined                       1,316
 ------------------------------------------------------------------------------
 Balance                                5,000   OK
 
@@ -56,21 +56,21 @@ Invalid values found                             948
 PII finding types confirmed                        7
 Rows with PII leaked into free text               40
 Rule failures before cleaning                  3,510
-Values normalised                              2,301
-Rows quarantined                               1,192
+Values normalised                              2,150
+Rows quarantined                               1,316
 Rule failures after cleaning                       0
-Uniquely re-identifiable before masking        3,808
-Uniquely re-identifiable after masking            44
+Uniquely re-identifiable before masking        3,684
+Uniquely re-identifiable after masking         1,775
 
 ------------------------------------------------------------------------------
 5. ARTIFACTS WRITTEN
 ------------------------------------------------------------------------------
-  data_quality_report.txt              6,060 bytes
-  pii_detection_report.txt             6,585 bytes
-  cleaning_log.txt                     3,456 bytes
-  customers_cleaned.csv              550,978 bytes
-  quarantine.csv                      73,087 bytes
-  validation_results.txt               3,770 bytes
-  masked_sample.txt                    8,201 bytes
-  customers_masked.csv               396,781 bytes
+  data_quality_report.txt              6,101 bytes
+  pii_detection_report.txt             7,072 bytes
+  cleaning_log.txt                     3,556 bytes
+  customers_cleaned.csv              533,202 bytes
+  quarantine.csv                      82,063 bytes
+  validation_results.txt               3,877 bytes
+  masked_sample.txt                    9,041 bytes
+  customers_masked.csv               383,855 bytes
 

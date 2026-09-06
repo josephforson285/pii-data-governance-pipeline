@@ -4,8 +4,10 @@ DATA QUALITY REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 5,000
-Generated  : 2026-09-05T13:28:56Z
+Generated  : 2026-09-06T15:12:48Z
 Pipeline   : v0.1.0
+Rules      : v2
+Reference  : 2026-09-06 (today (not pinned))
 
 ------------------------------------------------------------------------------
 1. SCHEMA CONFORMANCE
@@ -84,26 +86,26 @@ date_of_birth  (8 shapes)
 
 created_date  (8 shapes)
   SHAPE                     COUNT   EXAMPLE
-  9999-99-99                 4700   2025-06-06
-  9999/99/99                   79   2020/12/24
-  99/99/9999                   78   11/10/2021
-  99-99-9999                   67   23-09-2024
-  AAAAAAAA 99, 9999            20   December 21, 2024
-  AAAA 99, 9999                15   July 19, 2021
-  AAAAAAA 99, 9999             14   January 23, 2025
-  AAAAA 99, 9999               10   April 13, 2023
+  9999-99-99                 4700   [redacted]
+  9999/99/99                   79   [redacted]
+  99/99/9999                   78   [redacted]
+  99-99-9999                   67   [redacted]
+  AAAAAAAA 99, 9999            20   [redacted]
+  AAAA 99, 9999                15   [redacted]
+  AAAAAAA 99, 9999             14   [redacted]
+  AAAAA 99, 9999               10   [redacted]
 
 ------------------------------------------------------------------------------
 5. INVALID VALUES
 ------------------------------------------------------------------------------
 CHECK                         COUNT   EXAMPLES
 unparseable_date_of_birth       489   ####/##/##, ####/##/##, May ##, ####, 
-unparseable_created_date        300   11/10/2021, 07/19/2024, 23-09-2024, 05
+unparseable_created_date        300   ##/##/####, ##/##/####, ##-##-####, ##
 non_numeric_income               14   75k
 negative_income                  70   -20902.86, -3014.52, -25434.13, -39987
 income_above_cap                 25   448920101.06, 585087660.46, 499446821.
 implausible_age                  20   156, 157, 159, 166, 167
-future_created_date              30   2027-11-23, 2026-12-20, 2028-10-29
+future_created_date              30   ####-##-##, ####-##-##, ####-##-##
 
 ------------------------------------------------------------------------------
 6. CATEGORICAL VALIDITY - account_status

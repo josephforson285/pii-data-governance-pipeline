@@ -1,4 +1,23 @@
-# Validation rules from the project brief. Consumed by src/pipeline/validate.py.
+# Single source of truth for pipeline policy. Every threshold, pattern and
+# remediation rule lives here; no module may hardcode a policy value.
+# Bump `version` on any change - it is stamped into every report so two runs
+# that disagree can be explained.
+version: 2
+
+# Date all age and future-date checks are evaluated against. null means today,
+# which makes results drift over time; set an ISO date to freeze a run so the
+# same input always produces the same output.
+reference_date: null
+
+# Sentinel nulls (values that read as present but mean absent) are defined in
+# src/pipeline/profile.py:SENTINELS - a data-representation concern rather than
+# a business rule, and used inside tight loops.
+
+thresholds:
+  min_age: 18
+  max_age: 120
+  income_cap: 10000000
+
 schema:
   customer_id:
     dtype: int64
@@ -9,12 +28,14 @@ schema:
   first_name:
     dtype: str
     nullable: false
-    checks: {min_len: 2, max_len: 50, pattern: "^[A-Za-z][A-Za-z '\\-]*$"}
+    # Unicode-aware: [^\W\d_] is "a letter in any script". An ASCII-only class
+    # would reject Jose, Muller and Nguyen as malformed.
+    checks: {min_len: 2, max_len: 50, pattern: "^[^\\W\\d_](?:[^\\W\\d_]|[ '\\-])*$"}
 
   last_name:
     dtype: str
     nullable: false
-    checks: {min_len: 2, max_len: 50, pattern: "^[A-Za-z][A-Za-z '\\-]*$"}
+    checks: {min_len: 2, max_len: 50, pattern: "^[^\\W\\d_](?:[^\\W\\d_]|[ '\\-])*$"}
 
   email:
     dtype: str
@@ -29,7 +50,7 @@ schema:
   date_of_birth:
     dtype: date
     nullable: false
-    checks: {min_age: 18, max_age: 120}
+    checks: {min_age: true, max_age: true}
 
   address:
     dtype: str
@@ -39,7 +60,7 @@ schema:
   income:
     dtype: float64
     nullable: false
-    checks: {ge: 0, le: 10000000}
+    checks: {ge: 0, income_cap: true}
 
   account_status:
     dtype: str
@@ -51,38 +72,82 @@ schema:
     nullable: false
     checks: {not_future: true}
 
-# Cross-column rules Pandera checks at dataframe level
+# Rules spanning more than one column. Every rule listed here is executed; a
+# name with no implementation raises rather than being silently skipped.
 dataframe_checks:
   - name: dob_before_created
+    left: date_of_birth
+    right: created_date
+    op: lt
     description: A customer cannot be created before they were born
 
-# Remediation policy. Cleaning repairs what is unambiguous and quarantines the
-# rest; nothing is dropped silently. Deliberately declared here so the policy
-# can be argued about without reading Python.
 remediation:
-  # Variants that map to a permitted account_status with no guesswork.
+  # Fields whose absence degrades a record without invalidating it. Used to
+  # report what a tiered nullability policy would retain.
+  non_critical: [income, address, phone]
+
   status_aliases:
     actv: active
     inactve: inactive
     susp: suspended
-  # Date formats accepted on input. Tried in order; first match wins.
+
   date_formats:
     - "%Y-%m-%d"
     - "%Y/%m/%d"
     - "%m/%d/%Y"
     - "%d-%m-%Y"
     - "%B %d, %Y"
-  # A row failing any of these cannot be repaired without inventing data.
-  quarantine_reasons:
-    - duplicate_customer_id
-    - missing_required_field
-    - unparseable_date
-    - unparseable_phone
-    - unparseable_income
-    - income_out_of_range
-    - implausible_age
-    - future_created_date
-    - malformed_email
-    - unmappable_account_status
-    - address_too_short
-    - name_too_short
+
+masking:
+  address_placeholder: "[MASKED ADDRESS]"
+  income_band_width: 25000
+  # strategy names map to functions in mask.py; description and rationale are
+  # rendered into masked_sample.txt so the report cannot drift from the policy.
+  rules:
+    first_name:
+      strategy: initial
+      description: "John -> J***"
+      rationale: "Initial only; length not preserved"
+    last_name:
+      strategy: initial
+      description: "Doe -> D***"
+      rationale: "Initial only; length not preserved"
+    email:
+      strategy: email_local
+      description: "j.doe@gmail.com -> j***@gmail.com"
+      rationale: "Domain kept: analytic, not identifying"
+    phone:
+      strategy: last_four
+      description: "555-123-4567 -> ***-***-4567"
+      rationale: "Last four for support verification; residual risk in combination"
+    address:
+      strategy: suppress
+      description: "-> [MASKED ADDRESS]"
+      rationale: "Free text; replaced wholesale because it can carry leaked identifiers"
+    date_of_birth:
+      strategy: year_only
+      description: "1985-03-15 -> 1985-**-**"
+      rationale: "Year kept for age analysis"
+    income:
+      strategy: band
+      description: "52000 -> 50000-74999"
+      rationale: "Banded to break uniqueness"
+    created_date:
+      strategy: year_only
+      description: "2024-03-15 -> 2024-**-**"
+      rationale: "Near-unique when exact (1957 distinct values over 3684 rows); year retains tenure cohorts"
+
+# Columns released unmasked. Listed explicitly so the k-anonymity assessment
+# can be computed over everything actually shared, not a hand-picked subset.
+release:
+  unmasked_columns: [customer_id, account_status]
+  quasi_identifiers_before: [date_of_birth, address_postal, income]
+  quasi_identifiers_after: [date_of_birth, income, created_date]
+
+reporting:
+  # Columns whose sample values identify a person. Examples drawn from these
+  # are redacted in every report.
+  # created_date is included on the evidence: it has ~1 distinct value per two
+  # rows, which makes it a strong quasi-identifier despite being operational.
+  sensitive_columns:
+    [first_name, last_name, email, phone, date_of_birth, address, created_date]

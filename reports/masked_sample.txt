@@ -3,9 +3,11 @@ MASKED SAMPLE - BEFORE / AFTER
 ==============================================================================
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
-Rows       : 3,808
-Generated  : 2026-09-05T13:28:57Z
+Rows       : 3,684
+Generated  : 2026-09-06T15:12:49Z
 Pipeline   : v0.1.0
+Rules      : v2
+Reference  : 2026-09-06 (today (not pinned))
 
 HANDLING: this artifact shows unmasked values by design - it is the
 evidence the control works. It is committed only because the dataset
@@ -15,16 +17,17 @@ restricted and kept out of version control.
 ------------------------------------------------------------------------------
 1. MASKING RULES
 ------------------------------------------------------------------------------
-COLUMN          RULE                              RATIONALE
-first_name      John -> J***                      Initial only; length not preserved
-last_name       Doe -> D***                       Initial only; length not preserved
-email           j.doe@gmail.com -> j***@gmail.com Domain kept: analytic, not identifying
-phone           555-123-4567 -> ***-***-4567      Last four for support verification
-address         -> [MASKED ADDRESS]               Free text; replaced wholesale
-date_of_birth   1985-03-15 -> 1985-**-**          Year kept for age analysis
-income          52000 -> 50000-74999              Banded to break uniqueness
+COLUMN          STRATEGY      RULE                              RATIONALE
+first_name      initial       John -> J***                      Initial only; length not preserved
+last_name       initial       Doe -> D***                       Initial only; length not preserved
+email           email_local   j.doe@gmail.com -> j***@gmail.com Domain kept: analytic, not identifying
+phone           last_four     555-123-4567 -> ***-***-4567      Last four for support verification; residual risk in combination
+address         suppress      -> [MASKED ADDRESS]               Free text; replaced wholesale because it can carry leaked identifiers
+date_of_birth   year_only     1985-03-15 -> 1985-**-**          Year kept for age analysis
+income          band          52000 -> 50000-74999              Banded to break uniqueness
+created_date    year_only     2024-03-15 -> 2024-**-**          Near-unique when exact (1957 distinct values over 3684 rows); year retains tenure cohorts
 
-Untouched: customer_id, account_status, created_date
+Untouched: customer_id, account_status
 customer_id is left intact so the extract still joins, which means it
 remains a linkage key back to the unmasked source.
 
@@ -42,7 +45,7 @@ Record 1
  *address         819 Johnson Course, East William, AK 7  [MASKED ADDRESS]
  *income          72365.99                                50000-74999
   account_status  active                                  active
-  created_date    2025-06-06                              2025-06-06
+ *created_date    2025-06-06                              2025-**-**
 
 Record 2
   FIELD           BEFORE                                  AFTER
@@ -55,7 +58,7 @@ Record 2
  *address         26542 Susan Junction Apt. 161, Melanie  [MASKED ADDRESS]
  *income          37300.42                                25000-49999
   account_status  inactive                                inactive
-  created_date    2025-07-13                              2025-07-13
+ *created_date    2025-07-13                              2025-**-**
 
 Record 3
   FIELD           BEFORE                                  AFTER
@@ -68,7 +71,7 @@ Record 3
  *address         959 Janet Cape Apt. 413, South Joshuas  [MASKED ADDRESS]
  *income          69650.72                                50000-74999
   account_status  active                                  active
-  created_date    2026-04-28                              2026-04-28
+ *created_date    2026-04-28                              2026-**-**
 
 Record 4
   FIELD           BEFORE                                  AFTER
@@ -81,7 +84,7 @@ Record 4
  *address         327 Nelson Route, Lake Mark, WI 07832   [MASKED ADDRESS]
  *income          111133.4                                100000-124999
   account_status  inactive                                inactive
-  created_date    2026-05-20                              2026-05-20
+ *created_date    2026-05-20                              2026-**-**
 
 Record 5
   FIELD           BEFORE                                  AFTER
@@ -94,7 +97,7 @@ Record 5
  *address         76724 John Points Suite 969, Coxberg,   [MASKED ADDRESS]
  *income          172986.95                               150000-174999
   account_status  inactive                                inactive
-  created_date    2020-01-27                              2020-01-27
+ *created_date    2020-01-27                              2020-**-**
 
 Record 6
   FIELD           BEFORE                                  AFTER
@@ -107,7 +110,7 @@ Record 6
  *address         489 Eric Track, New Stephanie, NC 0057  [MASKED ADDRESS]
  *income          197182.48                               175000-199999
   account_status  suspended                               suspended
-  created_date    2025-08-05                              2025-08-05
+ *created_date    2025-08-05                              2025-**-**
 
 * masked field
 
@@ -124,22 +127,31 @@ city or postal code - would have left every one of them in place.
 Group sizes on the quasi-identifiers, before and after. Larger groups
 mean each person is hidden among more people.
 
-GROUP SIZE          BEFORE     AFTER
-k=1 (unique)          3808        44
-k=2                      0       126
-k=3-5                    0      1121
-k>5                      0      2517
+Before : date_of_birth, address_postal, income
+After  : date_of_birth, income, created_date
+The two sets differ because masking removed dimensions. The after
+set covers every attribute actually released, including columns
+left unmasked - scoring only the masked ones would flatter it.
 
-Uniquely re-identifiable: 100.0% -> 1.2%
+GROUP SIZE          BEFORE     AFTER
+k=1 (unique)          3684      1775
+k=2                      0      1230
+k=3-5                    0       673
+k>5                      0         6
+
+Uniquely re-identifiable: 100.0% -> 48.2%
 
 Achieved by generalising the quasi-identifiers, not by masking the
 direct identifiers: dropping the postal code with the address, coarsening
 the birth date to a year and banding income. Masking names and emails
 alone would have left the figure unchanged.
 
-44 records remain unique and are still re-identifiable by
-anyone holding a second dataset with birth year and income. The extract
-is pseudonymous, not anonymous, and stays personal data under GDPR.
+1775 records remain unique on the released attributes.
+k-anonymity is a risk indicator, not proof of anonymity: it measures
+uniqueness only over the quasi-identifiers chosen, says nothing about
+attribute disclosure within a group, and an attacker may hold
+attributes not modelled here. The extract is pseudonymous, not
+anonymous, and remains personal data under GDPR.
 
 ------------------------------------------------------------------------------
 5. UTILITY RETAINED
