@@ -2,7 +2,6 @@
 data, and the profiler must survive input bad enough to be worth reporting."""
 from __future__ import annotations
 
-from pathlib import Path
 
 import pandas as pd
 import pytest
