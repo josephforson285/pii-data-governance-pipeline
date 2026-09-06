@@ -270,7 +270,8 @@ def render_pii_report(r: PIIReport, source: Path, cfg: Config) -> str:
 
     out += _section("7. RE-IDENTIFICATION RISK")
     out.append("Masking direct identifiers does not make a dataset anonymous. Grouping")
-    out.append("rows by quasi-identifiers (birth year, postal code, income band) shows")
+    out.append("rows by quasi-identifiers (exact date of birth, postal code, income")
+    out.append("band) shows")
     out.append("how many people each record is hidden among.")
     out.append("")
     out.append(f"Quasi-identifiers modelled: {', '.join(r.quasi_identifiers)}")
@@ -290,8 +291,9 @@ def render_pii_report(r: PIIReport, source: Path, cfg: Config) -> str:
     out.append(f"{pct:.1f}% of records are unique on quasi-identifiers alone (k=1).")
     out.append("Those records are uniquely distinguishable on the modelled")
     out.append("quasi-identifiers, so they carry elevated linkage risk wherever")
-    out.append("matching auxiliary data exists. Masking direct identifiers does")
-    out.append("not change that.")
+    out.append("matching auxiliary data exists. Masking names, emails and phones")
+    out.append("alone would not change that; generalising the quasi-identifiers is")
+    out.append("what reduces it, which is what the masking stage does.")
     out.append("")
     out.append("The masked output should be treated as pseudonymised rather than")
     out.append("anonymous for this assessment: k-anonymity alone does not settle")
@@ -313,18 +315,32 @@ def render_validation_report(pre: ValidationResult, source: Path, cfg: Config,
     out.append("the rules can change without touching pipeline code.")
     out.append("")
 
-    out += _section(f"2. TYPE COERCION - {pre.stage.upper()}")
+    out += _section("2. TYPE COERCION")
     out.append("Values that are present but will not convert to their declared type.")
     out.append("Pandera sees these as null once coerced, so they would otherwise be")
     out.append("counted as missing - a different defect needing a different fix.")
+    out.append("They also block publication, so the delta matters as much as the")
+    out.append("rule-failure delta below.")
     out.append("")
-    out.append(f"{'COLUMN':<20}{'UNCOERCIBLE':>13}   EXAMPLES")
-    for col, n in pre.coercion_by_column.items():
-        sensitive = col in cfg.sensitive_columns
-        ex = ", ".join(dict.fromkeys(
-            _safe(f.failure_case, sensitive) for f in pre.coercion if f.column == col))[:36]
-        out.append(f"{col:<20}{n:>13}   {ex}")
-    out.append(f"{'TOTAL':<20}{len(pre.coercion):>13}")
+    if post is None:
+        out.append(f"{'COLUMN':<20}{'UNCOERCIBLE':>13}   EXAMPLES")
+        for col, n in pre.coercion_by_column.items():
+            sensitive = col in cfg.sensitive_columns
+            ex = ", ".join(dict.fromkeys(
+                _safe(f.failure_case, sensitive) for f in pre.coercion if f.column == col))[:36]
+            out.append(f"{col:<20}{n:>13}   {ex}")
+        out.append(f"{'TOTAL':<20}{len(pre.coercion):>13}")
+    else:
+        columns = list(dict.fromkeys(
+            list(pre.coercion_by_column) + list(post.coercion_by_column)))
+        out.append(f"{'COLUMN':<20}{'PRE':>8}{'POST':>8}{'DELTA':>9}")
+        for col in columns:
+            a = pre.coercion_by_column.get(col, 0)
+            b = post.coercion_by_column.get(col, 0)
+            out.append(f"{col:<20}{a:>8}{b:>8}{b - a:>+9}")
+        out.append("-" * WIDTH)
+        out.append(f"{'TOTAL':<20}{len(pre.coercion):>8}{len(post.coercion):>8}"
+                   f"{len(post.coercion) - len(pre.coercion):>+9}")
     out.append("")
 
     out += _section("3. RULE FAILURES")
@@ -498,10 +514,12 @@ def render_masked_sample(r: MaskResult, original: "pd.DataFrame", source: Path,
                f"   (unparseable component in {100 * r.incomplete_after:.1f}%)")
     out.append("Rows whose quasi-identifiers would not parse share an 'unknown'")
     out.append("signature, which groups them and overstates their protection.")
-    out.append("The two sets differ because masking removed dimensions. The after")
-    out.append("set covers every released attribute designated a quasi-identifier,")
-    out.append("including columns left unmasked - scoring only the masked ones")
-    out.append("would flatter the result.")
+    out.append("The risk model changes with masking: postal code disappears with")
+    out.append("the suppressed address, date of birth and income are generalised,")
+    out.append("and created_date joins the set at its released year granularity.")
+    out.append("The after set covers every released attribute designated a")
+    out.append("quasi-identifier, including columns left unmasked - scoring only")
+    out.append("the masked ones would flatter the result.")
     out.append("")
     total = len(r.masked)
     out.append(f"{'GROUP SIZE':<16}{'BEFORE':>10}{'AFTER':>10}")
@@ -516,7 +534,8 @@ def render_masked_sample(r: MaskResult, original: "pd.DataFrame", source: Path,
     out.append("the birth date to a year and banding income. Masking names and emails")
     out.append("alone would have left the figure unchanged.")
     out.append("")
-    out.append(f"{r.unique_after} records remain unique on the released attributes.")
+    out.append(f"{r.unique_after} records remain unique on the modelled post-mask")
+    out.append("quasi-identifiers.")
     out.append("k-anonymity is a risk indicator, not proof of anonymity: it measures")
     out.append("uniqueness only over the quasi-identifiers chosen, says nothing about")
     out.append("attribute disclosure within a group, and an attacker may hold")

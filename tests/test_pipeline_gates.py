@@ -263,3 +263,32 @@ def test_profile_separates_repairable_formats_from_unrepairable_values(cfg):
     assert v["income_repairable_format"]["count"] == 1
     # 'not disclosed' is a sentinel, so it is missing rather than unrepairable
     assert v["income_unrepairable"]["count"] == 0
+
+
+def test_repairable_income_forms_are_classified_as_repairable(cfg):
+    """'$52,000' parsed fine, so the repairable branch never fired and it was
+    reported as already canonical."""
+    df = pd.DataFrame([row(income="$52,000"), row(income="75k"),
+                       row(income="60,000.00"), row(income="52000")])
+    v = profile(df, cfg).invalid_values
+    assert v["income_repairable_format"]["count"] == 3
+    assert v["income_unrepairable"]["count"] == 0
+
+
+def test_semantic_checks_cover_repairable_dates(cfg):
+    """A 10-year-old written as 01/01/2016 escaped the profiler's age check
+    while the validator rejected the row."""
+    df = pd.DataFrame([row(date_of_birth="01/01/2016")])
+    assert profile(df, cfg).invalid_values["age_outside_policy"]["count"] == 1
+
+
+def test_cleaning_never_emits_an_unclassified_column(cfg):
+    """Building the frame from the input's columns invented an empty column
+    for anything unexpected, silently blanking whatever it held."""
+    from pipeline.clean import clean
+
+    df = pd.DataFrame([row()])
+    df["marketing_note"] = "call john@example.com"
+    cleaned, _ = clean(df, cfg)
+    assert list(cleaned.columns) == list(cfg.schema)
+    assert "marketing_note" not in cleaned.columns

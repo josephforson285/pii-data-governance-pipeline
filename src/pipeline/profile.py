@@ -87,10 +87,19 @@ def _examples(values, k: int = 5) -> list:
 
 
 def _as_number(v: Any) -> float | None:
+    """Semantic value, accepting the forms the cleaner recovers."""
+    text = str(v).strip()
+    if re.fullmatch(r"\d+(\.\d+)?[kK]", text):
+        return float(text[:-1]) * 1000
     try:
-        return float(str(v).replace(",", "").replace("$", "").strip())
+        return float(text.replace(",", "").replace("$", ""))
     except (ValueError, AttributeError):
         return None
+
+
+def _is_canonical_number(v: Any) -> bool:
+    """A bare decimal, which needs no repair."""
+    return re.fullmatch(r"-?\d+(\.\d+)?", str(v).strip()) is not None
 
 
 def _as_date(v: Any) -> date | None:
@@ -112,11 +121,8 @@ def _repairable_date(v: Any, formats: list[str]) -> bool:
 
 
 def _repairable_number(v: Any) -> bool:
-    """Values the cleaner recovers: '$52,000', '60,000.00', '75k'."""
-    text = str(v).strip()
-    if re.fullmatch(r"\d+(\.\d+)?[kK]", text):
-        return True
-    return _as_number(text) is not None
+    """Non-canonical but recoverable: '$52,000', '60,000.00', '75k'."""
+    return not _is_canonical_number(v) and _as_number(v) is not None
 
 
 def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
@@ -156,7 +162,22 @@ def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
     dup_counts = pd.Series(ids, dtype=object).value_counts()
     duplicates = {str(k): int(v) for k, v in dup_counts[dup_counts > 1].items()} if ids else {}
 
-    ages = [(today - d).days / 365.25 for d in (_as_date(v) for v in col("date_of_birth")) if d]
+    # Semantic checks parse everything the cleaner could parse. Restricting
+    # them to canonical ISO let a repairable date carrying an impossible age
+    # slip past the profiler while the validator rejected it.
+    def parsed_date(v: Any) -> date | None:
+        canonical = _as_date(v)
+        if canonical:
+            return canonical
+        for fmt in formats:
+            try:
+                return datetime.strptime(str(v).strip(), fmt).date()
+            except ValueError:
+                continue
+        return None
+
+    ages = [(today - d).days / 365.25
+            for d in (parsed_date(v) for v in col("date_of_birth")) if d]
     incomes = [x for x in (_as_number(v) for v in col("income")) if x is not None]
 
     invalid = {
@@ -187,29 +208,31 @@ def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
                                   and _as_date(v) is None and not _repairable_date(v, formats)),
         },
         "income_repairable_format": {
-            "count": sum(1 for v in col("income") if not is_missing(v)
-                         and _as_number(v) is None and _repairable_number(v)),
-            "examples": _examples(str(v) for v in col("income") if not is_missing(v)
-                                  and _as_number(v) is None and _repairable_number(v)),
+            "count": sum(1 for v in col("income")
+                         if not is_missing(v) and _repairable_number(v)),
+            "examples": _examples(str(v) for v in col("income")
+                                  if not is_missing(v) and _repairable_number(v)),
         },
         "income_unrepairable": {
             "count": sum(1 for v in col("income") if not is_missing(v)
-                         and not _repairable_number(v)),
+                         and not _is_canonical_number(v) and not _repairable_number(v)),
             "examples": _examples(str(v) for v in col("income") if not is_missing(v)
+                                  and not _is_canonical_number(v)
                                   and not _repairable_number(v)),
         },
         "negative_income": {"count": sum(1 for x in incomes if x < 0), "examples": _examples(x for x in incomes if x < 0)},
         "income_above_cap": {"count": sum(1 for x in incomes if x > cap), "examples": _examples((x for x in incomes if x > cap), 3)},
-        # Same bounds the cleaner and validator use, so the three cannot
-        # disagree about whether a record's age is acceptable.
+        # Same bounds and the same date formats the cleaner uses, so profiler,
+        # cleaner and validator agree on coverage as well as verdict.
         "age_outside_policy": {
             "count": sum(1 for a in ages if not cfg.min_age <= a <= cfg.max_age),
             "examples": _examples(sorted(f"{a:.1f}y" for a in ages
                                          if not cfg.min_age <= a <= cfg.max_age)),
         },
         "future_created_date": {
-            "count": sum(1 for v in col("created_date") if (d := _as_date(v)) and d > today),
-            "examples": _examples((str(v) for v in col("created_date") if (d := _as_date(v)) and d > today), 3),
+            "count": sum(1 for v in col("created_date") if (d := parsed_date(v)) and d > today),
+            "examples": _examples((str(v) for v in col("created_date")
+                                   if (d := parsed_date(v)) and d > today), 3),
         },
     }
 

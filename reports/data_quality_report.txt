@@ -4,7 +4,7 @@ DATA QUALITY REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T19:05:06Z
+Generated  : 2026-09-06T19:27:03Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)
@@ -106,7 +106,7 @@ date_of_birth_repairable_format       450   ##-##-####, ####/##/##, ####/##/
 date_of_birth_unrepairable             42   ####-##-##, invalid_date, ####-#
 created_date_repairable_format        300   ##/##/####, ##/##/####, ##-##-##
 created_date_unrepairable               0   
-income_repairable_format               17   75k
+income_repairable_format               40   75k, 60,000.00, $52,000
 income_unrepairable                     0   
 negative_income                        70   -26572.96, -39772.12, -28555.12,
 income_above_cap                       25   781058296.67, 500389206.67, 9023
@@ -143,7 +143,7 @@ SUMMARY
 Rows profiled            : 5,000
 Columns with missing data: 5
 Least complete column    : income (4.70% missing)
-Invalid-value findings   : 955
+Invalid-value findings   : 978
 Additional format shapes : 21
   (shapes beyond the canonical one, not a count of bad records)
 

@@ -153,7 +153,8 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
             pre = validate(raw, cfg, stage="pre-clean")
             result.outputs["failures_pre"] = len(pre.failures)
             result.outputs["coercion_pre"] = len(pre.coercion)
-            t.finish(len(raw), f"{len(pre.failures)} rule failures")
+            t.finish(len(raw), f"{len(pre.failures)} rule failures, "
+                     f"{len(pre.coercion)} uncoercible")
 
         with _Timer(result, "clean", len(raw)) as t:
             cleaned, clog = clean(raw, cfg)
@@ -176,7 +177,8 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
                            render_validation_report(pre, source, cfg, post=post)))
             result.outputs["failures_post"] = len(post.failures)
             result.outputs["coercion_post"] = len(post.coercion)
-            t.finish(len(cleaned), f"{len(post.failures)} rule failures")
+            t.finish(len(cleaned), f"{len(post.failures)} rule failures, "
+                     f"{len(post.coercion)} uncoercible")
 
         with _Timer(result, "publish", len(cleaned)) as t:
             # A row that survived cleaning and still fails the schema was

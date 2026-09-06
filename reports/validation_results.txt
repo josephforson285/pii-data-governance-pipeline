@@ -4,7 +4,7 @@ VALIDATION RESULTS
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T19:05:07Z
+Generated  : 2026-09-06T19:27:04Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)
@@ -19,17 +19,20 @@ Declared in config/rules.yml and translated to pandera checks, so
 the rules can change without touching pipeline code.
 
 ------------------------------------------------------------------------------
-2. TYPE COERCION - PRE-CLEAN
+2. TYPE COERCION
 ------------------------------------------------------------------------------
 Values that are present but will not convert to their declared type.
 Pandera sees these as null once coerced, so they would otherwise be
 counted as missing - a different defect needing a different fix.
+They also block publication, so the delta matters as much as the
+rule-failure delta below.
 
-COLUMN                UNCOERCIBLE   EXAMPLES
-date_of_birth                 492   ####-##-##, ##-##-####, ####/##/##, 
-created_date                  300   ##/##/####, ##-##-####, ####/##/##, 
-income                         40   75k, 60,000.00, $52,000
-TOTAL                         832
+COLUMN                   PRE    POST    DELTA
+date_of_birth            492       0     -492
+created_date             300       0     -300
+income                    40       0      -40
+------------------------------------------------------------------------------
+TOTAL                    832       0     -832
 
 ------------------------------------------------------------------------------
 3. RULE FAILURES

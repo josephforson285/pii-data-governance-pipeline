@@ -4,7 +4,7 @@ PII DETECTION REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T19:05:06Z
+Generated  : 2026-09-06T19:27:03Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)
@@ -118,7 +118,8 @@ identifiers are the factors that assessment would weigh.
 7. RE-IDENTIFICATION RISK
 ------------------------------------------------------------------------------
 Masking direct identifiers does not make a dataset anonymous. Grouping
-rows by quasi-identifiers (birth year, postal code, income band) shows
+rows by quasi-identifiers (exact date of birth, postal code, income
+band) shows
 how many people each record is hidden among.
 
 Quasi-identifiers modelled: date_of_birth, address_postal, income
@@ -132,8 +133,9 @@ k=1 (unique)        5000   100.0%
 100.0% of records are unique on quasi-identifiers alone (k=1).
 Those records are uniquely distinguishable on the modelled
 quasi-identifiers, so they carry elevated linkage risk wherever
-matching auxiliary data exists. Masking direct identifiers does
-not change that.
+matching auxiliary data exists. Masking names, emails and phones
+alone would not change that; generalising the quasi-identifiers is
+what reduces it, which is what the masking stage does.
 
 The masked output should be treated as pseudonymised rather than
 anonymous for this assessment: k-anonymity alone does not settle

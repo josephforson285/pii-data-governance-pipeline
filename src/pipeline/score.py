@@ -55,9 +55,9 @@ class ScoreCard:
 
     @property
     def specificity(self) -> float:
-        """Share of defect-free rows the pipeline left alone.
+        """Share of defect-free rows that were not quarantined.
 
-        The counterweight to recall. Quarantining everything scores perfect
+        The counterweight to recall: quarantining everything scores perfect
         recall and zero specificity, so the pair cannot both be gamed.
         """
         if not self.clean_rows:
@@ -149,10 +149,10 @@ def score(truth: dict, clean_log, pii_report) -> ScoreCard:
     for f in pii_report.leaks:
         leak_rows.update(f.rows)
 
-    # Rows that reached the published extract. Publication is gated on
-    # post-clean validation, so every one of these satisfies the schema.
+    # Rows that survived cleaning. The scorer observes cleaning only; whether
+    # they were then published is decided by a gate it does not run.
     rejected_rows = {r.row for r in clean_log.rejections}
-    published = set(range(truth["n_rows"])) - rejected_rows
+    survived_cleaning = set(range(truth["n_rows"])) - rejected_rows
     repaired_rows_by_column: dict[str, set[int]] = {}
     for r in clean_log.repaired:
         repaired_rows_by_column.setdefault(r.column, set()).add(r.row)
@@ -180,11 +180,11 @@ def score(truth: dict, clean_log, pii_report) -> ScoreCard:
             else:
                 attributed = handled
 
-        # Escaped: published without the cleaner rewriting that column, so the
-        # planted value is still in the cleaned extract. Not necessarily
-        # harmful, and masking may remove it later, but recall alone would not
-        # say it survived.
-        escaped = planted & published - repaired_rows_by_column.get(column, set())
+        # Escaped: survived cleaning without the cleaner rewriting that column,
+        # so the planted value is still in the cleaned extract. Masking may
+        # remove it later, but recall alone would not say it survived.
+        escaped = ((planted & survived_cleaning)
+                   - repaired_rows_by_column.get(column, set()))
         scores.append(Score(defect, column, len(planted), len(handled),
                             len(attributed), len(escaped)))
 

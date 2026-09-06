@@ -180,10 +180,8 @@ def detect(df: pd.DataFrame, cfg: Config) -> PIIReport:
     pii_rows: set[int] = set()
     for f in findings:
         pii_rows.update(f.rows)
-    # Every row also carries a name and an id, so exposure is effectively total.
     # Every row carries a name and an id by schema, so exposure is total
     # regardless of what the content scan found.
-    declared_pii_rows = len(df)
 
     keys = signatures(df, cfg.quasi_identifiers_before, cfg)
     buckets = k_buckets(keys)
@@ -193,7 +191,7 @@ def detect(df: pd.DataFrame, cfg: Config) -> PIIReport:
         findings=sorted(findings, key=lambda f: -f.row_count),
         suppressed=sorted(suppressed, key=lambda f: -f.row_count),
         leaks=leaks,
-        rows_with_pii=max(len(pii_rows), declared_pii_rows),
+        rows_with_pii=len(df),
         k_anonymity=buckets,
         unique_rows=buckets.get("k=1 (unique)", 0),
         quasi_identifiers=cfg.quasi_identifiers_before,

@@ -4,7 +4,7 @@ MASKED SAMPLE - BEFORE / AFTER
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 3,682
-Generated  : 2026-09-06T19:05:07Z
+Generated  : 2026-09-06T19:27:04Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)
@@ -131,10 +131,12 @@ Before : date_of_birth, address_postal, income   (unparseable component in 0.0%)
 After  : date_of_birth, income, created_date   (unparseable component in 0.0%)
 Rows whose quasi-identifiers would not parse share an 'unknown'
 signature, which groups them and overstates their protection.
-The two sets differ because masking removed dimensions. The after
-set covers every released attribute designated a quasi-identifier,
-including columns left unmasked - scoring only the masked ones
-would flatter the result.
+The risk model changes with masking: postal code disappears with
+the suppressed address, date of birth and income are generalised,
+and created_date joins the set at its released year granularity.
+The after set covers every released attribute designated a
+quasi-identifier, including columns left unmasked - scoring only
+the masked ones would flatter the result.
 
 GROUP SIZE          BEFORE     AFTER
 k=1 (unique)          3682      1761
@@ -149,7 +151,8 @@ direct identifiers: dropping the postal code with the address, coarsening
 the birth date to a year and banding income. Masking names and emails
 alone would have left the figure unchanged.
 
-1761 records remain unique on the released attributes.
+1761 records remain unique on the modelled post-mask
+quasi-identifiers.
 k-anonymity is a risk indicator, not proof of anonymity: it measures
 uniqueness only over the quasi-identifiers chosen, says nothing about
 attribute disclosure within a group, and an attacker may hold

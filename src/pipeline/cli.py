@@ -20,9 +20,12 @@ def _structure_problem(df, cfg) -> str | None:
     if missing:
         return f"input is missing required columns: {', '.join(missing)}"
     unexpected = [c for c in df.columns if c not in cfg.schema]
-    if unexpected and cfg.unexpected_column_policy == "fail":
-        return (f"input has columns absent from the schema: {', '.join(unexpected)}. "
-                f"They are unclassified, so nothing masks them.")
+    if unexpected:
+        if cfg.unexpected_column_policy == "fail":
+            return (f"input has columns absent from the schema: "
+                    f"{', '.join(unexpected)}. They are unclassified, so "
+                    f"nothing masks them.")
+        log.warning("unexpected columns not in schema: %s", ", ".join(unexpected))
     return None
 
 
@@ -157,8 +160,9 @@ def _cmd_mask(args: argparse.Namespace) -> int:
     src = Path(args.input)
     cfg = load_config(Path(args.rules))
     cleaned = load_raw(src)
-    if _structure_problem(cleaned, cfg) is not None:
-        log.error("%s", _structure_problem(cleaned, cfg))
+    problem = _structure_problem(cleaned, cfg)
+    if problem:
+        log.error("%s", problem)
         return 1
 
     checked = validate(cleaned, cfg, stage="pre-mask")
@@ -220,6 +224,10 @@ def _cmd_score(args: argparse.Namespace) -> int:
 
     raw = load_raw(src)
     cfg = load_config(Path(args.rules))
+    problem = _structure_problem(raw, cfg)
+    if problem:
+        log.error("%s", problem)
+        return 1
     _, clog = clean(raw, cfg)
     card = score(load_ground_truth(truth_path), clog, detect(raw, cfg))
     log.info("recall %.1f%%, attribution %.1f%% over %d planted defects",

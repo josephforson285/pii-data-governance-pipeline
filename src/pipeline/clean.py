@@ -273,7 +273,10 @@ def clean(df: pd.DataFrame, cfg: Config) -> tuple[pd.DataFrame, CleaningLog]:
         kept.append(record)
 
     log.rows_out = len(kept)
-    return pd.DataFrame(kept, columns=list(df.columns)), log
+    # Schema columns only. Building on the input's columns invented an empty
+    # column for anything unexpected, silently blanking whatever it held -
+    # reachable whenever the drift policy is 'warn'.
+    return pd.DataFrame(kept, columns=list(cfg.schema)), log
 
 
 def policy_sensitivity(log: CleaningLog, non_critical: set[str]) -> dict[str, int]:
