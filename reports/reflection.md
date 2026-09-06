@@ -8,7 +8,7 @@ records. Figures cite the reports in this directory.
 | Issue | Scale | Fix | Impact if unfixed |
 | --- | --- | --- | --- |
 | Sentinel nulls (`"N/A"`, whitespace) | 418 values, 5 columns | Counted as missing at profiling | Survives `dropna()`; corrupts every mean and join |
-| Non-standard phone formats | 8 shapes, 1,026 rows | Reformatted; 34 quarantined | One customer looks like several; dedup fails |
+| Non-standard phone formats | 8 shapes, 1,036 rows | Reformatted; 34 quarantined | One customer looks like several; dedup fails |
 | Unparseable / non-standard dates | 787 values | 748 repaired, 39 quarantined | Age and tenure wrong or crashing |
 | Invalid `account_status` | 350 rows, 9 variants | Case/alias mapping; 110 quarantined | `active` splits into 4 buckets |
 | Duplicate `customer_id` | 47 ids, 50 surplus rows | Detected across whole input; quarantined | Joins fan out; balances double-counted |
@@ -45,7 +45,7 @@ something the pipeline makes, but I would expect it to clear.
 ## 3. Masking trade-offs
 
 Before masking, **100% of 3,682 cleaned records were uniquely identifiable on
-quasi-identifiers alone**. After, 1,760 remain unique: **47.8%**.
+quasi-identifiers alone**. After, 1,761 remain unique: **47.8%**.
 
 That figure was originally 1.2%, and it was wrong. I computed it over the
 *masked* columns only, ignoring `created_date` — released untouched because I
@@ -61,7 +61,7 @@ the ones you decided were boring.
 Retained: age cohorts, income bands, provider mix, tenure by year, joins.
 Lost: contacting individuals, geographic analysis, exact income and age.
 
-**Would I release it?** No. 48.2% is not anonymity, and `customer_id` still
+**Would I release it?** No. 47.8% is not anonymity, and `customer_id` still
 links to source — so it stays personal data, under contract to a named
 recipient with access control. Open release would need `customer_id` dropped,
 wider bands, birth year in ranges, then re-measuring. k-anonymity is a risk
