@@ -4,50 +4,45 @@ PIPELINE EXECUTION REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T21:10:39Z
+Generated  : 2026-09-06T23:20:40Z
 Pipeline   : v0.1.0
 
-Started    : 2026-09-06T21:10:38Z
+Started    : 2026-09-06T23:20:39Z
 Rules      : v3
 Reference  : 2026-09-06
 Status     : SUCCESS
-Duration   : 0.84s
+Duration   : 0.81s
 
 ------------------------------------------------------------------------------
 1. STAGE TIMELINE
 ------------------------------------------------------------------------------
 #  STAGE                 IN     OUT  SECONDS  STATUS  DETAIL
 1  load                   0    5000     0.04  ok      10 columns
-2  profile             5000    5000     0.09  ok      978 invalid values
+2  profile             5000    5000     0.08  ok      978 invalid values
 3  detect_pii          5000    5000     0.11  ok      7 findings, 40 leaked rows
 4  validate_pre        5000    5000     0.15  ok      3527 rule failures, 832 uncoer
-5  clean               5000    3682     0.27  ok      1318 quarantined, reconciled
-6  validate_post       3682    3682     0.08  ok      0 rule failures, 0 uncoercible
+5  clean               5000    3682     0.26  ok      1318 quarantined, reconciled
+6  validate_post       3682    3682     0.07  ok      0 rule failures, 0 uncoercible
 7  publish             3682    3682     0.01  ok      schema compliant
-8  mask                3682    3682     0.03  ok      unique 3682 -> 1761
+8  mask                3682    3682     0.02  ok      unique 3682 -> 1761
 9  verify_release      3682    3682     0.06  ok      no direct identifiers remain
 10 publish_masked      3682    3682     0.01  ok      verified before write
 ------------------------------------------------------------------------------
-   TOTAL                                0.84
+   TOTAL                                0.81
 
-Slowest stage: clean (0.27s, 32% of runtime)
+Slowest stage: clean (0.26s, 32% of runtime)
 
 ------------------------------------------------------------------------------
 2. STAGE ORDER
 ------------------------------------------------------------------------------
-Post-clean validation gates publication: the cleaned extract is
-written only after it satisfies the schema it claims to satisfy.
+Two gates. Post-clean validation guards publication: the cleaned
+extract is written only once it satisfies its own schema. Release
+verification guards masking: the masked frame is re-scanned and
+nothing reaches disk unless it is clean.
 
-Masking is likewise verified before release: the masked frame is
-re-scanned for direct identifiers, and nothing reaches disk unless
-the scan is clean.
-
-PII detection runs on the raw file, before cleaning: exposure is a
-property of what landed on disk, and scanning post-clean would
-understate it by every quarantined row.
-
-Validation runs twice. A single post-clean pass only proves the clean
-data is clean; the pre/post delta is what shows remediation worked.
+PII detection runs on the raw file - exposure is a property of what
+landed on disk. Validation runs twice: the pre/post delta is what
+shows remediation worked.
 
 ------------------------------------------------------------------------------
 3. ROW ACCOUNTING
@@ -58,8 +53,8 @@ Rows quarantined                       1,318
 ------------------------------------------------------------------------------
 Balance                                5,000   OK
 
-Asserted inside the clean stage: a mismatch aborts the run rather
-than producing an output file that is quietly short of rows.
+Asserted in the clean stage: a mismatch aborts rather than writing
+a file quietly short of rows.
 
 ------------------------------------------------------------------------------
 4. OUTCOMES
@@ -80,12 +75,12 @@ Direct identifiers left in the masked extract       0
 ------------------------------------------------------------------------------
 5. ARTIFACTS WRITTEN
 ------------------------------------------------------------------------------
-  data_quality_report.txt              6,622 bytes
-  pii_detection_report.txt             7,681 bytes
-  cleaning_log.txt                     3,544 bytes
+  data_quality_report.txt              6,479 bytes
+  pii_detection_report.txt             6,900 bytes
+  cleaning_log.txt                     3,415 bytes
   quarantine.csv                      82,405 bytes
-  validation_results.txt               4,165 bytes
+  validation_results.txt               3,967 bytes
   customers_cleaned.csv              533,216 bytes
-  masked_sample.txt                    9,504 bytes
+  masked_sample.txt                    9,148 bytes
   customers_masked.csv               383,802 bytes
 

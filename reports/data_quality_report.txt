@@ -4,7 +4,7 @@ DATA QUALITY REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T21:10:38Z
+Generated  : 2026-09-06T23:20:40Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)
@@ -27,8 +27,8 @@ income          object        numeric     needs coercion
 account_status  object        string      as expected
 created_date    object        date        needs coercion
 
-Every column reads as object: the CSV is loaded as text so that
-malformed values survive to be reported instead of being coerced away.
+Everything reads as object: the CSV loads as text so malformed values
+survive to be reported instead of coerced away.
 
 ------------------------------------------------------------------------------
 2. COMPLETENESS
@@ -45,14 +45,13 @@ income                93       142      235   4.70%
 account_status         0         0        0   0.00%
 created_date           0         0        0   0.00%
 
-SENTINEL counts values that read as present but mean absent
-('N/A', 'NULL', 'unknown', whitespace). These survive dropna().
+SENTINEL: reads as present, means absent ('N/A', 'unknown',
+whitespace). These survive dropna().
 
 ------------------------------------------------------------------------------
 3. UNIQUENESS
 ------------------------------------------------------------------------------
-Raw values, before normalisation: '00123' and '123' count as
-distinct here, and absent ids are excluded rather than grouped.
+Raw values: '00123' and '123' are distinct; absent ids excluded.
 
 customer_id unique      : NO
 Distinct ids duplicated : 47
@@ -62,8 +61,8 @@ Examples (id x occurrences): 34 x3, 20 x3, 9 x3, 1 x2, 2829 x2, 2213 x2, 1571 x2
 ------------------------------------------------------------------------------
 4. FORMAT INVENTORY
 ------------------------------------------------------------------------------
-Distinct value shapes per column (digits -> 9, letters -> A).
-Examples from identifying columns are redacted.
+Value shapes per column (digits -> 9, letters -> A). Examples from
+identifying columns are redacted.
 
 phone  (8 shapes)
   SHAPE                     COUNT   EXAMPLE
@@ -113,8 +112,8 @@ income_above_cap                       25   781058296.67, 500389206.67, 9023
 age_outside_policy                     21   156.3y, 161.8y, 164.9y, 171.9y, 
 future_created_date                    30   ####-##-##, ####-##-##, ####-##-
 
-'repairable_format' values are non-canonical but recoverable by the
-cleaner; 'unrepairable' ones need a decision, not a parser.
+'repairable_format' is recoverable by the cleaner; 'unrepairable'
+needs a decision, not a parser.
 
 ------------------------------------------------------------------------------
 6. CATEGORICAL VALIDITY - account_status

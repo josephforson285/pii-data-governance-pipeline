@@ -4,31 +4,24 @@ DETECTION SCORECARD
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T21:10:40Z
+Generated  : 2026-09-06T23:20:41Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)
 
-Measured against the generator's manifest of planted defects.
-Nothing in the pipeline reads that manifest: a detector with sight
-of the answer key measures nothing.
+Measured against the generator's manifest. Nothing in the pipeline
+reads it: a detector that can see the answer key measures nothing.
 
 ------------------------------------------------------------------------------
 1. WHAT IS MEASURED
 ------------------------------------------------------------------------------
-RECALL      the row was acted on for that column - repaired or
-            rejected. A miss here reaches production.
-ATTRIBUTION the specific check expected to catch it is the one that
-            fired. A miss here means the diagnosis was wrong, even
-            though the row was handled.
+RECALL      the row was acted on - repaired or rejected
+ATTRIBUTION the check expected to catch it is the one that fired
+CONTAINMENT it did not survive into the cleaned extract
+SPECIFICITY defect-free rows that were not quarantined
 
-CONTAINMENT share of planted defects that did not survive into the
-            cleaned extract. Measures cleaning, not the release:
-            masking may remove what does survive.
-SPECIFICITY share of defect-free rows that were not quarantined.
-            The counterweight to recall:
-            quarantining everything scores perfect recall and
-            zero specificity, so neither can be gamed alone.
+Recall and specificity are a pair: quarantining everything scores
+100% recall and 0% specificity, so neither can be gamed alone.
 
 ------------------------------------------------------------------------------
 2. PER-DEFECT RESULTS
@@ -60,9 +53,8 @@ duplicate_customer_id           customer_id          50  100.0%  100.0%   100.0%
 TOTAL (micro)                                      3670  100.0%   97.0%    99.2%
 TOTAL (macro, per defect class)                      22  100.0%   90.7%
 
-Micro totals weight by planted volume, so frequent defects dominate.
-Macro totals weight each defect class equally, so a rare broken rule
-stays visible.
+Micro weights by volume; macro weights each defect class equally, so
+a rare broken rule stays visible.
 
 ------------------------------------------------------------------------------
 3. DEFECTS NOT FULLY RECALLED
@@ -72,10 +64,9 @@ None: every planted defect was acted on.
 ------------------------------------------------------------------------------
 4. RECALL AND ATTRIBUTION DIVERGENCE
 ------------------------------------------------------------------------------
-The row was handled, but by a different check than expected.
-This may be legitimate classification ambiguity - a value that is
-both malformed and sentinel-null is reportable as either - or a
-mismatch in the expected mapping. Worth reviewing, not assuming.
+Handled, but by a different check than expected. May be genuine
+ambiguity - a value both malformed and sentinel-null is reportable
+as either - or a mismatched mapping. Worth reviewing.
 
 DEFECT                               RECALL   ATTRIB    DIFF
 income_non_numeric                   100.0%     0.0%      50
@@ -93,16 +84,14 @@ Correctly attributed                 3,561   97.0%
 
 Survived into cleaned extract           30   pre-mask containment 99.2%
 
-These reached customers_cleaned.csv without the cleaner rewriting
-that column. It measures cleaning, not the final release: masking
-may still remove them, and the verify_release stage confirms the
-masked extract carries no direct identifiers.
+Reached customers_cleaned.csv untouched in that column. Masking may
+still remove them; verify_release confirms the masked extract is
+clean.
 
 Rows with no planted defect          2,261
   of those, quarantined                  1
 Specificity                                  100.0%
 
-Rows quarantined without a planted defect are not necessarily
-errors: the generator plants defects per column, and a row can
-carry a naturally invalid combination it never planted.
+Not necessarily errors: defects are planted per column, so a row
+can carry an invalid combination that was never planted.
 

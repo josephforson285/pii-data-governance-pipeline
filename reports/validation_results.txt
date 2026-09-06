@@ -4,28 +4,25 @@ VALIDATION RESULTS
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T21:10:39Z
+Generated  : 2026-09-06T23:20:40Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)
 
-Engine: pandera, lazy=True - every rule is evaluated against every
-row so one bad value cannot hide the rest.
+Engine: pandera, lazy=True - every rule against every row, so one bad
+value cannot hide the rest.
 
 ------------------------------------------------------------------------------
 1. RULES APPLIED
 ------------------------------------------------------------------------------
-Declared in config/rules.yml and translated to pandera checks, so
-the rules can change without touching pipeline code.
+Declared in config/rules.yml, so rules change without touching code.
 
 ------------------------------------------------------------------------------
 2. TYPE COERCION
 ------------------------------------------------------------------------------
-Values that are present but will not convert to their declared type.
-Pandera sees these as null once coerced, so they would otherwise be
-counted as missing - a different defect needing a different fix.
-They also block publication, so the delta matters as much as the
-rule-failure delta below.
+Present but unconvertible. Pandera sees these as null once coerced,
+which would lump them with genuinely missing values - a different
+defect needing a different fix. They also block publication.
 
 COLUMN                   PRE    POST    DELTA
 date_of_birth            492       0     -492
@@ -69,8 +66,7 @@ quarantine file with a reason, not silently dropped.
 ------------------------------------------------------------------------------
 4. FAILURE DETAIL
 ------------------------------------------------------------------------------
-First 40 failures, with the row and the offending value.
-Values from identifying columns are redacted.
+First 40 failures. Values from identifying columns are redacted.
 
     ROW   COLUMN          CHECK                     VALUE
 

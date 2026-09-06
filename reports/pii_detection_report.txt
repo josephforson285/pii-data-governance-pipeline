@@ -4,7 +4,7 @@ PII DETECTION REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T21:10:38Z
+Generated  : 2026-09-06T23:20:40Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)
@@ -12,7 +12,6 @@ Reference  : 2026-09-06 (pinned)
 ------------------------------------------------------------------------------
 1. DECLARED PII INVENTORY
 ------------------------------------------------------------------------------
-What each column holds by design. Governance metadata, not inference.
 
 COLUMN          CLASSIFICATION      SENS      RATIONALE
 customer_id     pseudonymous key    medium    Linkage key. Pseudonymised data is still personal data (GDPR Recital 26)
@@ -39,11 +38,10 @@ postal_code   quasi-identifier    medium    Narrows population to a few thousand
 date_iso      quasi-identifier    medium    Birth date is a strong re-identification signal
 ip_address    direct identifier   medium    Personal data under GDPR (Breyer, C-582/14)
 
-Every column is scanned with every pattern. Detecting by column
-name would find only the PII we already knew about.
 
-Scope: these patterns cover common US-formatted identifiers. Absence
-of a finding does not establish absence of international-format PII.
+Every column is scanned with every pattern; detecting by column name
+would find only known PII. Patterns are US-format: absence of a
+finding does not prove absence of international-format PII.
 
 ------------------------------------------------------------------------------
 3. CONFIRMED MATCHES
@@ -57,14 +55,13 @@ address         phone              18       18   ### Bennett Mountains, Lake Alb
 address         email              11       11   #### Heather Mountain, East Timothy, WI ####
 address         us_ssn             11       11   Unit #### Box ####, DPO AA #####, SSN ###-##
 
-Samples are redacted. A PII report that quotes raw PII is itself a breach.
+Samples redacted: a PII report must not itself carry PII.
 
 ------------------------------------------------------------------------------
-4. SUPPRESSED MATCHES - PRECISION
+4. SUPPRESSED MATCHES
 ------------------------------------------------------------------------------
-Regex matches shape, not meaning. These hits are structural
-coincidence, discarded by declared rule rather than by tuning the
-patterns, so the decision stays auditable.
+Structural coincidences, discarded by declared rule rather than by
+tuning the patterns, so each discard stays auditable.
 
 COLUMN          DETECTOR         ROWS   REASON
 created_date    date_iso         4700   Account creation timestamp; operational, not a birth date
@@ -72,18 +69,15 @@ income          postal_code      1778   Numeric field; any 5-digit amount matche
 phone           postal_code        11   Truncated phone number, not a postal code
 
 Raw hits 25,365 -> confirmed 18,876 (74.4% confirmation rate).
-
-This is a confirmation rate, not precision. Precision would need
-each match labelled true or false against ground truth; these are
-regex hits filtered by declared policy. Scanning recall-first and
-suppressing afterwards is deliberate: a missed identifier is a
-breach, a false positive is review effort.
+Not precision: these are regex hits filtered by policy, not matches
+labelled against ground truth. Recall-first is deliberate - a missed
+identifier is a breach, a false positive is review effort.
 
 ------------------------------------------------------------------------------
 5. UNDECLARED PII - LEAKAGE
 ------------------------------------------------------------------------------
-Direct identifiers found in columns not meant to hold them.
-Field-level masking driven by the schema would miss all of these.
+Direct identifiers in columns not meant to hold them. Schema-driven
+masking would miss every one.
 
 COLUMN          DETECTOR         ROWS   FIRST AFFECTED ROWS
 address         email              11   [450, 507, 706, 721, 851, 1576]
@@ -98,29 +92,25 @@ Highest severity: us_ssn in address (critical).
 ------------------------------------------------------------------------------
 Records containing personal data : 5,000 of 5,000 (100.0%)
 
-Every record carries a name, an identifier and contact details, so
-exposure is total: there is no subset of this file that is safe to
-release unmasked.
+Every record carries a name, an identifier and contact details, so no
+subset of this file is safe to release unmasked.
 
-If this file were disclosed:
+If disclosed:
   - Direct identifiers  name, email, phone, and 11 leaked SSNs
   - Financial data      income for every data subject
   - Location            home address for every data subject
 
-Where GDPR applies, Art. 33 requires notifying the supervisory
-authority within 72 hours of becoming aware of a breach likely to
-result in a risk to data subjects' rights. Whether that threshold is
-met is a formal risk assessment, not a determination this pipeline
-can make; the volume, the financial data and the presence of national
-identifiers are the factors that assessment would weigh.
+Where GDPR applies, Art. 33 sets a 72-hour notification duty for a
+breach likely to risk data subjects' rights. Whether that threshold
+is met is a formal assessment, not this pipeline's call; volume,
+financial data and national identifiers are what it would weigh.
 
 ------------------------------------------------------------------------------
 7. RE-IDENTIFICATION RISK
 ------------------------------------------------------------------------------
-Masking direct identifiers does not make a dataset anonymous. Grouping
-rows by quasi-identifiers (exact date of birth, postal code, income
-band) shows
-how many people each record is hidden among.
+Masking direct identifiers does not make a dataset anonymous. Rows are
+grouped by quasi-identifier (exact DOB, postal code, income band) to
+show how many people each record hides among.
 
 Quasi-identifiers modelled: date_of_birth, address_postal, income
 Signatures with an unparseable component: 7.7% - these share a common
@@ -131,14 +121,10 @@ GROUP SIZE          ROWS      PCT
 k=1 (unique)        5000   100.0%
 
 100.0% of records are unique on quasi-identifiers alone (k=1).
-Those records are uniquely distinguishable on the modelled
-quasi-identifiers, so they carry elevated linkage risk wherever
-matching auxiliary data exists. Masking names, emails and phones
-alone would not change that; generalising the quasi-identifiers is
-what reduces it, which is what the masking stage does.
+These carry elevated linkage risk wherever matching auxiliary data
+exists. Masking names and emails alone would not change it -
+generalising the quasi-identifiers is what does.
 
-The masked output should be treated as pseudonymised rather than
-anonymous for this assessment: k-anonymity alone does not settle
-that question, and Recital 26 keeps pseudonymised data in scope.
-Reaching a k threshold would need further generalisation.
+Treat the output as pseudonymised, not anonymous: k-anonymity does not
+settle that, and Recital 26 keeps pseudonymised data in scope.
 

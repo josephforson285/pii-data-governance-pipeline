@@ -4,15 +4,14 @@ MASKED SAMPLE - BEFORE / AFTER
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 3,682
-Generated  : 2026-09-06T21:10:39Z
+Generated  : 2026-09-06T23:20:40Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)
 
-HANDLING: this artifact shows unmasked values by design - it is the
-evidence the control works. It is committed only because the dataset
-is synthetic. Against production data it would be classified
-restricted and kept out of version control.
+HANDLING: shows unmasked values by design - it is the evidence the
+control works. Committed only because the data is synthetic; against
+production data this would be restricted.
 
 ------------------------------------------------------------------------------
 1. MASKING RULES
@@ -28,8 +27,8 @@ income          band          52000 -> 50000-74999              Banded to break 
 created_date    year_only     2024-03-15 -> 2024-**-**          Near-unique when exact (1957 distinct values over 3684 rows); year retains tenure cohorts
 
 Untouched: customer_id, account_status
-customer_id is left intact so the extract still joins, which means it
-remains a linkage key back to the unmasked source.
+customer_id is left intact so the extract still joins - which keeps it
+a linkage key back to the unmasked source.
 
 ------------------------------------------------------------------------------
 2. RECORD COMPARISON
@@ -118,25 +117,23 @@ Record 6
 3. LEAKED PII IN FREE TEXT
 ------------------------------------------------------------------------------
 Part 2 found emails, phones and SSNs inside the address field.
-Replacing the whole field removes them. Partial masking - keeping a
-city or postal code - would have left every one of them in place.
+Replacing the whole field removes them; keeping a city or postcode
+would have left every one in place.
 
 ------------------------------------------------------------------------------
 4. RE-IDENTIFICATION AFTER MASKING
 ------------------------------------------------------------------------------
-Group sizes on the quasi-identifiers, before and after. Larger groups
-mean each person is hidden among more people.
+Group sizes on the quasi-identifiers. Larger groups hide each person
+among more people.
 
 Before : date_of_birth, address_postal, income   (unparseable component in 0.0%)
 After  : date_of_birth, income, created_date   (unparseable component in 0.0%)
-Rows whose quasi-identifiers would not parse share an 'unknown'
-signature, which groups them and overstates their protection.
-The risk model changes with masking: postal code disappears with
-the suppressed address, date of birth and income are generalised,
-and created_date joins the set at its released year granularity.
-The after set covers every released attribute designated a
-quasi-identifier, including columns left unmasked - scoring only
-the masked ones would flatter the result.
+Unparseable quasi-identifiers share an 'unknown' signature, which
+groups them and overstates their protection.
+The model changes with masking: postal code goes with the suppressed
+address, DOB and income are generalised, created_date joins at year
+granularity. The after set covers every released quasi-identifier,
+including unmasked columns - scoring only masked ones would flatter.
 
 GROUP SIZE          BEFORE     AFTER
 k=1 (unique)          3682      1761
@@ -146,10 +143,8 @@ k>5                      0         0
 
 Uniquely re-identifiable: 100.0% -> 47.8%
 
-Achieved by generalising the quasi-identifiers, not by masking the
-direct identifiers: dropping the postal code with the address, coarsening
-the birth date to a year and banding income. Masking names and emails
-alone would have left the figure unchanged.
+Achieved by generalising quasi-identifiers, not by masking direct
+ones. Masking names and emails alone leaves this figure unchanged.
 
 1761 records remain unique on the modelled post-mask
 quasi-identifiers.
