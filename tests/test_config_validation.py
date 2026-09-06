@@ -115,3 +115,30 @@ def test_further_structural_problems_are_rejected(cfg, mutate, expected):
 
     with pytest.raises(ValueError, match=expected):
         validate_config(broken(cfg, mutate))
+
+
+@pytest.mark.parametrize("section,key", [
+    ("thresholds", "income_cap"),
+    ("masking", "rules"),
+    ("release", "unmasked_columns"),
+    ("reporting", "sensitive_columns"),
+    ("remediation", "date_formats"),
+])
+def test_missing_nested_keys_are_reported_not_raised(cfg, section, key):
+    """A present section with a missing key raised KeyError from a property
+    before a single problem could be collected."""
+    from pipeline.config import validate_config
+
+    raw = copy.deepcopy(cfg._raw)
+    del raw[section][key]
+    with pytest.raises(ValueError, match=f"{section}.{key}"):
+        validate_config(Config(raw))
+
+
+def test_missing_permitted_statuses_is_reported(cfg):
+    from pipeline.config import validate_config
+
+    raw = copy.deepcopy(cfg._raw)
+    del raw["schema"]["account_status"]["checks"]["isin"]
+    with pytest.raises(ValueError, match="account_status.checks.isin"):
+        validate_config(Config(raw))

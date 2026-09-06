@@ -146,14 +146,11 @@ def apply_masks(df: pd.DataFrame, cfg: Config) -> pd.DataFrame:
 
 def mask(df: pd.DataFrame, cfg: Config) -> MaskResult:
     masked = apply_masks(df, cfg)
-    # Both sides use the shared signature logic, so the comparison stays
-    # like-for-like when a band width or quasi-identifier set changes.
+    # Shared signature logic keeps the comparison like-for-like.
     keys_before = signatures(df, cfg.quasi_identifiers_before, cfg)
     keys_after = signatures(masked, cfg.quasi_identifiers_after, cfg)
     before = k_buckets(keys_before)
-    # The after set covers every released attribute designated a
-    # quasi-identifier, including columns left unmasked - assessing only the
-    # masked columns would flatter the result.
+    # Covers unmasked released columns too: scoring only masked ones flatters.
     after = k_buckets(keys_after)
     masked_columns = [r.column for r in cfg.mask_rules if r.column in df.columns]
     return MaskResult(

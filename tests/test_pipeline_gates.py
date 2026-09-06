@@ -2,6 +2,8 @@
 data, and the profiler must survive input bad enough to be worth reporting."""
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
@@ -292,3 +294,26 @@ def test_cleaning_never_emits_an_unclassified_column(cfg):
     cleaned, _ = clean(df, cfg)
     assert list(cleaned.columns) == list(cfg.schema)
     assert "marketing_note" not in cleaned.columns
+
+
+def test_validation_report_reflects_coercion_only_failures(cfg):
+    """The narrative keyed off rule failures alone, so a run blocked purely by
+    coercion still read 'every row satisfies the schema'."""
+    import copy
+
+    from pipeline.config import Config
+    from pipeline.report import render_validation_report
+
+    raw = copy.deepcopy(cfg._raw)
+    raw["schema"]["income"]["nullable"] = True
+    nullable = Config(raw)
+
+    clean_frame = pd.DataFrame([row()])
+    dirty = pd.DataFrame([row(income="abc")])
+    pre = validate(clean_frame, nullable, "pre-clean")
+    post = validate(dirty, nullable, "post-clean")
+    assert len(post.failures) == 0 and post.coercion and not post.passed
+
+    text = render_validation_report(pre, Path("x.csv"), nullable, post=post)
+    assert "Publication is blocked" in text
+    assert "Every row remaining after cleaning satisfies" not in text

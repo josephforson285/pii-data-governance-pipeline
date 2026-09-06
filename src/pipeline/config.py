@@ -146,6 +146,19 @@ DERIVED_QUASI = {"address_postal"}
 REQUIRED_SECTIONS = ("thresholds", "schema", "remediation", "masking",
                      "release", "reporting")
 
+# Keys the Config properties read directly. Without these, a property raises
+# KeyError before a single problem can be collected.
+REQUIRED_KEYS = (
+    ("thresholds", "min_age"), ("thresholds", "max_age"), ("thresholds", "income_cap"),
+    ("remediation", "non_critical"), ("remediation", "status_aliases"),
+    ("remediation", "date_formats"),
+    ("masking", "address_placeholder"), ("masking", "income_band_width"),
+    ("masking", "rules"),
+    ("release", "unmasked_columns"), ("release", "quasi_identifiers_before"),
+    ("release", "quasi_identifiers_after"),
+    ("reporting", "sensitive_columns"),
+)
+
 
 def _structural_problems(raw: dict[str, Any]) -> list[str]:
     """Missing sections, checked before any property is read.
@@ -156,6 +169,12 @@ def _structural_problems(raw: dict[str, Any]) -> list[str]:
     """
     problems = [f"missing required section: {name}"
                 for name in REQUIRED_SECTIONS if name not in raw]
+    for section, key in REQUIRED_KEYS:
+        if section in raw and key not in (raw[section] or {}):
+            problems.append(f"missing required key: {section}.{key}")
+    status = (raw.get("schema") or {}).get("account_status") or {}
+    if raw.get("schema") is not None and "isin" not in (status.get("checks") or {}):
+        problems.append("missing required key: schema.account_status.checks.isin")
     if "version" not in raw:
         problems.append("missing required key: version")
 

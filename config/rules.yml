@@ -125,7 +125,7 @@ masking:
     email:
       strategy: email_local
       description: "j.doe@gmail.com -> j***@gmail.com"
-      rationale: "Domain retained for provider-mix analysis; lower identifying power than the full address, but still a quasi-identifier on a rare domain"
+      rationale: "Domain retained for provider-mix analysis; lower identifying power than the full email, but still a quasi-identifier on a rare domain"
     phone:
       strategy: last_four
       description: "555-123-4567 -> ***-***-4567"

@@ -94,8 +94,7 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
     rejects.mkdir(parents=True, exist_ok=True)
     reports.mkdir(parents=True, exist_ok=True)
 
-    # Clear what this run publishes. A failed run would otherwise leave the
-    # previous run's extract in place, looking current.
+    # A failed run must not leave the previous extract looking current.
     for stale in ("customers_cleaned.csv", "customers_masked.csv"):
         (processed / stale).unlink(missing_ok=True)
     (rejects / "quarantine.csv").unlink(missing_ok=True)
@@ -120,8 +119,7 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
                 )
             unexpected = [c for c in raw.columns if c not in cfg.schema]
             if unexpected:
-                # An unclassified column may be new sensitive data. The policy
-                # decides whether that stops the run.
+                # Unclassified may mean new sensitive data.
                 result.outputs["unexpected_columns"] = ", ".join(unexpected)
                 if cfg.unexpected_column_policy == "fail":
                     raise ValueError(
@@ -181,8 +179,7 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
                      f"{len(post.coercion)} uncoercible")
 
         with _Timer(result, "publish", len(cleaned)) as t:
-            # A row that survived cleaning and still fails the schema was
-            # neither repaired nor quarantined - a defect in the cleaner.
+            # Survived cleaning yet fails the schema: a cleaner defect.
             if not post.passed:
                 offenders = ", ".join(
                     sorted({f.column for f in post.failures + post.coercion})[:5])

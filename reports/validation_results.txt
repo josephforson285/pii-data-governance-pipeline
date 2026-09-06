@@ -4,7 +4,7 @@ VALIDATION RESULTS
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T19:27:04Z
+Generated  : 2026-09-06T19:47:38Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)
@@ -62,9 +62,9 @@ TOTAL                                           3527       0    -3527
 
 Rows failing : 2,658 -> 0
 
-Every published row satisfies the schema. Rows that could not be
-repaired without inventing data are in the quarantine file with a
-reason, not silently dropped.
+Every row remaining after cleaning satisfies the schema. Rows
+that could not be repaired without inventing data are in the
+quarantine file with a reason, not silently dropped.
 
 ------------------------------------------------------------------------------
 4. FAILURE DETAIL

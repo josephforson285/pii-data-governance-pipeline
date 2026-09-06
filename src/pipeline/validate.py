@@ -168,12 +168,8 @@ def _dataframe_check_failures(typed: pd.DataFrame, cfg: Config) -> list[Failure]
 
 
 def _coerce_for_validation(df: pd.DataFrame, cfg: Config) -> pd.DataFrame:
-    """Best-effort typing so checks see values, not strings.
-
-    Anything that will not convert becomes NaN/NaT and is caught by the
-    nullable=False rule, so a bad value is reported rather than crashing
-    the run before any other rule gets to fire.
-    """
+    """Type so checks see values, not strings. What will not convert becomes
+    NaN and is reported, rather than crashing the run."""
     out = df.copy()
     for name, spec in cfg.schema.items():
         if name not in out.columns:
@@ -198,12 +194,8 @@ def _coerce_for_validation(df: pd.DataFrame, cfg: Config) -> pd.DataFrame:
 
 
 def _coercion_failures(raw: pd.DataFrame, typed: pd.DataFrame, cfg: Config) -> list[Failure]:
-    """Values that were present but would not convert.
-
-    Pandera sees these as nulls once coerced, so they land under not_nullable
-    alongside genuinely absent values. Two different defects needing two
-    different fixes, so they are counted apart.
-    """
+    """Present but unconvertible. Pandera sees these as nulls, lumping them
+    with absent values - two defects needing two fixes, so counted apart."""
     from pipeline.profile import is_missing
 
     out: list[Failure] = []

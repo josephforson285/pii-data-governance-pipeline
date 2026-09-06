@@ -4,7 +4,7 @@ MASKED SAMPLE - BEFORE / AFTER
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 3,682
-Generated  : 2026-09-06T19:27:04Z
+Generated  : 2026-09-06T19:47:39Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)
@@ -20,7 +20,7 @@ restricted and kept out of version control.
 COLUMN          STRATEGY      RULE                              RATIONALE
 first_name      initial       John -> J***                      Initial only; length not preserved
 last_name       initial       Doe -> D***                       Initial only; length not preserved
-email           email_local   j.doe@gmail.com -> j***@gmail.com Domain retained for provider-mix analysis; lower identifying power than the full address, but still a quasi-identifier on a rare domain
+email           email_local   j.doe@gmail.com -> j***@gmail.com Domain retained for provider-mix analysis; lower identifying power than the full email, but still a quasi-identifier on a rare domain
 phone           last_four     555-123-4567 -> ***-***-4567      Last four for support verification; residual risk in combination
 address         suppress      -> [MASKED ADDRESS]               Free text; replaced wholesale because it can carry leaked identifiers
 date_of_birth   year_only     1985-03-15 -> 1985-**-**          Year kept for age analysis

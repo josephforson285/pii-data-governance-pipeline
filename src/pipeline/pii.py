@@ -59,16 +59,13 @@ DECLARED = {
     "created_date":   (QUASI, "medium", "Near-unique when exact; a strong quasi-identifier despite being operational"),
 }
 
-# Columns not intended to hold direct identifiers such as an email, phone or
-# SSN. Several of these are personal data in their own right; what makes a hit
-# here a leak is that a *direct* identifier turned up where none was designed
-# to be.
+# Not intended to hold direct identifiers. Several are personal data anyway;
+# a hit here is a leak because a direct identifier turned up unplanned.
 NON_IDENTIFIER_COLUMNS = {"address", "account_status", "created_date", "income"}
 
 
-# Content regexes match shapes, not meaning, so some hits are structural
-# coincidence. Suppressions are declared here rather than folded into the
-# patterns: the scan stays recall-first and every discard is on the record.
+# Regexes match shapes, not meaning. Declaring the discards keeps the scan
+# recall-first and every one of them on the record.
 SUPPRESSIONS: list[tuple[str, set[str], str]] = [
     ("postal_code", {"income", "customer_id"},
      "Numeric field; any 5-digit amount matches the postal shape"),
@@ -159,8 +156,8 @@ def verify_release(df: pd.DataFrame) -> list[Finding]:
     """
     residual: list[Finding] = []
     for column in df.columns:
-        # Suppressions cut noise while triaging raw data; on a release they
-        # would wave through a real identifier.
+        # Suppressions cut noise on raw data; on a release they would wave
+        # through a real identifier.
         for finding in _scan_column(df[column], column, apply_suppressions=False):
             if finding.category == DIRECT:
                 residual.append(finding)
@@ -180,8 +177,7 @@ def detect(df: pd.DataFrame, cfg: Config) -> PIIReport:
     pii_rows: set[int] = set()
     for f in findings:
         pii_rows.update(f.rows)
-    # Every row carries a name and an id by schema, so exposure is total
-    # regardless of what the content scan found.
+    # Every row carries a name and an id by schema, so exposure is total.
 
     keys = signatures(df, cfg.quasi_identifiers_before, cfg)
     buckets = k_buckets(keys)

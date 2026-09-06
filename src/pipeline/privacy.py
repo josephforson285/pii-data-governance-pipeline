@@ -26,12 +26,8 @@ def postal_code(value: object) -> str:
 
 
 def income_band(value: object, width: int) -> str:
-    """Band a raw income, or pass through one that is already banded.
-
-    The post-mask frame already holds bands. Re-banding them would fail to
-    parse, collapse every row onto a shared '?' and make the population look
-    far more anonymous than it is.
-    """
+    """Band a raw income, or pass through an already-banded one. Re-banding
+    would fail to parse and collapse every row onto '?'."""
     if width <= 0:
         raise ValueError(f"income band width must be positive, got {width}")
     text = str(value).strip()
@@ -87,12 +83,8 @@ def k_buckets(keys: list[tuple[str, ...]]) -> dict[str, int]:
 
 
 def incomplete_share(keys: list[tuple[str, ...]]) -> float:
-    """Fraction of signatures carrying an unknown component.
-
-    Rows whose quasi-identifiers could not be parsed collapse onto a shared
-    '?' signature, which groups them together and makes them look protected.
-    Reporting the share keeps that read honest.
-    """
+    """Fraction of signatures with an unparseable component. These collapse
+    onto a shared '?' and look protected, so the share is reported."""
     if not keys:
         return 0.0
     return sum(1 for k in keys if "?" in k) / len(keys)

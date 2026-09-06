@@ -4,33 +4,33 @@ PIPELINE EXECUTION REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T19:27:04Z
+Generated  : 2026-09-06T19:47:39Z
 Pipeline   : v0.1.0
 
-Started    : 2026-09-06T19:27:03Z
+Started    : 2026-09-06T19:47:38Z
 Rules      : v3
 Reference  : 2026-09-06
 Status     : SUCCESS
-Duration   : 0.81s
+Duration   : 0.80s
 
 ------------------------------------------------------------------------------
 1. STAGE TIMELINE
 ------------------------------------------------------------------------------
 #  STAGE                 IN     OUT  SECONDS  STATUS  DETAIL
-1  load                   0    5000     0.04  ok      10 columns
+1  load                   0    5000     0.03  ok      10 columns
 2  profile             5000    5000     0.08  ok      978 invalid values
 3  detect_pii          5000    5000     0.11  ok      7 findings, 40 leaked rows
 4  validate_pre        5000    5000     0.15  ok      3527 rule failures, 832 uncoer
-5  clean               5000    3682     0.26  ok      1318 quarantined, reconciled
+5  clean               5000    3682     0.25  ok      1318 quarantined, reconciled
 6  validate_post       3682    3682     0.07  ok      0 rule failures, 0 uncoercible
 7  publish             3682    3682     0.01  ok      schema compliant
 8  mask                3682    3682     0.02  ok      unique 3682 -> 1761
 9  verify_release      3682    3682     0.06  ok      no direct identifiers remain
 10 publish_masked      3682    3682     0.01  ok      verified before write
 ------------------------------------------------------------------------------
-   TOTAL                                0.81
+   TOTAL                                0.80
 
-Slowest stage: clean (0.26s, 32% of runtime)
+Slowest stage: clean (0.25s, 32% of runtime)
 
 ------------------------------------------------------------------------------
 2. STAGE ORDER
@@ -84,8 +84,8 @@ Direct identifiers left in the masked extract       0
   pii_detection_report.txt             7,681 bytes
   cleaning_log.txt                     3,544 bytes
   quarantine.csv                      82,405 bytes
-  validation_results.txt               4,150 bytes
+  validation_results.txt               4,165 bytes
   customers_cleaned.csv              533,216 bytes
-  masked_sample.txt                    9,506 bytes
+  masked_sample.txt                    9,504 bytes
   customers_masked.csv               383,802 bytes
 

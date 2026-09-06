@@ -143,8 +143,7 @@ def clean_income(value: Any, cap: float) -> tuple[float | None, str | None]:
         return None, "unparseable_income"
     if amount < 0 or amount > cap:
         return None, "income_out_of_range"
-    # Compare numerically: '50000' and 50000.0 are the same value, and
-    # counting that as a repair inflates the normalisation figures.
+    # Numerically: '50000' and 50000.0 are the same value.
     original = str(value).strip()
     if tag is None:
         try:
@@ -204,9 +203,8 @@ def clean(df: pd.DataFrame, cfg: Config) -> tuple[pd.DataFrame, CleaningLog]:
     kept: list[dict] = []
     seen_ids: set[int] = set()
 
-    # Duplicate ids are identified over the whole input, before any row is
-    # quarantined. Deriving them from surviving rows made detection depend on
-    # what the previous checks happened to reject.
+    # Over the whole input: deriving these from surviving rows made detection
+    # depend on what earlier checks rejected.
     parsed_ids = [clean_customer_id(v)[0] for v in df["customer_id"]]
     id_counts = Counter(i for i in parsed_ids if i is not None)
     duplicated_ids = {i for i, n in id_counts.items() if n > 1}
@@ -255,9 +253,7 @@ def clean(df: pd.DataFrame, cfg: Config) -> tuple[pd.DataFrame, CleaningLog]:
             reasons.append(Rejection(idx, cid_raw, "created_before_birth",
                                      "created_date", created.isoformat()))
 
-        # Survivorship: first occurrence is the only one eligible to survive.
-        # Deterministic, not correct - no business rule says which duplicate is
-        # authoritative, so the choice is stated rather than hidden.
+        # Survivorship: first occurrence only. Deterministic, not authoritative.
         if cid is not None and cid in duplicated_ids:
             if cid in seen_ids:
                 reasons.append(Rejection(idx, cid_raw, "duplicate_customer_id",
@@ -273,9 +269,8 @@ def clean(df: pd.DataFrame, cfg: Config) -> tuple[pd.DataFrame, CleaningLog]:
         kept.append(record)
 
     log.rows_out = len(kept)
-    # Schema columns only. Building on the input's columns invented an empty
-    # column for anything unexpected, silently blanking whatever it held -
-    # reachable whenever the drift policy is 'warn'.
+    # Schema columns only: building on df.columns invented empty columns for
+    # unexpected ones, blanking whatever they held.
     return pd.DataFrame(kept, columns=list(cfg.schema)), log
 
 

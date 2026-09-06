@@ -126,10 +126,8 @@ DEFECT_TO_CHECK = {
     "last_name_dirty": ("mixed", "last_name"),
 }
 
-# "mixed" defects plant several kinds of damage in one column (case, padding,
-# digits), which no single check owns. Their attribution equals their recall by
-# construction, so they cannot lower the attribution score - a known weakness
-# of this measurement, recorded rather than hidden.
+# "mixed" defects plant several kinds of damage in one column, so no single
+# check owns them and attribution equals recall by construction.
 
 
 def load_ground_truth(path: Path) -> dict:
@@ -149,8 +147,7 @@ def score(truth: dict, clean_log, pii_report) -> ScoreCard:
     for f in pii_report.leaks:
         leak_rows.update(f.rows)
 
-    # Rows that survived cleaning. The scorer observes cleaning only; whether
-    # they were then published is decided by a gate it does not run.
+    # The scorer observes cleaning only, not the publication gate.
     rejected_rows = {r.row for r in clean_log.rejections}
     survived_cleaning = set(range(truth["n_rows"])) - rejected_rows
     repaired_rows_by_column: dict[str, set[int]] = {}
@@ -180,9 +177,8 @@ def score(truth: dict, clean_log, pii_report) -> ScoreCard:
             else:
                 attributed = handled
 
-        # Escaped: survived cleaning without the cleaner rewriting that column,
-        # so the planted value is still in the cleaned extract. Masking may
-        # remove it later, but recall alone would not say it survived.
+        # Survived cleaning untouched in its own column. Masking may still
+        # remove it; recall alone would not say it survived.
         escaped = ((planted & survived_cleaning)
                    - repaired_rows_by_column.get(column, set()))
         scores.append(Score(defect, column, len(planted), len(handled),

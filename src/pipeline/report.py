@@ -365,16 +365,15 @@ def render_validation_report(pre: ValidationResult, source: Path, cfg: Config,
         out.append(f"{'TOTAL':<44}{a:>8}{b:>8}{b - a:>+9}")
         out.append("")
         out.append(f"Rows failing : {len(pre.failing_rows):,} -> {len(post.failing_rows):,}")
-        if b:
-            out.append("")
-            out.append("These rows survived cleaning and still fail the schema, so they")
-            out.append("were neither repaired nor quarantined - a defect in the cleaner,")
-            out.append("not in the data. Publication is blocked while any remain.")
+        out.append("")
+        if not post.passed:
+            out.append("Rows survived cleaning and still fail validation, by rule or by")
+            out.append("type coercion. They were neither repaired nor quarantined - a")
+            out.append("defect in the cleaner, not the data. Publication is blocked.")
         else:
-            out.append("")
-            out.append("Every published row satisfies the schema. Rows that could not be")
-            out.append("repaired without inventing data are in the quarantine file with a")
-            out.append("reason, not silently dropped.")
+            out.append("Every row remaining after cleaning satisfies the schema. Rows")
+            out.append("that could not be repaired without inventing data are in the")
+            out.append("quarantine file with a reason, not silently dropped.")
     out.append("")
 
     out += _section("4. FAILURE DETAIL")

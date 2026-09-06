@@ -155,16 +155,14 @@ def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
         """A column, or an empty series when the input does not have it."""
         return df[name] if name in df.columns else pd.Series([], dtype=object)
 
-    # Counted as strings: coercing to int crashes on a malformed id, which is
-    # itself a defect worth reporting. Absent ids are excluded - two blank ids
-    # are two missing values, not a duplicate.
+    # Strings: int() crashes on a malformed id. Absent ids are excluded -
+    # two blanks are two missing values, not a duplicate.
     ids = [str(v) for v in col("customer_id") if not is_missing(v)]
     dup_counts = pd.Series(ids, dtype=object).value_counts()
     duplicates = {str(k): int(v) for k, v in dup_counts[dup_counts > 1].items()} if ids else {}
 
-    # Semantic checks parse everything the cleaner could parse. Restricting
-    # them to canonical ISO let a repairable date carrying an impossible age
-    # slip past the profiler while the validator rejected it.
+    # Parses everything the cleaner could: canonical-only let a repairable
+    # date carrying an impossible age slip past.
     def parsed_date(v: Any) -> date | None:
         canonical = _as_date(v)
         if canonical:
@@ -181,8 +179,7 @@ def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
     incomes = [x for x in (_as_number(v) for v in col("income")) if x is not None]
 
     invalid = {
-        # Split by what remediation can do: a repairable format needs a
-        # parser, an unrepairable value needs a decision.
+        # Repairable needs a parser; unrepairable needs a decision.
         "date_of_birth_repairable_format": {
             "count": sum(1 for v in col("date_of_birth") if not is_missing(v)
                          and _as_date(v) is None and _repairable_date(v, formats)),
@@ -222,8 +219,9 @@ def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
         },
         "negative_income": {"count": sum(1 for x in incomes if x < 0), "examples": _examples(x for x in incomes if x < 0)},
         "income_above_cap": {"count": sum(1 for x in incomes if x > cap), "examples": _examples((x for x in incomes if x > cap), 3)},
-        # Same bounds and the same date formats the cleaner uses, so profiler,
-        # cleaner and validator agree on coverage as well as verdict.
+        # Same bounds and date formats as the cleaner. Pre-clean validation is
+        # deliberately stricter - it only accepts canonical ISO - so it flags
+        # more, not fewer.
         "age_outside_policy": {
             "count": sum(1 for a in ages if not cfg.min_age <= a <= cfg.max_age),
             "examples": _examples(sorted(f"{a:.1f}y" for a in ages
