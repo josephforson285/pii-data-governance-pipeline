@@ -71,7 +71,7 @@ def _cmd_validate(args: argparse.Namespace) -> int:
     out = write(Path(args.reports) / "validation_results.txt",
                 render_validation_report(result, src, cfg))
     log.info("wrote %s", out)
-    return 0
+    return 0 if result.passed else 1
 
 
 def _cmd_clean(args: argparse.Namespace) -> int:

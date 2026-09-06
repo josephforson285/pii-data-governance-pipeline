@@ -1,17 +1,9 @@
 """Part 4: normalise what is unambiguous, quarantine what is not.
 
-No row is dropped silently. Every rejected row is written to the quarantine
-file with the reason it failed, and the run asserts
-
-    rows_in == rows_cleaned + rows_quarantined
-
-so data cannot go missing without the pipeline noticing.
-
-The rule this module follows throughout: repair only where the intended value
-is recoverable without guessing. Stripping a character out of a name or a
-digit out of an identifier produces a plausible value that is not the one the
-customer gave, which is worse than a rejection because nothing downstream can
-tell it happened.
+Repair only where the intended value is recoverable without guessing: a
+stripped character produces a plausible value that is not the customer's, and
+nothing downstream can tell. Rejected rows go to quarantine with a reason, and
+the run asserts rows_in == rows_out + rows_quarantined.
 """
 from __future__ import annotations
 
@@ -78,10 +70,8 @@ class CleaningLog:
 def clean_name(value: Any, min_len: int = 2, max_len: int = 50) -> tuple[str | None, str | None]:
     """Normalise whitespace and case; reject anything else.
 
-    Deliberately does not strip disallowed characters. An earlier version
-    removed them, which silently turned 'José' into 'Jos' and 'Nguyễn' into
-    'Nguyn' while reporting the row as successfully repaired - a corrupted
-    name that no downstream check could detect.
+    Does not strip disallowed characters: doing so turned 'José' into 'Jos'
+    while reporting the row repaired.
     """
     if is_missing(value):
         return None, "missing_required_field"
@@ -102,9 +92,7 @@ def clean_name(value: Any, min_len: int = 2, max_len: int = 50) -> tuple[str | N
 def clean_customer_id(value: Any) -> tuple[int | None, str | None]:
     """Accept only an exact positive integer.
 
-    int(float(x)) was silently truncating: '12.9' became 12 and '1e3' became
-    1000. An identifier that quietly changes value is worse than one that is
-    rejected, because every join downstream then points at the wrong customer.
+    int(float(x)) truncated '12.9' to 12, silently repointing every join.
     """
     if is_missing(value):
         return None, "missing_required_field"
@@ -259,11 +247,9 @@ def clean(df: pd.DataFrame, cfg: Config) -> tuple[pd.DataFrame, CleaningLog]:
             reasons.append(Rejection(idx, cid_raw, "created_before_birth",
                                      "created_date", created.isoformat()))
 
-        # Survivorship: first occurrence wins. Deterministic rather than
-        # correct - with no business rule saying which duplicate is
-        # authoritative (most recent? most complete?), any choice is arbitrary,
-        # so the rule is stated here and the discarded rows are quarantined
-        # with their ids rather than dropped.
+        # Survivorship: first occurrence is the only one eligible to survive.
+        # Deterministic, not correct - no business rule says which duplicate is
+        # authoritative, so the choice is stated rather than hidden.
         if cid is not None and cid in duplicated_ids:
             if cid in seen_ids:
                 reasons.append(Rejection(idx, cid_raw, "duplicate_customer_id",
@@ -307,13 +293,9 @@ def policy_sensitivity(log: CleaningLog, non_critical: set[str]) -> dict[str, in
 def quarantine_frame(log: CleaningLog, sensitive_columns: set[str]) -> pd.DataFrame:
     """One row per rejected record, reasons joined.
 
-    Failing values from identifying columns are redacted. The quarantine file
-    is an operational artifact that gets copied around; it should not be the
-    one place raw PII escapes the pipeline.
-
-    customer_id is deliberately left intact: the file exists so someone can go
-    and fix the source record, and a redacted key makes that impossible. The
-    file is therefore restricted and gitignored, not sanitised.
+    Values from identifying columns are redacted. customer_id is left intact:
+    the file exists so someone can fix the source record, and a redacted key
+    makes that impossible - so the file is restricted, not sanitised.
     """
     from pipeline.pii import redact
 

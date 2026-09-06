@@ -1,14 +1,9 @@
 """Part 2: detect PII and quantify breach exposure.
 
-Runs on the raw dataset, before cleaning. Exposure is a property of what
-actually landed on disk - dropping bad rows first would understate it.
-
-Two passes, because they answer different questions:
-
-  declared  - which columns hold PII by design (governance: what must be
-              masked, minimised, retention-bound)
-  leaked    - PII found by content scan in a column not meant to hold it
-              (incident: masking the email column misses these entirely)
+Runs on raw data, before cleaning, because exposure is a property of what
+landed on disk. Two passes: `declared` is what a column holds by design,
+`leaked` is a direct identifier found where none was meant to be - which
+schema-driven masking never sees. Detectors are US-format by design.
 """
 from __future__ import annotations
 
@@ -154,21 +149,19 @@ def _scan_column(series: pd.Series, column: str) -> list[Finding]:
 def verify_release(df: pd.DataFrame) -> list[Finding]:
     """Re-scan a masked extract for direct identifiers.
 
-    Masking is asserted everywhere else in this pipeline; this is the only
-    place it is checked. Part 2 found emails, phones and SSNs embedded in
-    free-text addresses, and those survive cleaning untouched - the control
-    that removes them is address suppression at masking time. Verifying the
-    output closes the loop rather than trusting that the suppressor ran.
+    Masking is asserted everywhere else and checked only here.
 
-    Scans every column in the extract, not only the ones the policy claims to
-    mask. Scoping it to masked columns made the check disappear along with any
-    masking rule that was removed - it could not catch the one failure it
-    exists to catch.
+    Scans every column, not only those the policy claims to mask: scoping it
+    to masked columns made the check vanish along with any masking rule that
+    was removed.
     """
     residual: list[Finding] = []
     for column in df.columns:
+        # Suppressions are deliberately not applied. They exist to cut noise
+        # while triaging raw data; on a released extract they would let a real
+        # identifier through because a rule said that shape is usually benign.
         for finding in _scan_column(df[column], column):
-            if finding.confirmed and finding.category == DIRECT:
+            if finding.category == DIRECT:
                 residual.append(finding)
     return residual
 

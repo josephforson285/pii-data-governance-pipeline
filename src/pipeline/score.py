@@ -1,12 +1,8 @@
 """Measure detection against the generator's manifest of planted defects.
 
-Held apart from the pipeline on purpose. Nothing under run() reads the ground
-truth: a detector that can see the answer key measures nothing.
-
-Recall matters because a missed defect reaches the published output, but it is
-not a quality score on its own: a pipeline that quarantined every row would
-score 100%. It has to be read alongside specificity below and the retention
-figure in cleaning_log.txt, which that pipeline would drive to zero.
+Nothing under run() reads the ground truth: a detector that can see the answer
+key measures nothing. Recall is not a quality score on its own - quarantining
+every row scores 100% - so it is paired with specificity.
 """
 from __future__ import annotations
 
@@ -35,14 +31,10 @@ class Score:
         return self.attributed / self.planted if self.planted else 1.0
 
     @property
-    def containment(self) -> float:
-        """Share of planted defects that did not reach the published output.
-
-        Stricter than recall: `handled` counts any action on the row's column,
-        which a defect could survive if the action addressed something else.
-        This counts only rows that were quarantined, or whose column the
-        cleaner actually rewrote before publication.
-        """
+    def pre_mask_containment(self) -> float:
+        """Share of planted defects that did not survive into the cleaned
+        extract. Masking may still remove what does survive - this measures
+        cleaning, not the final release."""
         return 1 - (self.escaped / self.planted) if self.planted else 1.0
 
 
@@ -58,7 +50,7 @@ class ScoreCard:
         return sum(s.escaped for s in self.scores)
 
     @property
-    def containment(self) -> float:
+    def pre_mask_containment(self) -> float:
         return 1 - (self.escaped / self.planted) if self.planted else 1.0
 
     @property
@@ -189,16 +181,14 @@ def score(truth: dict, clean_log, pii_report) -> ScoreCard:
                 attributed = handled
 
         # Escaped: published without the cleaner rewriting that column, so the
-        # planted value is still in the shared output. Such a defect is not
-        # necessarily harmful - it may simply not violate any declared rule -
-        # but it did survive, and recall alone would not say so.
+        # planted value is still in the cleaned extract. Not necessarily
+        # harmful, and masking may remove it later, but recall alone would not
+        # say it survived.
         escaped = planted & published - repaired_rows_by_column.get(column, set())
         scores.append(Score(defect, column, len(planted), len(handled),
                             len(attributed), len(escaped)))
 
-    # Specificity: rows with nothing planted in them that were quarantined
-    # anyway. Without this, recall alone cannot distinguish a good pipeline
-    # from one that rejects everything.
+    # Defect-free rows quarantined anyway: the counterweight to recall.
     planted_anywhere: set[int] = set()
     for info in truth["defects"].values():
         planted_anywhere.update(info["rows"])

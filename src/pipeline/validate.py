@@ -40,7 +40,13 @@ class ValidationResult:
 
     @property
     def passed(self) -> bool:
-        return not self.failures
+        """No rule failures and nothing that would not convert.
+
+        Coercion failures currently always coincide with a not_nullable
+        failure, because every column is non-nullable. Checking both keeps
+        that true if a column is ever made nullable.
+        """
+        return not self.failures and not self.coercion
 
     @property
     def by_rule(self) -> dict[str, int]:
@@ -129,9 +135,8 @@ def build_schema(cfg: Config) -> DataFrameSchema:
 def _dataframe_check_failures(typed: pd.DataFrame, cfg: Config) -> list[Failure]:
     """Execute the cross-column rules declared in config.
 
-    An earlier version declared dob_before_created in YAML and never ran it,
-    which is worse than omitting it: the config advertised a guarantee the
-    pipeline did not provide. An unknown op now raises rather than skipping.
+    An unknown op raises: config that declares a rule it never runs is worse
+    than config that omits it.
     """
     failures: list[Failure] = []
     for check in cfg.dataframe_checks:
@@ -143,8 +148,7 @@ def _dataframe_check_failures(typed: pd.DataFrame, cfg: Config) -> list[Failure]
             )
         missing = [c for c in (check.left, check.right) if c not in typed.columns]
         if missing:
-            # Skipping quietly would let a declared guarantee disappear the
-            # moment a column is renamed.
+            # A renamed column must not silently retire a declared guarantee.
             raise ValueError(
                 f"dataframe check {check.name!r} needs column(s) "
                 f"{', '.join(missing)}, which the input does not have"
@@ -175,9 +179,8 @@ def _coerce_for_validation(df: pd.DataFrame, cfg: Config) -> pd.DataFrame:
             continue
         kind = spec["dtype"]
         if kind == "int64":
-            # Round-trip through float would silently truncate "12.9" to 12.
-            # Anything that is not an exact integer becomes NA and is reported
-            # as a coercion failure instead of crashing the cast.
+            # Non-integers become NA and are reported as coercion failures
+            # rather than crashing the cast or truncating.
             numeric = pd.to_numeric(out[name], errors="coerce")
             exact = numeric.notna() & (numeric % 1 == 0)
             out[name] = numeric.where(exact).astype("Int64")

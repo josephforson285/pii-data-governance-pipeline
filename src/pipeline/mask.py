@@ -1,14 +1,9 @@
 """Part 5: mask PII before the dataset is shared.
 
-Masking is one-way and applied to the cleaned data, never to the raw file.
-Which column gets which strategy is declared in config/rules.yml, so the
-policy, the transformation and the report that describes it cannot drift
-apart.
-
-Two strategies go beyond the brief, both forced by the part 2 measurement:
-address is suppressed wholesale because the free-text field was found to carry
-leaked identifiers, and income is banded because exact income was part of what
-made every record unique.
+One-way, applied to cleaned data. Strategies are declared in config/rules.yml
+so policy, transformation and report cannot drift apart. Address is suppressed
+wholesale and income banded - both beyond the brief, both forced by the part 2
+measurement.
 """
 from __future__ import annotations
 
@@ -134,9 +129,16 @@ class MaskResult:
 
 def apply_masks(df: pd.DataFrame, cfg: Config) -> pd.DataFrame:
     out = df.copy()
-    for column, masker in build_maskers(cfg).items():
-        if column in out.columns:
-            out[column] = out[column].map(masker)
+    maskers = build_maskers(cfg)
+    missing = [c for c in maskers if c not in out.columns]
+    if missing:
+        raise ValueError(
+            f"masking policy names column(s) {', '.join(missing)}, absent from this "
+            f"frame. Skipping them would leave the report claiming a masked column "
+            f"that was never masked."
+        )
+    for column, masker in maskers.items():
+        out[column] = out[column].map(masker)
     return out
 
 

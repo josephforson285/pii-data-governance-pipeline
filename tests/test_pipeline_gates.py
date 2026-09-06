@@ -157,7 +157,7 @@ def test_release_verification_catches_an_unmasked_column(cfg):
     assert {f.detector for f in residual} >= {"us_ssn", "email"}
 
 
-def test_containment_counts_defects_reaching_the_extract():
+def test_pre_mask_containment_counts_defects_reaching_the_extract():
     """Recall says the row was acted on; containment says it did not survive."""
     from pipeline.clean import CleaningLog, Repair
     from pipeline.score import score
@@ -172,4 +172,43 @@ def test_containment_counts_defects_reaching_the_extract():
 
     card = score(truth, log, _NoLeaks())
     assert card.escaped == 1
-    assert card.containment == 0.5
+    assert card.pre_mask_containment == 0.5
+
+
+def test_verify_release_ignores_suppressions():
+    """Suppressions cut noise while triaging raw data. On a released extract
+    they would let a real identifier through because a rule said that shape is
+    usually benign."""
+    from pipeline.pii import suppression_for, verify_release
+
+    assert suppression_for("postal_code", "income"), "fixture assumes a suppression exists"
+    leaky = pd.DataFrame([{"income": "contact a@b.com", "customer_id": "1"}])
+    assert any(f.detector == "email" for f in verify_release(leaky))
+
+
+def test_blank_ids_are_not_reported_as_duplicates(cfg):
+    """Two rows with no id are two missing values, not a duplicate."""
+    df = pd.DataFrame([row(customer_id=""), row(customer_id=""),
+                       row(customer_id="N/A"), row(customer_id="N/A")])
+    assert profile(df, cfg).duplicate_ids == {}
+
+
+def test_unexpected_columns_fail_under_the_configured_policy(cfg, tmp_path):
+    import subprocess
+    import sys
+
+    assert cfg.unexpected_column_policy == "fail"
+    src = tmp_path / "extra.csv"
+    frame = pd.DataFrame([row()])
+    frame["mystery_column"] = "x"
+    frame.to_csv(src, index=False)
+
+    proc = subprocess.run(
+        [sys.executable, "-m", "pipeline", "run", "--input", str(src),
+         "--reports", str(tmp_path / "rep"), "--processed", str(tmp_path / "proc"),
+         "--rejects", str(tmp_path / "rej")],
+        capture_output=True, text=True,
+        env={"PYTHONPATH": "src", "PATH": "/usr/bin:/bin"},
+    )
+    assert proc.returncode == 1
+    assert "mystery_column" in proc.stderr

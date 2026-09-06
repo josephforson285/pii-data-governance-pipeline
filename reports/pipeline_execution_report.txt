@@ -4,38 +4,43 @@ PIPELINE EXECUTION REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 5,000
-Generated  : 2026-09-06T17:24:19Z
+Generated  : 2026-09-06T18:10:25Z
 Pipeline   : v0.1.0
 
-Started    : 2026-09-06T17:24:18Z
+Started    : 2026-09-06T18:10:23Z
 Rules      : v2
 Reference  : 2026-09-06
 Status     : SUCCESS
-Duration   : 1.58s
+Duration   : 1.53s
 
 ------------------------------------------------------------------------------
 1. STAGE TIMELINE
 ------------------------------------------------------------------------------
 #  STAGE                 IN     OUT  SECONDS  STATUS  DETAIL
-1  load                   0    5000     0.10  ok      10 columns
-2  profile             5000    5000     0.11  ok      948 invalid values
+1  load                   0    5000     0.06  ok      10 columns
+2  profile             5000    5000     0.09  ok      948 invalid values
 3  detect_pii          5000    5000     0.21  ok      7 findings, 40 leaked rows
 4  validate_pre        5000    5000     0.30  ok      3510 rule failures
-5  clean               5000    3684     0.52  ok      1316 quarantined, reconciled
+5  clean               5000    3684     0.51  ok      1316 quarantined, reconciled
 6  validate_post       3684    3684     0.15  ok      0 rule failures
 7  publish             3684    3684     0.02  ok      schema compliant
-8  mask                3684    3684     0.06  ok      unique 3684 -> 1775
+8  mask                3684    3684     0.04  ok      unique 3684 -> 1775
 9  verify_release      3684    3684     0.12  ok      no direct identifiers remain
+10 publish_masked      3684    3684     0.02  ok      verified before write
 ------------------------------------------------------------------------------
-   TOTAL                                1.58
+   TOTAL                                1.53
 
-Slowest stage: clean (0.52s, 33% of runtime)
+Slowest stage: clean (0.51s, 34% of runtime)
 
 ------------------------------------------------------------------------------
 2. STAGE ORDER
 ------------------------------------------------------------------------------
 Post-clean validation gates publication: the cleaned extract is
 written only after it satisfies the schema it claims to satisfy.
+
+Masking is likewise verified before release: the masked frame is
+re-scanned for direct identifiers, and nothing reaches disk unless
+the scan is clean.
 
 PII detection runs on the raw file, before cleaning: exposure is a
 property of what landed on disk, and scanning post-clean would

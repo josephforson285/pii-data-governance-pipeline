@@ -21,11 +21,8 @@ from pipeline.score import ScoreCard
 from pipeline.validate import ValidationResult
 
 def _safe(value: object, sensitive: bool) -> str:
-    """Redact a value if it comes from an identifying column.
-
-    A report that quotes raw PII is a disclosure of its own, so this is
-    applied to every sample and every failing value the reports render.
-    """
+    """Redact a value from an identifying column: a report that quotes raw
+    PII is a disclosure of its own."""
     return redact(str(value)) if sensitive else str(value)
 
 
@@ -88,9 +85,10 @@ def render_quality_report(p: QualityProfile, source: Path, cfg: Config) -> str:
     out += _section("2. COMPLETENESS")
     out.append(f"{'COLUMN':<16}{'NULL':>8}{'SENTINEL':>10}{'MISSING':>9}{'PCT':>8}")
     for c in p.columns:
+        pct = 100 * c.missing_count / p.n_rows if p.n_rows else 0.0
         out.append(
             f"{c.name:<16}{c.null_count:>8}{c.sentinel_count:>10}"
-            f"{c.missing_count:>9}{100 * c.missing_count / p.n_rows:>7.2f}%"
+            f"{c.missing_count:>9}{pct:>7.2f}%"
         )
     out.append("")
     out.append("SENTINEL counts values that read as present but mean absent")
@@ -142,14 +140,16 @@ def render_quality_report(p: QualityProfile, source: Path, cfg: Config) -> str:
     for k, v in sorted(invalid.items(), key=lambda x: -x[1]):
         out.append(f"{repr(k):<20}{v:>8}   INVALID")
     out.append("")
-    out.append(f"Invalid total: {sum(invalid.values())} rows ({100 * sum(invalid.values()) / p.n_rows:.2f}%)")
+    invalid_pct = 100 * sum(invalid.values()) / p.n_rows if p.n_rows else 0.0
+    out.append(f"Invalid total: {sum(invalid.values())} rows ({invalid_pct:.2f}%)")
     out.append("")
 
     out += _section("SUMMARY")
     worst = max(p.columns, key=lambda c: c.missing_count)
     out.append(f"Rows profiled            : {p.n_rows:,}")
     out.append(f"Columns with missing data: {sum(1 for c in p.columns if c.missing_count)}")
-    out.append(f"Least complete column    : {worst.name} ({100 * worst.missing_count / p.n_rows:.2f}% missing)")
+    worst_pct = 100 * worst.missing_count / p.n_rows if p.n_rows else 0.0
+    out.append(f"Least complete column    : {worst.name} ({worst_pct:.2f}% missing)")
     out.append(f"Invalid-value findings   : {sum(i['count'] for i in p.invalid_values.values())}")
     out.append(f"Non-canonical formats    : {sum(len(s) - 1 for s in p.format_inventory.values())}")
     out.append("")
@@ -313,8 +313,9 @@ def render_validation_report(pre: ValidationResult, source: Path, cfg: Config,
         out.append("-" * WIDTH)
         out.append(f"{'TOTAL':<44}{len(pre.failures):>10}")
         out.append("")
+        failing_pct = 100 * len(pre.failing_rows) / pre.n_rows if pre.n_rows else 0.0
         out.append(f"Rows with at least one failure: {len(pre.failing_rows):,} "
-                   f"of {pre.n_rows:,} ({100 * len(pre.failing_rows) / pre.n_rows:.1f}%)")
+                   f"of {pre.n_rows:,} ({failing_pct:.1f}%)")
     else:
         rules = list(dict.fromkeys(list(pre.by_rule) + list(post.by_rule)))
         out.append(f"{'RULE':<44}{'PRE':>8}{'POST':>8}{'DELTA':>9}")
@@ -400,7 +401,8 @@ def render_cleaning_log(log: CleaningLog, source: Path, cfg: Config) -> str:
     out.append("Asserted on every run. Without it, a row lost to a silent exception")
     out.append("looks identical to a row that was never there.")
     out.append("")
-    out.append(f"Retention: {100 * log.rows_out / log.rows_in:.1f}%")
+    retention = 100 * log.rows_out / log.rows_in if log.rows_in else 0.0
+    out.append(f"Retention: {retention:.1f}%")
     out.append("")
 
     out += _section("4. POLICY SENSITIVITY")
@@ -532,6 +534,10 @@ def render_execution_report(r: RunResult) -> str:
     out.append("Post-clean validation gates publication: the cleaned extract is")
     out.append("written only after it satisfies the schema it claims to satisfy.")
     out.append("")
+    out.append("Masking is likewise verified before release: the masked frame is")
+    out.append("re-scanned for direct identifiers, and nothing reaches disk unless")
+    out.append("the scan is clean.")
+    out.append("")
     out.append("PII detection runs on the raw file, before cleaning: exposure is a")
     out.append("property of what landed on disk, and scanning post-clean would")
     out.append("understate it by every quarantined row.")
@@ -605,8 +611,8 @@ def render_scorecard(card: ScoreCard, source: Path, n_rows: int, cfg: Config) ->
     out.append("            fired. A miss here means the diagnosis was wrong, even")
     out.append("            though the row was handled.")
     out.append("")
-    out.append("SPECIFICITY share of rows with nothing planted in them that the")
-    out.append("            pipeline left alone. The counterweight to recall:")
+    out.append("SPECIFICITY share of defect-free rows that were not quarantined.")
+    out.append("            The counterweight to recall:")
     out.append("            quarantining everything scores perfect recall and")
     out.append("            zero specificity, so neither can be gamed alone.")
     out.append("")
@@ -666,17 +672,14 @@ def render_scorecard(card: ScoreCard, source: Path, n_rows: int, cfg: Config) ->
     out.append(f"{'Handled':<34}{card.handled:>8,}   {100 * card.recall:.1f}%")
     out.append(f"{'Correctly attributed':<34}{card.attributed:>8,}   {100 * card.attribution:.1f}%")
     out.append("")
-    out.append(f"{'Reached the published extract':<34}{card.escaped:>8,}   "
-               f"containment {100 * card.containment:.1f}%")
+    out.append(f"{'Survived into cleaned extract':<34}{card.escaped:>8,}   "
+               f"pre-mask containment {100 * card.pre_mask_containment:.1f}%")
     out.append("")
     if card.escaped:
-        out.append("Escaped defects were published without the cleaner rewriting that")
-        out.append("column. That is not automatically a failure - a planted value may")
-        out.append("violate no declared rule - but it did survive into the extract,")
-        out.append("which recall alone would not say. PII leaked into free text is the")
-        out.append("case here: cleaning normalises address whitespace and leaves the")
-        out.append("embedded identifiers, which address suppression removes at masking")
-        out.append("time. The verify_release stage checks that it did.")
+        out.append("These reached customers_cleaned.csv without the cleaner rewriting")
+        out.append("that column. It measures cleaning, not the final release: masking")
+        out.append("may still remove them, and the verify_release stage confirms the")
+        out.append("masked extract carries no direct identifiers.")
         out.append("")
     out.append(f"{'Rows with no planted defect':<34}{card.clean_rows:>8,}")
     out.append(f"{'  of those, quarantined':<34}{card.falsely_quarantined:>8,}")

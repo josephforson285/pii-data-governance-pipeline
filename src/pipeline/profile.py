@@ -49,10 +49,6 @@ class QualityProfile:
     status_counts: dict[str, int]
     permitted_statuses: list[str]
 
-    @property
-    def pct_missing(self) -> dict[str, float]:
-        return {c.name: 100 * c.missing_count / self.n_rows for c in self.columns}
-
 
 def is_missing(v: Any) -> bool:
     if v is None or (isinstance(v, float) and pd.isna(v)):
@@ -133,10 +129,12 @@ def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
         """A column, or an empty series when the input does not have it."""
         return df[name] if name in df.columns else pd.Series([], dtype=object)
 
-    # Ids are counted as strings: coercing to int crashes on a malformed id,
-    # which is exactly the defect the profiler exists to report.
-    dup_counts = col("customer_id").astype(str).value_counts()
-    duplicates = {str(k): int(v) for k, v in dup_counts[dup_counts > 1].items()}
+    # Counted as strings: coercing to int crashes on a malformed id, which is
+    # itself a defect worth reporting. Absent ids are excluded - two blank ids
+    # are two missing values, not a duplicate.
+    ids = [str(v) for v in col("customer_id") if not is_missing(v)]
+    dup_counts = pd.Series(ids, dtype=object).value_counts()
+    duplicates = {str(k): int(v) for k, v in dup_counts[dup_counts > 1].items()} if ids else {}
 
     ages = [(today - d).days / 365.25 for d in (_as_date(v) for v in col("date_of_birth")) if d]
     incomes = [x for x in (_as_number(v) for v in col("income")) if x is not None]

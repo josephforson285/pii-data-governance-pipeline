@@ -1,10 +1,8 @@
 """Shared re-identification measurement.
 
-Part 2 (raw exposure) and Part 5 (post-mask residual risk) both group rows by
-quasi-identifier signature. They previously did it with separate code and
-separate constants, so a change to the income band width moved one number and
-not the other, and the before/after comparison silently stopped being
-like-for-like.
+Parts 2 and 5 both group rows by quasi-identifier signature. One
+implementation, so a change to the band width cannot move one number and not
+the other.
 """
 from __future__ import annotations
 
@@ -14,10 +12,6 @@ from collections import Counter
 import pandas as pd
 
 from pipeline.config import Config
-
-# Derived quasi-identifiers: not columns, but values extracted from one.
-DERIVED = {"address_postal"}
-
 
 def postal_code(value: object) -> str:
     m = re.search(r"\b(\d{5})(?:-\d{4})?\b", str(value))

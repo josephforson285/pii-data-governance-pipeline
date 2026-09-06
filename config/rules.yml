@@ -13,6 +13,12 @@ reference_date: null
 # src/pipeline/profile.py:SENTINELS - a data-representation concern rather than
 # a business rule, and used inside tight loops.
 
+# What to do with a column the schema does not declare. 'fail' is the safer
+# default for a PII pipeline: an unclassified column has unknown sensitivity
+# and nothing masks it. 'warn' is kept for exploratory runs over new inputs.
+schema_policy:
+  unexpected_columns: fail
+
 thresholds:
   min_age: 18
   max_age: 120

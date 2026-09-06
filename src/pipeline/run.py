@@ -1,17 +1,9 @@
 """Part 6: orchestrate every stage into one run.
 
-Stage order matters and is not the order the brief lists:
-
-  profile -> detect PII -> validate(pre) -> clean -> validate(post) -> mask
-
-PII detection runs on the raw data because breach exposure is a property of
-what actually landed on disk; running it after cleaning would understate it by
-however many rows were quarantined. Validation runs on both sides because a
-single post-clean pass only proves the clean data is clean - the delta is what
-shows remediation worked.
-
-A stage failure aborts the run and still writes the execution report: a run
-that dies without a record of where is the failure mode this exists to avoid.
+Detection runs on raw data (exposure is a property of what landed on disk) and
+validation runs both sides of cleaning (the delta is the evidence). Nothing is
+published until it has been validated, and nothing masked is written until it
+has been re-scanned. A stage failure still writes the execution report.
 """
 from __future__ import annotations
 
@@ -122,10 +114,16 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
                 )
             unexpected = [c for c in raw.columns if c not in cfg.schema]
             if unexpected:
-                # Schema drift in a PII pipeline may be a new sensitive column
-                # arriving unclassified, so it is surfaced rather than ignored.
-                log.warning("unexpected columns not in schema: %s", ", ".join(unexpected))
+                # An unclassified column may be new sensitive data. The policy
+                # decides whether that stops the run.
                 result.outputs["unexpected_columns"] = ", ".join(unexpected)
+                if cfg.unexpected_column_policy == "fail":
+                    raise ValueError(
+                        f"input has columns absent from the schema: "
+                        f"{', '.join(unexpected)}. They are unclassified, so their "
+                        f"sensitivity is unknown and nothing masks them."
+                    )
+                log.warning("unexpected columns not in schema: %s", ", ".join(unexpected))
             t.finish(len(raw), f"{len(raw.columns)} columns")
 
         with _Timer(result, "profile", len(raw)) as t:
@@ -157,9 +155,7 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
                     f"reconciliation failed: {clog.rows_in} in != "
                     f"{clog.rows_out} out + {clog.rows_quarantined} quarantined"
                 )
-            # The cleaned extract is not written here. Post-validation is a
-            # publication gate, and writing before it passes would leave a
-            # non-compliant file on disk for someone to pick up.
+            # Not written here: post-validation gates publication.
             quarantine_frame(clog, cfg.sensitive_columns).to_csv(rejects / "quarantine.csv", index=False)
             artifact(write(reports / "cleaning_log.txt", render_cleaning_log(clog, source, cfg)))
             artifact(rejects / "quarantine.csv")
@@ -175,10 +171,8 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
             t.finish(len(cleaned), f"{len(post.failures)} rule failures")
 
         with _Timer(result, "publish", len(cleaned)) as t:
-            # A row that survived cleaning and still fails the schema is a
-            # defect in the cleaner, not in the data: it was neither repaired
-            # nor quarantined. Publishing it would put a row the pipeline
-            # claims is compliant into the shared extract.
+            # A row that survived cleaning and still fails the schema was
+            # neither repaired nor quarantined - a defect in the cleaner.
             if not post.passed:
                 offenders = ", ".join(sorted({f.column for f in post.failures})[:5])
                 raise RuntimeError(
@@ -191,11 +185,9 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
             t.finish(len(cleaned), "schema compliant")
 
         with _Timer(result, "mask", len(cleaned)) as t:
+            # Masked in memory only. Nothing reaches disk until verify_release
+            # has confirmed it carries no direct identifiers.
             masked = mask(cleaned, cfg)
-            masked.masked.to_csv(processed / "customers_masked.csv", index=False)
-            artifact(write(reports / "masked_sample.txt",
-                           render_masked_sample(masked, cleaned, source, cfg)))
-            artifact(processed / "customers_masked.csv")
             result.outputs["unique_before"] = masked.unique_before
             result.outputs["unique_after"] = masked.unique_after
             t.finish(len(masked.masked), f"unique {masked.unique_before} -> {masked.unique_after}")
@@ -211,6 +203,13 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
                 )
             result.outputs["residual_identifiers"] = 0
             t.finish(len(masked.masked), "no direct identifiers remain")
+
+        with _Timer(result, "publish_masked", len(masked.masked)) as t:
+            masked.masked.to_csv(processed / "customers_masked.csv", index=False)
+            artifact(write(reports / "masked_sample.txt",
+                           render_masked_sample(masked, cleaned, source, cfg)))
+            artifact(processed / "customers_masked.csv")
+            t.finish(len(masked.masked), "verified before write")
     except Exception:
         # _Timer has already recorded which stage failed and why; the caller
         # needs the partial result to write the execution report.

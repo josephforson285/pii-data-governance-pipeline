@@ -136,9 +136,21 @@ def test_masking_preserves_row_count_and_columns(cfg):
 
 
 def test_non_pii_columns_are_untouched(cfg):
-    df = pd.DataFrame([{"customer_id": "7", "account_status": "active"}])
+    df = pd.DataFrame([{c: "x" for c in
+                        ["customer_id", "first_name", "last_name", "email", "phone",
+                         "date_of_birth", "address", "income", "account_status",
+                         "created_date"]}])
     out = apply_masks(df, cfg)
-    assert out.iloc[0].to_dict() == df.iloc[0].to_dict()
+    for column in cfg.unmasked_columns:
+        assert out.iloc[0][column] == df.iloc[0][column]
+
+
+def test_masking_a_frame_missing_a_configured_column_raises(cfg):
+    """Skipping it would leave the report claiming a column was masked when
+    nothing touched it."""
+    partial = pd.DataFrame([{"customer_id": "7", "account_status": "active"}])
+    with pytest.raises(ValueError, match="masking policy names column"):
+        apply_masks(partial, cfg)
 
 
 def test_masking_rules_come_from_config(cfg):
