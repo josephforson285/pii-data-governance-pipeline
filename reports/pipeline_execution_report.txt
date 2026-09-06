@@ -4,20 +4,20 @@ PIPELINE EXECUTION REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T20:33:22Z
+Generated  : 2026-09-06T21:04:38Z
 Pipeline   : v0.1.0
 
-Started    : 2026-09-06T20:33:21Z
+Started    : 2026-09-06T21:04:38Z
 Rules      : v3
 Reference  : 2026-09-06
 Status     : SUCCESS
-Duration   : 0.82s
+Duration   : 0.81s
 
 ------------------------------------------------------------------------------
 1. STAGE TIMELINE
 ------------------------------------------------------------------------------
 #  STAGE                 IN     OUT  SECONDS  STATUS  DETAIL
-1  load                   0    5000     0.03  ok      10 columns
+1  load                   0    5000     0.04  ok      10 columns
 2  profile             5000    5000     0.08  ok      978 invalid values
 3  detect_pii          5000    5000     0.11  ok      7 findings, 40 leaked rows
 4  validate_pre        5000    5000     0.15  ok      3527 rule failures, 832 uncoer
@@ -28,7 +28,7 @@ Duration   : 0.82s
 9  verify_release      3682    3682     0.06  ok      no direct identifiers remain
 10 publish_masked      3682    3682     0.01  ok      verified before write
 ------------------------------------------------------------------------------
-   TOTAL                                0.82
+   TOTAL                                0.81
 
 Slowest stage: clean (0.26s, 32% of runtime)
 
