@@ -1,10 +1,10 @@
 ==============================================================================
 VALIDATION RESULTS
 ==============================================================================
-Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
-SHA256     : fee85faca79359aa
-Rows       : 5,000
-Generated  : 2026-09-06T19:47:38Z
+Source     : data/processed/customers_cleaned.csv
+SHA256     : 0426f1557d8e0f3f
+Rows       : 3,682
+Generated  : 2026-09-06T20:33:41Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)
@@ -27,44 +27,17 @@ counted as missing - a different defect needing a different fix.
 They also block publication, so the delta matters as much as the
 rule-failure delta below.
 
-COLUMN                   PRE    POST    DELTA
-date_of_birth            492       0     -492
-created_date             300       0     -300
-income                    40       0      -40
-------------------------------------------------------------------------------
-TOTAL                    832       0     -832
+COLUMN                UNCOERCIBLE   EXAMPLES
+TOTAL                           0
 
 ------------------------------------------------------------------------------
 3. RULE FAILURES
 ------------------------------------------------------------------------------
-RULE                                             PRE    POST    DELTA
-phone.str_matches                               1036       0    -1036
-date_of_birth.not_nullable                       560       0     -560
-account_status.isin                              350       0     -350
-created_date.not_nullable                        300       0     -300
-income.not_nullable                              275       0     -275
-email.str_matches                                235       0     -235
-first_name.str_matches                           124       0     -124
-address.length_10_200                             99       0      -99
-last_name.str_matches                             98       0      -98
-customer_id.field_uniqueness                      97       0      -97
-income.greater_than_or_equal_to                   70       0      -70
-phone.not_nullable                                54       0      -54
-first_name.length_2_50                            42       0      -42
-email.not_nullable                                40       0      -40
-address.not_nullable                              36       0      -36
-last_name.length_2_50                             36       0      -36
-created_date.not_in_future                        30       0      -30
-income.less_than_or_equal_to                      25       0      -25
-date_of_birth.age_18_120                          20       0      -20
+RULE                                          FAILURES
 ------------------------------------------------------------------------------
-TOTAL                                           3527       0    -3527
+TOTAL                                                0
 
-Rows failing : 2,658 -> 0
-
-Every row remaining after cleaning satisfies the schema. Rows
-that could not be repaired without inventing data are in the
-quarantine file with a reason, not silently dropped.
+Rows with at least one failure: 0 of 3,682 (0.0%)
 
 ------------------------------------------------------------------------------
 4. FAILURE DETAIL
@@ -77,7 +50,7 @@ Values from identifying columns are redacted.
 ------------------------------------------------------------------------------
 SUMMARY
 ------------------------------------------------------------------------------
-Stage validated       : post-clean
+Stage validated       : pre-clean
 Rule failures         : 0
 Uncoercible values    : 0
 Schema compliant      : YES

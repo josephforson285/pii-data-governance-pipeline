@@ -122,8 +122,7 @@ def render_quality_report(p: QualityProfile, source: Path, cfg: Config) -> str:
         sensitive = col in cfg.sensitive_columns
         out.append(f"  {'SHAPE':<24}{'COUNT':>7}   EXAMPLE")
         for sig, n, ex in shapes:
-            # For identifying columns the shape already carries the format, so a
-            # redacted example would only restate it.
+            # The shape already carries the format; a redacted example repeats it.
             shown = "[redacted]" if sensitive else ex[:28]
             out.append(f"  {sig[:23]:<24}{n:>7}   {shown}")
     out.append("")
@@ -749,7 +748,6 @@ def render_scorecard(card: ScoreCard, source: Path, n_rows: int, cfg: Config) ->
 
 def write(path: Path, content: str) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
-    # Explicit encoding: reports carry names in any script, and the default
-    # depends on the host locale.
+    # Explicit: reports carry names in any script, the default is locale-dependent.
     path.write_text(content, encoding="utf-8")
     return path

@@ -59,13 +59,11 @@ DECLARED = {
     "created_date":   (QUASI, "medium", "Near-unique when exact; a strong quasi-identifier despite being operational"),
 }
 
-# Not intended to hold direct identifiers. Several are personal data anyway;
-# a hit here is a leak because a direct identifier turned up unplanned.
+# Not meant to hold direct identifiers; a hit here is a leak, not a design.
 NON_IDENTIFIER_COLUMNS = {"address", "account_status", "created_date", "income"}
 
 
-# Regexes match shapes, not meaning. Declaring the discards keeps the scan
-# recall-first and every one of them on the record.
+# Regexes match shapes, not meaning. Declaring discards keeps them on record.
 SUPPRESSIONS: list[tuple[str, set[str], str]] = [
     ("postal_code", {"income", "customer_id"},
      "Numeric field; any 5-digit amount matches the postal shape"),
@@ -156,8 +154,7 @@ def verify_release(df: pd.DataFrame) -> list[Finding]:
     """
     residual: list[Finding] = []
     for column in df.columns:
-        # Suppressions cut noise on raw data; on a release they would wave
-        # through a real identifier.
+        # Suppressions cut raw-scan noise; on a release they would wave PII through.
         for finding in _scan_column(df[column], column, apply_suppressions=False):
             if finding.category == DIRECT:
                 residual.append(finding)
@@ -192,7 +189,6 @@ def detect(df: pd.DataFrame, cfg: Config) -> PIIReport:
         unique_rows=buckets.get("k=1 (unique)", 0),
         quasi_identifiers=cfg.quasi_identifiers_before,
         incomplete_signatures=incomplete_share(keys),
-        # Union, not a sum: a row leaking both an email and a phone is one
-        # affected record, not two.
+        # Union, not sum: a row leaking two identifiers is one record.
         leak_rows=len({r for f in leaks for r in f.rows}),
     )

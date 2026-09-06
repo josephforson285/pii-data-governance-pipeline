@@ -203,8 +203,7 @@ def clean(df: pd.DataFrame, cfg: Config) -> tuple[pd.DataFrame, CleaningLog]:
     kept: list[dict] = []
     seen_ids: set[int] = set()
 
-    # Over the whole input: deriving these from surviving rows made detection
-    # depend on what earlier checks rejected.
+    # Over the whole input: surviving rows made this depend on earlier checks.
     parsed_ids = [clean_customer_id(v)[0] for v in df["customer_id"]]
     id_counts = Counter(i for i in parsed_ids if i is not None)
     duplicated_ids = {i for i, n in id_counts.items() if n > 1}
@@ -269,8 +268,7 @@ def clean(df: pd.DataFrame, cfg: Config) -> tuple[pd.DataFrame, CleaningLog]:
         kept.append(record)
 
     log.rows_out = len(kept)
-    # Schema columns only: building on df.columns invented empty columns for
-    # unexpected ones, blanking whatever they held.
+    # Schema columns only: df.columns invented empty ones, blanking their data.
     return pd.DataFrame(kept, columns=list(cfg.schema)), log
 
 

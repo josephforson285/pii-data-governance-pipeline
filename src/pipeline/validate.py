@@ -176,15 +176,13 @@ def _coerce_for_validation(df: pd.DataFrame, cfg: Config) -> pd.DataFrame:
             continue
         kind = spec["dtype"]
         if kind == "int64":
-            # Non-integers become NA and are reported as coercion failures
-            # rather than crashing the cast or truncating.
+            # Non-integers become NA and are reported, not truncated.
             numeric = pd.to_numeric(out[name], errors="coerce")
             exact = numeric.notna() & (numeric % 1 == 0)
             out[name] = numeric.where(exact).astype("Int64")
         elif kind == "float64":
-            # Strict, like the date branch: '$50,000' is a format defect the
-            # cleaner repairs, so pre-clean validation should report it rather
-            # than quietly accepting it and understating the delta.
+            # Strict like the date branch: '$50,000' is a defect to report,
+            # not to quietly accept and understate the delta.
             out[name] = pd.to_numeric(out[name], errors="coerce")
         elif kind == "date":
             out[name] = pd.to_datetime(out[name], format="%Y-%m-%d", errors="coerce")

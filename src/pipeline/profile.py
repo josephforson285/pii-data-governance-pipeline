@@ -11,8 +11,7 @@ import pandas as pd
 
 from pipeline.config import Config
 
-# Values that mean "missing" without being null. Counted separately from true
-# nulls because they survive dropna() and silently pollute downstream stats.
+# Missing without being null. Counted apart: these survive dropna().
 SENTINELS = {"", "null", "n/a", "na", "none", "nan", "unknown", "-", "not disclosed"}
 
 # Presentation labels for the config's dtype names. The authoritative types

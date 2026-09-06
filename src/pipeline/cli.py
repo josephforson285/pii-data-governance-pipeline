@@ -135,8 +135,7 @@ def _cmd_clean(args: argparse.Namespace) -> int:
           render_validation_report(pre, src, cfg, post=post))
     log.info("wrote cleaning_log.txt and validation_results.txt")
 
-    # Same publication gate as `run`: the extract is written only once it is
-    # known to satisfy the schema it claims to satisfy.
+    # Same gate as `run`: written only once it satisfies its own schema.
     if not post.passed:
         log.error("post-clean validation failed: %d rule failures, %d coercion "
                   "failures; refusing to write customers_cleaned.csv",

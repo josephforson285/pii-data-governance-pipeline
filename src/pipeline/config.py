@@ -146,8 +146,7 @@ DERIVED_QUASI = {"address_postal"}
 REQUIRED_SECTIONS = ("thresholds", "schema", "remediation", "masking",
                      "release", "reporting")
 
-# Keys the Config properties read directly. Without these, a property raises
-# KeyError before a single problem can be collected.
+# Read directly by properties; absent, they raise before problems collect.
 REQUIRED_KEYS = (
     ("thresholds", "min_age"), ("thresholds", "max_age"), ("thresholds", "income_cap"),
     ("remediation", "non_critical"), ("remediation", "status_aliases"),

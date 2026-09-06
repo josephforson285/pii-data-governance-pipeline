@@ -108,9 +108,8 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
             result.rules_version = cfg.version
             result.reference_date = cfg.reference_date.isoformat()
             raw = load_raw(source)
-            # Structural check before any stage touches a column, so a renamed
-            # or absent field fails here with a usable message rather than as a
-            # KeyError from whichever stage happened to reach it first.
+            # Before any stage touches a column, so a renamed field fails here
+            # with a usable message rather than as a KeyError downstream.
             missing = [c for c in cfg.schema if c not in raw.columns]
             if missing:
                 raise ValueError(
@@ -194,8 +193,7 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
             t.finish(len(cleaned), "schema compliant")
 
         with _Timer(result, "mask", len(cleaned)) as t:
-            # Masked in memory only. Nothing reaches disk until verify_release
-            # has confirmed it carries no direct identifiers.
+            # In memory only: nothing reaches disk until verify_release passes.
             masked = mask(cleaned, cfg)
             result.outputs["unique_before"] = masked.unique_before
             result.outputs["unique_after"] = masked.unique_after
@@ -220,7 +218,6 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
             artifact(processed / "customers_masked.csv")
             t.finish(len(masked.masked), "verified before write")
     except Exception:
-        # _Timer has already recorded which stage failed and why; the caller
-        # needs the partial result to write the execution report.
+        # _Timer recorded the failure; the caller needs the partial result.
         log.error("run aborted at stage %s", result.failed_stage)
     return result
