@@ -79,7 +79,7 @@ independent count.
 
 Against 3,670 planted defects: **100% recall, 97.0% attribution** (90.7%
 macro). Recall alone is a poor score — quarantining everything scores 100% —
-so the harness measures **specificity** too: of 2,283 rows with nothing
+so the harness measures **specificity** too: of 2,261 rows with nothing
 planted, none were quarantined. A test asserts a quarantine-everything
 pipeline scores 100% recall and 0% specificity.
 
