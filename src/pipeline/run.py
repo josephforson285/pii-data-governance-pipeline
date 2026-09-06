@@ -38,6 +38,7 @@ class Stage:
 class RunResult:
     source: Path
     started: str
+    reference_date: str = ""
     stages: list[Stage] = field(default_factory=list)
     artifacts: list[Path] = field(default_factory=list)
     outputs: dict[str, Any] = field(default_factory=dict)
@@ -108,6 +109,7 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
         with _Timer(result, "load", 0) as t:
             cfg = load_config(rules_path)
             result.rules_version = cfg.version
+            result.reference_date = cfg.reference_date.isoformat()
             raw = load_raw(source)
             # Structural check before any stage touches a column, so a renamed
             # or absent field fails here with a usable message rather than as a
@@ -134,10 +136,13 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
             t.finish(len(raw), f"{issues} invalid values")
 
         with _Timer(result, "detect_pii", len(raw)) as t:
-            pii = detect(raw)
+            pii = detect(raw, cfg)
             artifact(write(reports / "pii_detection_report.txt", render_pii_report(pii, source, cfg)))
             result.outputs["pii_findings"] = len(pii.findings)
-            result.outputs["pii_leaks"] = sum(f.row_count for f in pii.leaks)
+            leak_rows = set()
+            for f in pii.leaks:
+                leak_rows.update(f.rows)
+            result.outputs["pii_leaks"] = len(leak_rows)
             t.finish(len(raw), f"{len(pii.findings)} findings, {result.outputs['pii_leaks']} leaked rows")
 
         with _Timer(result, "validate_pre", len(raw)) as t:
@@ -152,10 +157,11 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
                     f"reconciliation failed: {clog.rows_in} in != "
                     f"{clog.rows_out} out + {clog.rows_quarantined} quarantined"
                 )
-            cleaned.to_csv(processed / "customers_cleaned.csv", index=False)
+            # The cleaned extract is not written here. Post-validation is a
+            # publication gate, and writing before it passes would leave a
+            # non-compliant file on disk for someone to pick up.
             quarantine_frame(clog, cfg.sensitive_columns).to_csv(rejects / "quarantine.csv", index=False)
             artifact(write(reports / "cleaning_log.txt", render_cleaning_log(clog, source, cfg)))
-            artifact(processed / "customers_cleaned.csv")
             artifact(rejects / "quarantine.csv")
             result.outputs["quarantined"] = clog.rows_quarantined
             result.outputs["repairs"] = sum(clog.repairs.values())
@@ -167,6 +173,22 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
                            render_validation_report(pre, source, cfg, post=post)))
             result.outputs["failures_post"] = len(post.failures)
             t.finish(len(cleaned), f"{len(post.failures)} rule failures")
+
+        with _Timer(result, "publish", len(cleaned)) as t:
+            # A row that survived cleaning and still fails the schema is a
+            # defect in the cleaner, not in the data: it was neither repaired
+            # nor quarantined. Publishing it would put a row the pipeline
+            # claims is compliant into the shared extract.
+            if not post.passed:
+                offenders = ", ".join(sorted({f.column for f in post.failures})[:5])
+                raise RuntimeError(
+                    f"post-clean validation failed with {len(post.failures)} "
+                    f"failures across [{offenders}]; refusing to publish. "
+                    f"See reports/validation_results.txt"
+                )
+            cleaned.to_csv(processed / "customers_cleaned.csv", index=False)
+            artifact(processed / "customers_cleaned.csv")
+            t.finish(len(cleaned), "schema compliant")
 
         with _Timer(result, "mask", len(cleaned)) as t:
             masked = mask(cleaned, cfg)

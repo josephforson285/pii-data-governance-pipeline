@@ -4,7 +4,7 @@ DATA QUALITY REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 5,000
-Generated  : 2026-09-06T15:12:48Z
+Generated  : 2026-09-06T17:15:58Z
 Pipeline   : v0.1.0
 Rules      : v2
 Reference  : 2026-09-06 (today (not pinned))
@@ -104,7 +104,7 @@ unparseable_created_date        300   ##/##/####, ##/##/####, ##-##-####, ##
 non_numeric_income               14   75k
 negative_income                  70   -20902.86, -3014.52, -25434.13, -39987
 income_above_cap                 25   448920101.06, 585087660.46, 499446821.
-implausible_age                  20   156, 157, 159, 166, 167
+age_outside_policy               20   156, 157, 160, 167, 168
 future_created_date              30   ####-##-##, ####-##-##, ####-##-##
 
 ------------------------------------------------------------------------------

@@ -84,7 +84,7 @@ def _checks_for(spec: dict, cfg: Config) -> list[Check]:
         ))
     if "pattern" in c:
         checks.append(Check.str_matches(c["pattern"], name="format"))
-    if "income_cap" in c:
+    if c.get("income_cap"):
         checks.append(Check.le(cfg.income_cap, name="within_cap"))
     if c.get("min_age") or c.get("max_age"):
         lo, hi = cfg.min_age, cfg.max_age
@@ -108,9 +108,10 @@ def _age_years(s: pd.Series, reference: date) -> pd.Series:
 def build_schema(cfg: Config) -> DataFrameSchema:
     """Build the column schema.
 
-    strict="filter" is deliberate: an unexpected column in a PII pipeline may
-    be schema drift carrying new sensitive data, so it is reported by the
-    loader rather than silently validated as if it belonged.
+    strict=False: unexpected columns do not fail the schema here, because an
+    unexpected column in a PII pipeline needs reporting rather than dropping -
+    it may be schema drift carrying new sensitive data. The loader surfaces
+    it; see run.py.
     """
     columns = {}
     for name, spec in cfg.schema.items():
@@ -140,8 +141,14 @@ def _dataframe_check_failures(typed: pd.DataFrame, cfg: Config) -> list[Failure]
                 f"dataframe check {check.name!r} uses unknown op {check.op!r}; "
                 f"known ops: {', '.join(sorted(DF_CHECK_OPS))}"
             )
-        if check.left not in typed.columns or check.right not in typed.columns:
-            continue
+        missing = [c for c in (check.left, check.right) if c not in typed.columns]
+        if missing:
+            # Skipping quietly would let a declared guarantee disappear the
+            # moment a column is renamed.
+            raise ValueError(
+                f"dataframe check {check.name!r} needs column(s) "
+                f"{', '.join(missing)}, which the input does not have"
+            )
         left, right = typed[check.left], typed[check.right]
         comparable = left.notna() & right.notna()
         violated = comparable & ~op(left, right)
@@ -168,7 +175,12 @@ def _coerce_for_validation(df: pd.DataFrame, cfg: Config) -> pd.DataFrame:
             continue
         kind = spec["dtype"]
         if kind == "int64":
-            out[name] = pd.to_numeric(out[name], errors="coerce").astype("Int64")
+            # Round-trip through float would silently truncate "12.9" to 12.
+            # Anything that is not an exact integer becomes NA and is reported
+            # as a coercion failure instead of crashing the cast.
+            numeric = pd.to_numeric(out[name], errors="coerce")
+            exact = numeric.notna() & (numeric % 1 == 0)
+            out[name] = numeric.where(exact).astype("Int64")
         elif kind == "float64":
             out[name] = pd.to_numeric(
                 out[name].astype(str).str.replace(r"[$,]", "", regex=True).str.strip(),

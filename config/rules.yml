@@ -29,7 +29,8 @@ schema:
     dtype: str
     nullable: false
     # Unicode-aware: [^\W\d_] is "a letter in any script". An ASCII-only class
-    # would reject Jose, Muller and Nguyen as malformed.
+    # would reject José, Müller and Nguyễn as malformed and, worse, an earlier
+    # version stripped the offending letters instead of rejecting the row.
     checks: {min_len: 2, max_len: 50, pattern: "^[^\\W\\d_](?:[^\\W\\d_]|[ '\\-])*$"}
 
   last_name:
@@ -78,7 +79,9 @@ dataframe_checks:
   - name: dob_before_created
     left: date_of_birth
     right: created_date
-    op: lt
+    # le, not lt: an account opened on the customer's date of birth is odd but
+    # not impossible, and the rule is "not created before birth".
+    op: le
     description: A customer cannot be created before they were born
 
 remediation:

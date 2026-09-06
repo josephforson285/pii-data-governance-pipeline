@@ -79,7 +79,7 @@ def clean_name(value: Any, min_len: int = 2, max_len: int = 50) -> tuple[str | N
     """Normalise whitespace and case; reject anything else.
 
     Deliberately does not strip disallowed characters. An earlier version
-    removed them, which silently turned 'Jose' into 'Jos' and 'Nguyen' into
+    removed them, which silently turned 'José' into 'Jos' and 'Nguyễn' into
     'Nguyn' while reporting the row as successfully repaired - a corrupted
     name that no downstream check could detect.
     """
@@ -215,7 +215,7 @@ def clean(df: pd.DataFrame, cfg: Config) -> tuple[pd.DataFrame, CleaningLog]:
     id_counts = Counter(i for i in parsed_ids if i is not None)
     duplicated_ids = {i for i, n in id_counts.items() if n > 1}
 
-    for position, (idx, row) in enumerate(df.iterrows()):
+    for idx, row in df.iterrows():
         idx = int(idx)
         cid_raw = str(row["customer_id"])
         reasons: list[Rejection] = []
@@ -259,7 +259,11 @@ def clean(df: pd.DataFrame, cfg: Config) -> tuple[pd.DataFrame, CleaningLog]:
             reasons.append(Rejection(idx, cid_raw, "created_before_birth",
                                      "created_date", created.isoformat()))
 
-        # First occurrence of a duplicated id is kept, later ones rejected.
+        # Survivorship: first occurrence wins. Deterministic rather than
+        # correct - with no business rule saying which duplicate is
+        # authoritative (most recent? most complete?), any choice is arbitrary,
+        # so the rule is stated here and the discarded rows are quarantined
+        # with their ids rather than dropped.
         if cid is not None and cid in duplicated_ids:
             if cid in seen_ids:
                 reasons.append(Rejection(idx, cid_raw, "duplicate_customer_id",
@@ -306,6 +310,10 @@ def quarantine_frame(log: CleaningLog, sensitive_columns: set[str]) -> pd.DataFr
     Failing values from identifying columns are redacted. The quarantine file
     is an operational artifact that gets copied around; it should not be the
     one place raw PII escapes the pipeline.
+
+    customer_id is deliberately left intact: the file exists so someone can go
+    and fix the source record, and a redacted key makes that impossible. The
+    file is therefore restricted and gitignored, not sanitised.
     """
     from pipeline.pii import redact
 

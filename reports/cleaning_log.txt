@@ -4,7 +4,7 @@ CLEANING LOG
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 5,000
-Generated  : 2026-09-06T15:12:49Z
+Generated  : 2026-09-06T17:15:59Z
 Pipeline   : v0.1.0
 Rules      : v2
 Reference  : 2026-09-06 (today (not pinned))

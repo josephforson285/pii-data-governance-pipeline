@@ -4,7 +4,7 @@ MASKED SAMPLE - BEFORE / AFTER
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 3,684
-Generated  : 2026-09-06T15:12:49Z
+Generated  : 2026-09-06T17:15:59Z
 Pipeline   : v0.1.0
 Rules      : v2
 Reference  : 2026-09-06 (today (not pinned))
@@ -130,8 +130,9 @@ mean each person is hidden among more people.
 Before : date_of_birth, address_postal, income
 After  : date_of_birth, income, created_date
 The two sets differ because masking removed dimensions. The after
-set covers every attribute actually released, including columns
-left unmasked - scoring only the masked ones would flatter it.
+set covers every released attribute designated a quasi-identifier,
+including columns left unmasked - scoring only the masked ones
+would flatter the result.
 
 GROUP SIZE          BEFORE     AFTER
 k=1 (unique)          3684      1775

@@ -4,7 +4,7 @@ VALIDATION RESULTS
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 5,000
-Generated  : 2026-09-06T15:12:49Z
+Generated  : 2026-09-06T17:15:59Z
 Pipeline   : v0.1.0
 Rules      : v2
 Reference  : 2026-09-06 (today (not pinned))
@@ -58,6 +58,10 @@ date_of_birth.age_18_120                          20       0      -20
 TOTAL                                           3510       0    -3510
 
 Rows failing : 2,633 -> 0
+
+Every published row satisfies the schema. Rows that could not be
+repaired without inventing data are in the quarantine file with a
+reason, not silently dropped.
 
 ------------------------------------------------------------------------------
 4. FAILURE DETAIL

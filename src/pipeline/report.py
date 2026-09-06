@@ -219,7 +219,9 @@ def render_pii_report(r: PIIReport, source: Path, cfg: Config) -> str:
         for f in r.leaks:
             out.append(f"{f.column:<16}{f.detector:<14}{f.row_count:>7}   {f.rows[:6]}")
         out.append("")
-        out.append(f"Total: {sum(f.row_count for f in r.leaks)} rows.")
+        out.append(f"Total: {r.leak_rows} distinct rows "
+                   f"({sum(f.row_count for f in r.leaks)} findings; a row can leak more "
+                   f"than one identifier).")
         worst = max(r.leaks, key=lambda f: {"critical": 3, "high": 2, "medium": 1}.get(f.sensitivity, 0))
         out.append(f"Highest severity: {worst.detector} in {worst.column} ({worst.sensitivity}).")
     out.append("")
@@ -251,6 +253,13 @@ def render_pii_report(r: PIIReport, source: Path, cfg: Config) -> str:
     out.append("Masking direct identifiers does not make a dataset anonymous. Grouping")
     out.append("rows by quasi-identifiers (birth year, postal code, income band) shows")
     out.append("how many people each record is hidden among.")
+    out.append("")
+    out.append(f"Quasi-identifiers modelled: {', '.join(r.quasi_identifiers)}")
+    if r.incomplete_signatures:
+        out.append(f"Signatures with an unparseable component: "
+                   f"{100 * r.incomplete_signatures:.1f}% - these share a common")
+        out.append("'unknown' signature, which groups them together and overstates")
+        out.append("their protection.")
     out.append("")
     out.append(f"{'GROUP SIZE':<16}{'ROWS':>8}{'PCT':>9}")
     for label in ["k=1 (unique)", "k=2", "k=3-5", "k>5"]:
@@ -319,8 +328,14 @@ def render_validation_report(pre: ValidationResult, source: Path, cfg: Config,
         out.append(f"Rows failing : {len(pre.failing_rows):,} -> {len(post.failing_rows):,}")
         if b:
             out.append("")
-            out.append("Remaining failures are values that could not be repaired without")
-            out.append("inventing data. They are quarantined, not silently dropped.")
+            out.append("These rows survived cleaning and still fail the schema, so they")
+            out.append("were neither repaired nor quarantined - a defect in the cleaner,")
+            out.append("not in the data. Publication is blocked while any remain.")
+        else:
+            out.append("")
+            out.append("Every published row satisfies the schema. Rows that could not be")
+            out.append("repaired without inventing data are in the quarantine file with a")
+            out.append("reason, not silently dropped.")
     out.append("")
 
     out += _section("4. FAILURE DETAIL")
@@ -455,8 +470,9 @@ def render_masked_sample(r: MaskResult, original: "pd.DataFrame", source: Path,
     out.append(f"Before : {', '.join(r.quasi_before)}")
     out.append(f"After  : {', '.join(r.quasi_after)}")
     out.append("The two sets differ because masking removed dimensions. The after")
-    out.append("set covers every attribute actually released, including columns")
-    out.append("left unmasked - scoring only the masked ones would flatter it.")
+    out.append("set covers every released attribute designated a quasi-identifier,")
+    out.append("including columns left unmasked - scoring only the masked ones")
+    out.append("would flatter the result.")
     out.append("")
     total = len(r.masked)
     out.append(f"{'GROUP SIZE':<16}{'BEFORE':>10}{'AFTER':>10}")
@@ -492,6 +508,8 @@ def render_masked_sample(r: MaskResult, original: "pd.DataFrame", source: Path,
 def render_execution_report(r: RunResult) -> str:
     out = header("Pipeline Execution Report", r.source, r.stages[0].rows_out if r.stages else 0)
     out.append(f"Started    : {r.started}")
+    out.append(f"Rules      : v{r.rules_version}")
+    out.append(f"Reference  : {r.reference_date}")
     out.append(f"Status     : {'SUCCESS' if r.ok else 'FAILED at ' + str(r.failed_stage)}")
     out.append(f"Duration   : {r.seconds:.2f}s")
     out.append("")
@@ -504,13 +522,16 @@ def render_execution_report(r: RunResult) -> str:
     out.append("-" * WIDTH)
     out.append(f"{'':<3}{'TOTAL':<16}{'':>8}{'':>8}{r.seconds:>9.2f}")
     out.append("")
-    if r.stages:
+    if r.stages and r.seconds > 0:
         slowest = max(r.stages, key=lambda x: x.seconds)
         out.append(f"Slowest stage: {slowest.name} ({slowest.seconds:.2f}s, "
                    f"{100 * slowest.seconds / r.seconds:.0f}% of runtime)")
     out.append("")
 
     out += _section("2. STAGE ORDER")
+    out.append("Post-clean validation gates publication: the cleaned extract is")
+    out.append("written only after it satisfies the schema it claims to satisfy.")
+    out.append("")
     out.append("PII detection runs on the raw file, before cleaning: exposure is a")
     out.append("property of what landed on disk, and scanning post-clean would")
     out.append("understate it by every quarantined row.")
@@ -583,9 +604,10 @@ def render_scorecard(card: ScoreCard, source: Path, n_rows: int, cfg: Config) ->
     out.append("            fired. A miss here means the diagnosis was wrong, even")
     out.append("            though the row was handled.")
     out.append("")
-    out.append("Recall alone is not a quality score: a pipeline that quarantined")
-    out.append("every row would score 100%. Read it against the retention figure in")
-    out.append("cleaning_log.txt, which is what that pipeline would drive to zero.")
+    out.append("SPECIFICITY share of rows with nothing planted in them that the")
+    out.append("            pipeline left alone. The counterweight to recall:")
+    out.append("            quarantining everything scores perfect recall and")
+    out.append("            zero specificity, so neither can be gamed alone.")
     out.append("")
 
     out += _section("2. PER-DEFECT RESULTS")
@@ -643,6 +665,15 @@ def render_scorecard(card: ScoreCard, source: Path, n_rows: int, cfg: Config) ->
     out.append(f"{'Handled':<34}{card.handled:>8,}   {100 * card.recall:.1f}%")
     out.append(f"{'Correctly attributed':<34}{card.attributed:>8,}   {100 * card.attribution:.1f}%")
     out.append("")
+    out.append(f"{'Rows with no planted defect':<34}{card.clean_rows:>8,}")
+    out.append(f"{'  of those, quarantined':<34}{card.falsely_quarantined:>8,}")
+    out.append(f"{'Specificity':<34}{'':>8}   {100 * card.specificity:.1f}%")
+    out.append("")
+    if card.falsely_quarantined:
+        out.append("Rows quarantined without a planted defect are not necessarily")
+        out.append("errors: the generator plants defects per column, and a row can")
+        out.append("carry a naturally invalid combination it never planted.")
+        out.append("")
     return "\n".join(out) + "\n"
 
 

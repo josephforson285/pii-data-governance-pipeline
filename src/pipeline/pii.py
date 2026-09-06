@@ -13,12 +13,12 @@ Two passes, because they answer different questions:
 from __future__ import annotations
 
 import re
-from collections import Counter, defaultdict
 from dataclasses import dataclass, field
-from datetime import date
 
 import pandas as pd
 
+from pipeline.config import Config
+from pipeline.privacy import incomplete_share, k_buckets, signatures
 from pipeline.profile import is_missing
 
 DIRECT = "direct identifier"
@@ -57,15 +57,17 @@ DECLARED = {
     "last_name":      (DIRECT, "high", "Identifies with forename"),
     "email":          (DIRECT, "high", "Contactable; account identifier"),
     "phone":          (DIRECT, "high", "Contactable"),
-    "date_of_birth":  (QUASI, "high", "With postcode and sex, re-identifies most individuals"),
-    "address":        (QUASI, "high", "Locates the individual physically"),
+    "date_of_birth":  (QUASI, "high", "Strong quasi-identifier with location and financial attributes"),
+    "address":        (QUASI, "high", "Location data; can identify a household directly"),
     "income":         (QUASI, "high", "Financial data; discriminatory if disclosed"),
     "account_status": ("non-PII", "low", "Operational attribute"),
     "created_date":   (QUASI, "medium", "Near-unique when exact; a strong quasi-identifier despite being operational"),
 }
 
-# Columns whose declared purpose is free text or non-PII: any identifier found
-# here is a leak, not a design decision.
+# Columns not intended to hold direct identifiers such as an email, phone or
+# SSN. Several of these are personal data in their own right; what makes a hit
+# here a leak is that a *direct* identifier turned up where none was designed
+# to be.
 NON_IDENTIFIER_COLUMNS = {"address", "account_status", "created_date", "income"}
 
 
@@ -116,6 +118,9 @@ class PIIReport:
     rows_with_pii: int
     k_anonymity: dict[str, int]
     unique_rows: int
+    quasi_identifiers: list[str]
+    incomplete_signatures: float
+    leak_rows: int
 
 
 def redact(value: str) -> str:
@@ -146,48 +151,7 @@ def _scan_column(series: pd.Series, column: str) -> list[Finding]:
     return found
 
 
-def _birth_year(v) -> str:
-    try:
-        return str(date.fromisoformat(str(v).strip()).year)
-    except ValueError:
-        return "?"
-
-
-def _postal(v) -> str:
-    m = re.search(r"\b(\d{5})(?:-\d{4})?\b", str(v))
-    return m.group(1) if m else "?"
-
-
-def _income_band(v) -> str:
-    try:
-        x = float(str(v).replace(",", "").replace("$", "").strip())
-    except ValueError:
-        return "?"
-    if pd.isna(x):
-        return "?"
-    return f"{int(x // 25_000) * 25}k"
-
-
-def k_anonymity(df: pd.DataFrame) -> tuple[dict[str, int], int]:
-    """Group rows by their quasi-identifier signature.
-
-    A group of size k means each member is indistinguishable from k-1 others.
-    k=1 rows are uniquely re-identifiable from the quasi-identifiers alone -
-    masking the direct identifiers does not protect them.
-    """
-    keys = [
-        (_birth_year(dob), _postal(addr), _income_band(inc))
-        for dob, addr, inc in zip(df["date_of_birth"], df["address"], df["income"])
-    ]
-    sizes = Counter(keys)
-    buckets: dict[str, int] = defaultdict(int)
-    for k in sizes.values():
-        label = "k=1 (unique)" if k == 1 else "k=2" if k == 2 else "k=3-5" if k <= 5 else "k>5"
-        buckets[label] += k
-    return dict(buckets), sizes.most_common()[-1][1] if sizes else 0
-
-
-def detect(df: pd.DataFrame) -> PIIReport:
+def detect(df: pd.DataFrame, cfg: Config) -> PIIReport:
     scanned: list[Finding] = []
     for column in df.columns:
         scanned.extend(_scan_column(df[column], column))
@@ -203,7 +167,8 @@ def detect(df: pd.DataFrame) -> PIIReport:
     # Every row also carries a name and an id, so exposure is effectively total.
     declared_pii_rows = len(df)
 
-    buckets, _ = k_anonymity(df)
+    keys = signatures(df, cfg.quasi_identifiers_before, cfg)
+    buckets = k_buckets(keys)
     return PIIReport(
         n_rows=len(df),
         declared=DECLARED,
@@ -213,4 +178,9 @@ def detect(df: pd.DataFrame) -> PIIReport:
         rows_with_pii=max(len(pii_rows), declared_pii_rows),
         k_anonymity=buckets,
         unique_rows=buckets.get("k=1 (unique)", 0),
+        quasi_identifiers=cfg.quasi_identifiers_before,
+        incomplete_signatures=incomplete_share(keys),
+        # Union, not a sum: a row leaking both an email and a phone is one
+        # affected record, not two.
+        leak_rows=len({r for f in leaks for r in f.rows}),
     )

@@ -3,8 +3,10 @@
 Held apart from the pipeline on purpose. Nothing under run() reads the ground
 truth: a detector that can see the answer key measures nothing.
 
-Recall is the number that matters here. A missed defect reaches production; a
-false positive costs review time.
+Recall matters because a missed defect reaches the published output, but it is
+not a quality score on its own: a pipeline that quarantined every row would
+score 100%. It has to be read alongside specificity below and the retention
+figure in cleaning_log.txt, which that pipeline would drive to zero.
 """
 from __future__ import annotations
 
@@ -36,6 +38,19 @@ class Score:
 class ScoreCard:
     scores: list[Score]
     unmeasured: list[str]
+    clean_rows: int = 0
+    falsely_quarantined: int = 0
+
+    @property
+    def specificity(self) -> float:
+        """Share of defect-free rows the pipeline left alone.
+
+        The counterweight to recall. Quarantining everything scores perfect
+        recall and zero specificity, so the pair cannot both be gamed.
+        """
+        if not self.clean_rows:
+            return 1.0
+        return 1 - self.falsely_quarantined / self.clean_rows
 
     @property
     def planted(self) -> int:
@@ -106,7 +121,7 @@ DEFECT_TO_CHECK = {
 
 
 def load_ground_truth(path: Path) -> dict:
-    return json.loads(path.read_text())
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def score(truth: dict, clean_log, pii_report) -> ScoreCard:
@@ -147,4 +162,19 @@ def score(truth: dict, clean_log, pii_report) -> ScoreCard:
 
         scores.append(Score(defect, column, len(planted), len(handled), len(attributed)))
 
-    return ScoreCard(sorted(scores, key=lambda s: (s.recall, s.attribution)), unmeasured)
+    # Specificity: rows with nothing planted in them that were quarantined
+    # anyway. Without this, recall alone cannot distinguish a good pipeline
+    # from one that rejects everything.
+    planted_anywhere: set[int] = set()
+    for info in truth["defects"].values():
+        planted_anywhere.update(info["rows"])
+    all_rows = set(range(truth["n_rows"]))
+    clean_rows = all_rows - planted_anywhere
+    quarantined = {r.row for r in clean_log.rejections}
+
+    return ScoreCard(
+        scores=sorted(scores, key=lambda s: (s.recall, s.attribution)),
+        unmeasured=unmeasured,
+        clean_rows=len(clean_rows),
+        falsely_quarantined=len(clean_rows & quarantined),
+    )

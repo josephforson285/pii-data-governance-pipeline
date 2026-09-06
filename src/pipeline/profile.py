@@ -15,14 +15,9 @@ from pipeline.config import Config
 # nulls because they survive dropna() and silently pollute downstream stats.
 SENTINELS = {"", "null", "n/a", "na", "none", "nan", "unknown", "-", "not disclosed"}
 
-# Human-readable expected types, for the report's schema-conformance section.
-# The authoritative types are in config/rules.yml.
-EXPECTED_DTYPES = {
-    "customer_id": "integer", "first_name": "string", "last_name": "string",
-    "email": "string", "phone": "string", "date_of_birth": "date",
-    "address": "string", "income": "numeric", "account_status": "string",
-    "created_date": "date",
-}
+# Presentation labels for the config's dtype names. The authoritative types
+# live in config/rules.yml; this only makes them readable in a report.
+DTYPE_LABELS = {"int64": "integer", "float64": "numeric", "str": "string", "date": "date"}
 
 
 
@@ -48,7 +43,7 @@ class QualityProfile:
     columns: list[ColumnProfile]
     missing_columns: list[str]
     unexpected_columns: list[str]
-    duplicate_ids: dict[int, int]
+    duplicate_ids: dict[str, int]
     format_inventory: dict[str, list[tuple[str, int, str]]]
     invalid_values: dict[str, dict[str, Any]]
     status_counts: dict[str, int]
@@ -110,9 +105,15 @@ def _as_date(v: Any) -> date | None:
 
 
 def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
+    """Profile the raw dataset.
+
+    Tolerates a missing or malformed column: reporting that the input is
+    unusable is the profiler's job, so it must not raise on the way to saying
+    so. Every column access below goes through `col()`.
+    """
     n = len(df)
     today = cfg.reference_date
-    max_age, cap = cfg.max_age, cfg.income_cap
+    cap = cfg.income_cap
     columns = []
     for name in df.columns:
         s = df[name]
@@ -120,42 +121,55 @@ def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
         columns.append(ColumnProfile(
             name=name,
             dtype_actual=str(s.dtype),
-            dtype_expected=EXPECTED_DTYPES.get(name, "?"),
+            dtype_expected=DTYPE_LABELS.get(
+                cfg.schema.get(name, {}).get("dtype", ""), "unexpected column"),
             null_count=int(s.isna().sum()),
             sentinel_count=sentinels,
             unique_count=int(s.nunique(dropna=True)),
             sample_values=[str(v) for v in s.dropna().head(3)],
         ))
 
-    dup_counts = df["customer_id"].value_counts()
-    duplicates = {int(k): int(v) for k, v in dup_counts[dup_counts > 1].items()}
+    def col(name: str) -> pd.Series:
+        """A column, or an empty series when the input does not have it."""
+        return df[name] if name in df.columns else pd.Series([], dtype=object)
 
-    ages = [(today.year - d.year) for d in (_as_date(v) for v in df["date_of_birth"]) if d]
-    incomes = [x for x in (_as_number(v) for v in df["income"]) if x is not None]
+    # Ids are counted as strings: coercing to int crashes on a malformed id,
+    # which is exactly the defect the profiler exists to report.
+    dup_counts = col("customer_id").astype(str).value_counts()
+    duplicates = {str(k): int(v) for k, v in dup_counts[dup_counts > 1].items()}
+
+    ages = [(today - d).days / 365.25 for d in (_as_date(v) for v in col("date_of_birth")) if d]
+    incomes = [x for x in (_as_number(v) for v in col("income")) if x is not None]
 
     invalid = {
         "unparseable_date_of_birth": {
-            "count": sum(1 for v in df["date_of_birth"] if not is_missing(v) and _as_date(v) is None),
-            "examples": _examples(str(v) for v in df["date_of_birth"] if not is_missing(v) and _as_date(v) is None),
+            "count": sum(1 for v in col("date_of_birth") if not is_missing(v) and _as_date(v) is None),
+            "examples": _examples(str(v) for v in col("date_of_birth") if not is_missing(v) and _as_date(v) is None),
         },
         "unparseable_created_date": {
-            "count": sum(1 for v in df["created_date"] if not is_missing(v) and _as_date(v) is None),
-            "examples": _examples(str(v) for v in df["created_date"] if not is_missing(v) and _as_date(v) is None),
+            "count": sum(1 for v in col("created_date") if not is_missing(v) and _as_date(v) is None),
+            "examples": _examples(str(v) for v in col("created_date") if not is_missing(v) and _as_date(v) is None),
         },
         "non_numeric_income": {
-            "count": sum(1 for v in df["income"] if not is_missing(v) and _as_number(v) is None),
-            "examples": _examples(str(v) for v in df["income"] if not is_missing(v) and _as_number(v) is None),
+            "count": sum(1 for v in col("income") if not is_missing(v) and _as_number(v) is None),
+            "examples": _examples(str(v) for v in col("income") if not is_missing(v) and _as_number(v) is None),
         },
         "negative_income": {"count": sum(1 for x in incomes if x < 0), "examples": _examples(x for x in incomes if x < 0)},
         "income_above_cap": {"count": sum(1 for x in incomes if x > cap), "examples": _examples((x for x in incomes if x > cap), 3)},
-        "implausible_age": {"count": sum(1 for a in ages if a > max_age or a < 0), "examples": _examples(sorted(a for a in ages if a > max_age))},
+        # Same bounds the cleaner and validator use, so the three cannot
+        # disagree about whether a record's age is acceptable.
+        "age_outside_policy": {
+            "count": sum(1 for a in ages if not cfg.min_age <= a <= cfg.max_age),
+            "examples": _examples(sorted(round(a) for a in ages
+                                         if not cfg.min_age <= a <= cfg.max_age)),
+        },
         "future_created_date": {
-            "count": sum(1 for v in df["created_date"] if (d := _as_date(v)) and d > today),
-            "examples": _examples((str(v) for v in df["created_date"] if (d := _as_date(v)) and d > today), 3),
+            "count": sum(1 for v in col("created_date") if (d := _as_date(v)) and d > today),
+            "examples": _examples((str(v) for v in col("created_date") if (d := _as_date(v)) and d > today), 3),
         },
     }
 
-    status_counts = Counter(str(v) for v in df["account_status"])
+    status_counts = Counter(str(v) for v in col("account_status"))
 
     expected = set(cfg.schema)
     return QualityProfile(
@@ -165,9 +179,9 @@ def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
         unexpected_columns=sorted(set(df.columns) - expected),
         duplicate_ids=duplicates,
         format_inventory={
-            "phone": _format_inventory(df["phone"]),
-            "date_of_birth": _format_inventory(df["date_of_birth"]),
-            "created_date": _format_inventory(df["created_date"]),
+            "phone": _format_inventory(col("phone")),
+            "date_of_birth": _format_inventory(col("date_of_birth")),
+            "created_date": _format_inventory(col("created_date")),
         },
         invalid_values=invalid,
         status_counts=dict(status_counts.most_common()),

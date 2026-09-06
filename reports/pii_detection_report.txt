@@ -4,7 +4,7 @@ PII DETECTION REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 5,000
-Generated  : 2026-09-06T15:12:49Z
+Generated  : 2026-09-06T17:15:58Z
 Pipeline   : v0.1.0
 Rules      : v2
 Reference  : 2026-09-06 (today (not pinned))
@@ -20,8 +20,8 @@ first_name      direct identifier   high      Identifies with surname
 last_name       direct identifier   high      Identifies with forename
 email           direct identifier   high      Contactable; account identifier
 phone           direct identifier   high      Contactable
-date_of_birth   quasi-identifier    high      With postcode and sex, re-identifies most individuals
-address         quasi-identifier    high      Locates the individual physically
+date_of_birth   quasi-identifier    high      Strong quasi-identifier with location and financial attributes
+address         quasi-identifier    high      Location data; can identify a household directly
 income          quasi-identifier    high      Financial data; discriminatory if disclosed
 account_status  non-PII             low       Operational attribute
 created_date    quasi-identifier    medium    Near-unique when exact; a strong quasi-identifier despite being operational
@@ -87,7 +87,7 @@ address         email              14   [1387, 1801, 2194, 2532, 2740, 2751]
 address         us_ssn              8   [1101, 2218, 3481, 3878, 3931, 4174]
 address         phone              18   [17, 430, 452, 560, 1882, 2054]
 
-Total: 40 rows.
+Total: 40 distinct rows (40 findings; a row can leak more than one identifier).
 Highest severity: us_ssn in address (critical).
 
 ------------------------------------------------------------------------------
@@ -118,12 +118,15 @@ Masking direct identifiers does not make a dataset anonymous. Grouping
 rows by quasi-identifiers (birth year, postal code, income band) shows
 how many people each record is hidden among.
 
-GROUP SIZE          ROWS      PCT
-k=1 (unique)        4968    99.4%
-k=2                   22     0.4%
-k=3-5                 10     0.2%
+Quasi-identifiers modelled: date_of_birth, address_postal, income
+Signatures with an unparseable component: 7.7% - these share a common
+'unknown' signature, which groups them together and overstates
+their protection.
 
-99.4% of records are unique on quasi-identifiers alone (k=1).
+GROUP SIZE          ROWS      PCT
+k=1 (unique)        5000   100.0%
+
+100.0% of records are unique on quasi-identifiers alone (k=1).
 Those individuals stay re-identifiable after every direct identifier
 is masked, by anyone holding a second dataset with the same attributes.
 

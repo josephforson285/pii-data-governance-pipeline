@@ -4,7 +4,7 @@ DETECTION SCORECARD
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 5,000
-Generated  : 2026-09-06T15:12:50Z
+Generated  : 2026-09-06T17:16:01Z
 Pipeline   : v0.1.0
 Rules      : v2
 Reference  : 2026-09-06 (today (not pinned))
@@ -22,9 +22,10 @@ ATTRIBUTION the specific check expected to catch it is the one that
             fired. A miss here means the diagnosis was wrong, even
             though the row was handled.
 
-Recall alone is not a quality score: a pipeline that quarantined
-every row would score 100%. Read it against the retention figure in
-cleaning_log.txt, which is what that pipeline would drive to zero.
+SPECIFICITY share of rows with nothing planted in them that the
+            pipeline left alone. The counterweight to recall:
+            quarantining everything scores perfect recall and
+            zero specificity, so neither can be gamed alone.
 
 ------------------------------------------------------------------------------
 2. PER-DEFECT RESULTS
@@ -86,4 +87,8 @@ Defect classes measured                 22
 Defects planted                      3,670
 Handled                              3,670   100.0%
 Correctly attributed                 3,553   96.8%
+
+Rows with no planted defect          2,283
+  of those, quarantined                  0
+Specificity                                  100.0%
 

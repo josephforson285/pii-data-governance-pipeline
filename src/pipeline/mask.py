@@ -13,14 +13,15 @@ made every record unique.
 from __future__ import annotations
 
 import re
-from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass
 
 import pandas as pd
 
 from pipeline.config import Config
+from pipeline.privacy import k_buckets, signatures
 
-Masker = "Callable[[object], str]"
+Masker = Callable[[object], str]
 
 
 def mask_initial(value: object) -> str:
@@ -33,8 +34,9 @@ def mask_initial(value: object) -> str:
 
 
 def mask_email_local(value: object) -> str:
-    """john.doe@gmail.com -> j***@gmail.com. Domain kept: it carries analytic
-    value (provider mix) and does not identify an individual."""
+    """john.doe@gmail.com -> j***@gmail.com. The domain is kept for provider-mix
+    analysis; on a rare or corporate domain it still narrows the population,
+    so it reduces rather than removes identifying power."""
     s = "" if value is None else str(value).strip()
     if "@" not in s:
         return "***"
@@ -87,7 +89,7 @@ def make_bander(width: int):
     return band
 
 
-def build_maskers(cfg: Config) -> dict[str, object]:
+def build_maskers(cfg: Config) -> dict[str, Masker]:
     """Resolve the config's strategy names to functions.
 
     An unknown strategy raises: a masking rule that silently does nothing
@@ -99,7 +101,9 @@ def build_maskers(cfg: Config) -> dict[str, object]:
         "last_four": mask_last_four,
         "year_only": mask_year_only,
     }
-    maskers: dict[str, object] = {}
+    if cfg.income_band_width <= 0:
+        raise ValueError(f"income_band_width must be positive, got {cfg.income_band_width}")
+    maskers: dict[str, Masker] = {}
     for rule in cfg.mask_rules:
         if rule.strategy in simple:
             maskers[rule.column] = simple[rule.strategy]
@@ -136,42 +140,15 @@ def apply_masks(df: pd.DataFrame, cfg: Config) -> pd.DataFrame:
     return out
 
 
-def _k_buckets(keys: list[tuple]) -> dict[str, int]:
-    sizes = Counter(keys)
-    buckets: dict[str, int] = {}
-    for k in sizes.values():
-        label = "k=1 (unique)" if k == 1 else "k=2" if k == 2 else "k=3-5" if k <= 5 else "k>5"
-        buckets[label] = buckets.get(label, 0) + k
-    return buckets
-
-
-def _postal(value: object) -> str:
-    m = re.search(r"\b(\d{5})(?:-\d{4})?\b", str(value))
-    return m.group(1) if m else "?"
-
-
-def _quasi_keys(df: pd.DataFrame, columns: list[str]) -> list[tuple]:
-    """Signature over the named quasi-identifiers.
-
-    `address_postal` extracts the postal code from the address rather than
-    using the whole string, which is unique per row and would make every
-    record look unique for the wrong reason.
-    """
-    series = []
-    for name in columns:
-        if name == "address_postal":
-            series.append([_postal(v) for v in df["address"]])
-        elif name in df.columns:
-            series.append(list(df[name]))
-    return list(zip(*series)) if series else []
-
-
 def mask(df: pd.DataFrame, cfg: Config) -> MaskResult:
     masked = apply_masks(df, cfg)
-    before = _k_buckets(_quasi_keys(df, cfg.quasi_identifiers_before))
-    # Measured over everything actually released, including columns left
-    # unmasked - assessing only the masked columns would flatter the result.
-    after = _k_buckets(_quasi_keys(masked, cfg.quasi_identifiers_after))
+    # Both sides use the shared signature logic, so the comparison stays
+    # like-for-like when a band width or quasi-identifier set changes.
+    before = k_buckets(signatures(df, cfg.quasi_identifiers_before, cfg))
+    # The after set covers every released attribute designated a
+    # quasi-identifier, including columns left unmasked - assessing only the
+    # masked columns would flatter the result.
+    after = k_buckets(signatures(masked, cfg.quasi_identifiers_after, cfg))
     masked_columns = [r.column for r in cfg.mask_rules if r.column in df.columns]
     return MaskResult(
         masked=masked,

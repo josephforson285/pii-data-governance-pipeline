@@ -47,7 +47,7 @@ def _cmd_detect(args: argparse.Namespace) -> int:
     src = Path(args.input)
     cfg = load_config(Path(args.rules))
     df = load_raw(src)
-    report = detect(df)
+    report = detect(df, cfg)
     log.info("scanned %d columns, %d confirmed findings, %d leaks",
              len(df.columns), len(report.findings), len(report.leaks))
 
@@ -98,7 +98,6 @@ def _cmd_clean(args: argparse.Namespace) -> int:
 
     Path(args.processed).mkdir(parents=True, exist_ok=True)
     Path(args.rejects).mkdir(parents=True, exist_ok=True)
-    cleaned.to_csv(Path(args.processed) / "customers_cleaned.csv", index=False)
     quarantine_frame(clog, cfg.sensitive_columns).to_csv(Path(args.rejects) / "quarantine.csv", index=False)
 
     post = validate(cleaned, cfg, stage="post-clean")
@@ -108,6 +107,15 @@ def _cmd_clean(args: argparse.Namespace) -> int:
     write(Path(args.reports) / "validation_results.txt",
           render_validation_report(pre, src, cfg, post=post))
     log.info("wrote cleaning_log.txt and validation_results.txt")
+
+    # Same publication gate as `run`: the extract is written only once it is
+    # known to satisfy the schema it claims to satisfy.
+    if not post.passed:
+        log.error("post-clean validation failed with %d failures; refusing to "
+                  "write customers_cleaned.csv", len(post.failures))
+        return 1
+    cleaned.to_csv(Path(args.processed) / "customers_cleaned.csv", index=False)
+    log.info("published customers_cleaned.csv (%d rows)", len(cleaned))
     return 0
 
 
@@ -123,6 +131,7 @@ def _cmd_mask(args: argparse.Namespace) -> int:
     cleaned = pd.read_csv(src, dtype=str, keep_default_na=False)
     result = mask(cleaned, cfg)
 
+    Path(args.processed).mkdir(parents=True, exist_ok=True)
     out_csv = Path(args.processed) / "customers_masked.csv"
     result.masked.to_csv(out_csv, index=False)
     log.info("masked %d columns over %d rows -> %s",
@@ -168,7 +177,7 @@ def _cmd_score(args: argparse.Namespace) -> int:
     raw = load_raw(src)
     cfg = load_config(Path(args.rules))
     _, clog = clean(raw, cfg)
-    card = score(load_ground_truth(truth_path), clog, detect(raw))
+    card = score(load_ground_truth(truth_path), clog, detect(raw, cfg))
     log.info("recall %.1f%%, attribution %.1f%% over %d planted defects",
              100 * card.recall, 100 * card.attribution, card.planted)
 
@@ -241,12 +250,13 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    REPORTS.mkdir(parents=True, exist_ok=True)
+    reports_dir = Path(getattr(args, "reports", REPORTS))
+    reports_dir.mkdir(parents=True, exist_ok=True)
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(asctime)s %(levelname)-7s %(name)s %(message)s",
         datefmt="%H:%M:%S",
-        handlers=[logging.StreamHandler(), logging.FileHandler(REPORTS / "pipeline.log", mode="w")],
+        handlers=[logging.StreamHandler(), logging.FileHandler(reports_dir / "pipeline.log", mode="w")],
     )
     try:
         return args.func(args)
