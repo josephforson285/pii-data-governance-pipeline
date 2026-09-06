@@ -17,7 +17,7 @@ export PYTHONPATH=src
 python -m pipeline generate      # synthetic raw dataset + defect manifest
 python -m pipeline run           # every stage, all reports
 python -m pipeline score         # detection measured against the manifest
-pytest                           # 82 tests
+pytest                           # 127 tests
 ```
 
 Individual stages (`profile`, `detect`, `validate`, `clean`, `mask`) can be run
@@ -27,7 +27,8 @@ execution report.
 ## Pipeline
 
 ```
-load -> profile -> detect PII -> validate(pre) -> clean -> validate(post) -> mask
+load -> profile -> detect PII -> validate(pre) -> clean -> validate(post)
+     -> publish -> mask -> verify_release -> publish_masked
 ```
 
 Two ordering decisions differ from the obvious one:
@@ -43,11 +44,11 @@ clean data is clean. The pre/post delta is what shows remediation worked.
 
 | Measure | Value |
 | --- | --- |
-| Rows in / cleaned / quarantined | 5,000 / 3,684 / 1,316 |
-| Rule failures, pre -> post | 3,510 -> 0 |
+| Rows in / cleaned / quarantined | 5,000 / 3,682 / 1,318 |
+| Rule failures, pre -> post | 3,504 -> 0 |
 | Rows with PII leaked into free text | 40, incl. 8 SSNs |
-| Uniquely re-identifiable, pre -> post mask | 100% -> 48.2% |
-| Detection recall / attribution | 100% / 96.8% |
+| Uniquely re-identifiable, pre -> post mask | 100% -> 47.8% |
+| Detection recall / attribution | 100% / 97.0% |
 
 ## Design notes
 
@@ -78,6 +79,14 @@ stays `Jose`; `John3` is quarantined.
 
 **The scorer cannot see the answer key.** `generate` writes a manifest of every
 planted defect. Nothing under `run` reads it; only `score` does.
+
+**Nothing is published unverified.** Post-clean validation gates the cleaned
+extract, and the masked extract is re-scanned for direct identifiers before it
+reaches disk. Both refuse to write and exit non-zero.
+
+**Reproducible from the seed.** `reference_date` in the config pins every date
+calculation, including the generator's, so the same seed produces the same
+bytes on any day.
 
 ## Layout
 

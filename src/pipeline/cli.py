@@ -14,10 +14,14 @@ log = logging.getLogger("pipeline")
 
 
 def _cmd_generate(args: argparse.Namespace) -> int:
+    from pipeline.config import load as load_config
     from pipeline.generate import write
 
-    path = write(Path(args.out), n_rows=args.rows, seed=args.seed)
-    log.info("wrote %s (%d rows, seed %d)", path, args.rows, args.seed)
+    cfg = load_config(Path(args.rules))
+    path = write(Path(args.out), n_rows=args.rows, seed=args.seed,
+                 reference_date=cfg.reference_date)
+    log.info("wrote %s (%d rows, seed %d, reference %s)",
+             path, args.rows, args.seed, cfg.reference_date.isoformat())
     return 0
 
 
@@ -196,6 +200,7 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--rows", type=int, default=5000)
     g.add_argument("--seed", type=int, default=42)
     g.add_argument("--out", default=str(RAW.parent))
+    g.add_argument("--rules", default=str(RULES))
     g.set_defaults(func=_cmd_generate)
 
     pr = sub.add_parser("profile", help="profile the raw dataset (part 1)")

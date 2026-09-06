@@ -1,7 +1,10 @@
-"""Generate a messy customer dataset with a recorded manifest of planted defects.
+"""Generate a messy customer dataset with a manifest of planted defects.
 
-The manifest (`_ground_truth.json`) is held out: the pipeline never reads it.
-Only `score.py` does, to measure detection recall.
+The manifest (`_ground_truth.json`) is held out: only score.py reads it.
+
+Every date derives from an explicit reference date rather than today, so the
+same seed produces the same bytes on any day. Without that, the committed
+reports describe a dataset a later regenerate would not reproduce.
 """
 from __future__ import annotations
 
@@ -30,15 +33,15 @@ class Defect:
     name: str
     column: str
     rate: float
-    apply: Callable[[list[dict], list[int], random.Random], None]
+    apply: Callable[[list[dict], list[int], random.Random], None] | str
 
 
-def _clean_rows(n: int, fake: Faker, rng: random.Random) -> list[dict]:
-    today = date.today()
+def _clean_rows(n: int, fake: Faker, rng: random.Random, today: date) -> list[dict]:
     rows = []
     for i in range(1, n + 1):
         first, last = fake.first_name(), fake.last_name()
-        dob = fake.date_of_birth(minimum_age=18, maximum_age=88)
+        # Not fake.date_of_birth: it is relative to the wall clock.
+        dob = today - timedelta(days=rng.randint(18 * 365, 88 * 365))
         created = today - timedelta(days=rng.randint(0, 2555))
         rows.append({
             "customer_id": i,
@@ -163,9 +166,9 @@ def _impossible_age(rows, targets, rng):
         rows[i]["date_of_birth"] = date(rng.randint(1800, 1870), rng.randint(1, 12), rng.randint(1, 28)).isoformat()
 
 
-def _future_created(rows, targets, rng):
+def _future_created(rows, targets, rng, today: date):
     for i in targets:
-        rows[i]["created_date"] = (date.today() + timedelta(days=rng.randint(30, 900))).isoformat()
+        rows[i]["created_date"] = (today + timedelta(days=rng.randint(30, 900))).isoformat()
 
 
 def _is_iso(v) -> bool:
@@ -187,7 +190,7 @@ DEFECTS: list[Defect] = [
     Defect("dob_nonstandard_format", "date_of_birth", 0.090, _date_formats("date_of_birth")),
     Defect("dob_invalid_value", "date_of_birth", 0.010, _date_invalid("date_of_birth")),
     Defect("created_date_nonstandard_format", "created_date", 0.060, _date_formats("created_date")),
-    Defect("created_date_future", "created_date", 0.006, _future_created),
+    Defect("created_date_future", "created_date", 0.006, "_future_created"),
     Defect("income_negative", "income", 0.014, _negative_income),
     Defect("income_above_cap", "income", 0.005, _extreme_income),
     Defect("income_non_numeric", "income", 0.010, _income_as_text),
@@ -203,12 +206,14 @@ DEFECTS: list[Defect] = [
 DUPLICATE_ID_RATE = 0.010
 
 
-def generate(n_rows: int = 5000, seed: int = 42) -> tuple[pd.DataFrame, dict]:
+def generate(n_rows: int = 5000, seed: int = 42,
+             reference_date: date | None = None) -> tuple[pd.DataFrame, dict]:
+    today = reference_date or date.today()
     rng = random.Random(seed)
     fake = Faker("en_US")
     Faker.seed(seed)
 
-    rows = _clean_rows(n_rows, fake, rng)
+    rows = _clean_rows(n_rows, fake, rng, today)
 
     # Reserve targets per column so two defects never overwrite each other.
     taken: dict[str, set[int]] = defaultdict(set)
@@ -218,7 +223,10 @@ def generate(n_rows: int = 5000, seed: int = 42) -> tuple[pd.DataFrame, dict]:
         pool = [i for i in range(n_rows) if i not in taken[d.column]]
         k = min(int(round(n_rows * d.rate)), len(pool))
         targets = sorted(rng.sample(pool, k))
-        d.apply(rows, targets, rng)
+        if d.apply == "_future_created":
+            _future_created(rows, targets, rng, today)
+        else:
+            d.apply(rows, targets, rng)
         taken[d.column].update(targets)
         manifest[d.name] = {"column": d.column, "count": k, "rows": targets}
 
@@ -233,6 +241,7 @@ def generate(n_rows: int = 5000, seed: int = 42) -> tuple[pd.DataFrame, dict]:
     df = pd.DataFrame(rows, columns=COLUMNS)
     ground_truth = {
         "seed": seed,
+        "reference_date": today.isoformat(),
         "n_rows": n_rows,
         "total_defects": sum(v["count"] for v in manifest.values()),
         "defects": manifest,
@@ -240,10 +249,11 @@ def generate(n_rows: int = 5000, seed: int = 42) -> tuple[pd.DataFrame, dict]:
     return df, ground_truth
 
 
-def write(out_dir: Path, n_rows: int = 5000, seed: int = 42) -> Path:
+def write(out_dir: Path, n_rows: int = 5000, seed: int = 42,
+          reference_date: date | None = None) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
-    df, truth = generate(n_rows, seed)
+    df, truth = generate(n_rows, seed, reference_date)
     csv_path = out_dir / "customers_raw.csv"
     df.to_csv(csv_path, index=False)
-    (out_dir / "_ground_truth.json").write_text(json.dumps(truth, indent=2))
+    (out_dir / "_ground_truth.json").write_text(json.dumps(truth, indent=2), encoding="utf-8")
     return csv_path

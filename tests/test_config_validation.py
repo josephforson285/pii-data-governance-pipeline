@@ -59,3 +59,21 @@ def test_reference_date_accepts_a_yaml_date_object(cfg):
     pinned = broken(cfg, lambda r: r.update(reference_date=date(2021, 6, 1)))
     assert pinned.reference_date == date(2021, 6, 1)
     assert pinned.reference_date_is_pinned
+
+
+def test_generation_is_reproducible_from_the_seed(cfg):
+    """The generator used date.today(), so the same seed produced different
+    data on different days - and the committed reports described a dataset a
+    later regenerate would not reproduce."""
+    from pipeline.generate import generate
+
+    first, _ = generate(200, 7, cfg.reference_date)
+    second, _ = generate(200, 7, cfg.reference_date)
+    assert first.equals(second)
+
+
+def test_reference_date_is_pinned_for_submission(cfg):
+    assert cfg.reference_date_is_pinned, (
+        "an unpinned reference date makes both the generated data and the "
+        "age checks drift over time"
+    )

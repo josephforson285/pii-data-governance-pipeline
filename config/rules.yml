@@ -4,10 +4,10 @@
 # that disagree can be explained.
 version: 2
 
-# Date all age and future-date checks are evaluated against. null means today,
-# which makes results drift over time; set an ISO date to freeze a run so the
-# same input always produces the same output.
-reference_date: null
+# Date all age, future-date and generator calculations resolve against. null
+# means today, which makes both the data and the results drift; pinning it
+# makes the whole project reproducible from the seed.
+reference_date: 2026-09-06
 
 # Sentinel nulls (values that read as present but mean absent) are defined in
 # src/pipeline/profile.py:SENTINELS - a data-representation concern rather than

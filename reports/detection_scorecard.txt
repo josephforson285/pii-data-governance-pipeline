@@ -2,12 +2,12 @@
 DETECTION SCORECARD
 ==============================================================================
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
-SHA256     : e8548ce51f229c0e
+SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T18:10:27Z
+Generated  : 2026-09-06T18:12:37Z
 Pipeline   : v0.1.0
 Rules      : v2
-Reference  : 2026-09-06 (today (not pinned))
+Reference  : 2026-09-06 (pinned)
 
 Measured against the generator's manifest of planted defects.
 Nothing in the pipeline reads that manifest: a detector with sight
@@ -32,9 +32,9 @@ SPECIFICITY share of defect-free rows that were not quarantined.
 ------------------------------------------------------------------------------
 DEFECT                            COLUMN           PLANTED   RECALL   ATTRIB
 income_non_numeric                income                50   100.0%     0.0%
-address_too_short                 address               60   100.0%    16.7%
-dob_invalid_value                 date_of_birth         50   100.0%    78.0%
-phone_unparseable                 phone                 40   100.0%    85.0%
+address_too_short                 address               60   100.0%    23.3%
+dob_invalid_value                 date_of_birth         50   100.0%    84.0%
+phone_unparseable                 phone                 40   100.0%    87.5%
 missing_email                     email                100   100.0%   100.0%
 missing_phone                     phone                150   100.0%   100.0%
 missing_income                    income               225   100.0%   100.0%
@@ -54,8 +54,8 @@ pii_leaked_in_address             address               40   100.0%   100.0%
 age_impossible                    date_of_birth         20   100.0%   100.0%
 duplicate_customer_id             customer_id           50   100.0%   100.0%
 ------------------------------------------------------------------------------
-TOTAL (micro)                                         3670   100.0%    96.8%
-TOTAL (macro, per defect class)                         22   100.0%    90.0%
+TOTAL (micro)                                         3670   100.0%    97.0%
+TOTAL (macro, per defect class)                         22   100.0%    90.7%
 
 Micro totals weight by planted volume, so frequent defects dominate.
 Macro totals weight each defect class equally, so a rare broken rule
@@ -76,9 +76,9 @@ legitimately reportable as either.
 
 DEFECT                               RECALL   ATTRIB    DIFF
 income_non_numeric                   100.0%     0.0%      50
-address_too_short                    100.0%    16.7%      50
-dob_invalid_value                    100.0%    78.0%      11
-phone_unparseable                    100.0%    85.0%       6
+address_too_short                    100.0%    23.3%      46
+dob_invalid_value                    100.0%    84.0%       8
+phone_unparseable                    100.0%    87.5%       5
 
 ------------------------------------------------------------------------------
 SUMMARY
@@ -86,16 +86,20 @@ SUMMARY
 Defect classes measured                 22
 Defects planted                      3,670
 Handled                              3,670   100.0%
-Correctly attributed                 3,553   96.8%
+Correctly attributed                 3,561   97.0%
 
-Survived into cleaned extract           31   pre-mask containment 99.2%
+Survived into cleaned extract           30   pre-mask containment 99.2%
 
 These reached customers_cleaned.csv without the cleaner rewriting
 that column. It measures cleaning, not the final release: masking
 may still remove them, and the verify_release stage confirms the
 masked extract carries no direct identifiers.
 
-Rows with no planted defect          2,283
-  of those, quarantined                  0
+Rows with no planted defect          2,261
+  of those, quarantined                  1
 Specificity                                  100.0%
+
+Rows quarantined without a planted defect are not necessarily
+errors: the generator plants defects per column, and a row can
+carry a naturally invalid combination it never planted.
 

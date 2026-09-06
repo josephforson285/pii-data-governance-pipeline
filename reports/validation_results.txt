@@ -2,12 +2,12 @@
 VALIDATION RESULTS
 ==============================================================================
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
-SHA256     : e8548ce51f229c0e
+SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T18:10:25Z
+Generated  : 2026-09-06T18:12:35Z
 Pipeline   : v0.1.0
 Rules      : v2
-Reference  : 2026-09-06 (today (not pinned))
+Reference  : 2026-09-06 (pinned)
 
 Engine: pandera, lazy=True - every rule is evaluated against every
 row so one bad value cannot hide the rest.
@@ -26,38 +26,38 @@ Pandera sees these as null once coerced, so they would otherwise be
 counted as missing - a different defect needing a different fix.
 
 COLUMN                UNCOERCIBLE   EXAMPLES
-date_of_birth                 489   ####/##/##, May ##, ####, ##-##-####
+date_of_birth                 492   ####-##-##, ##-##-####, ####/##/##, 
 created_date                  300   ##/##/####, ##-##-####, ####/##/##, 
-income                         14   75k
-TOTAL                         803
+income                         17   75k
+TOTAL                         809
 
 ------------------------------------------------------------------------------
 3. RULE FAILURES
 ------------------------------------------------------------------------------
 RULE                                             PRE    POST    DELTA
-phone.str_matches                               1026       0    -1026
+phone.str_matches                               1036       0    -1036
 date_of_birth.not_nullable                       560       0     -560
 account_status.isin                              350       0     -350
 created_date.not_nullable                        300       0     -300
-income.not_nullable                              253       0     -253
-email.str_matches                                231       0     -231
-first_name.str_matches                           129       0     -129
-address.length_10_200                            105       0     -105
-last_name.str_matches                            101       0     -101
+income.not_nullable                              252       0     -252
+email.str_matches                                235       0     -235
+first_name.str_matches                           124       0     -124
+address.length_10_200                             99       0      -99
+last_name.str_matches                             98       0      -98
 customer_id.field_uniqueness                      97       0      -97
 income.greater_than_or_equal_to                   70       0      -70
-phone.not_nullable                                64       0      -64
-email.not_nullable                                44       0      -44
-first_name.length_2_50                            41       0      -41
-last_name.length_2_50                             34       0      -34
-address.not_nullable                              30       0      -30
+phone.not_nullable                                54       0      -54
+first_name.length_2_50                            42       0      -42
+email.not_nullable                                40       0      -40
+address.not_nullable                              36       0      -36
+last_name.length_2_50                             36       0      -36
 created_date.not_in_future                        30       0      -30
 income.less_than_or_equal_to                      25       0      -25
 date_of_birth.age_18_120                          20       0      -20
 ------------------------------------------------------------------------------
-TOTAL                                           3510       0    -3510
+TOTAL                                           3504       0    -3504
 
-Rows failing : 2,633 -> 0
+Rows failing : 2,645 -> 0
 
 Every published row satisfies the schema. Rows that could not be
 repaired without inventing data are in the quarantine file with a

@@ -2,12 +2,12 @@
 CLEANING LOG
 ==============================================================================
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
-SHA256     : e8548ce51f229c0e
+SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T18:10:25Z
+Generated  : 2026-09-06T18:12:35Z
 Pipeline   : v0.1.0
 Rules      : v2
-Reference  : 2026-09-06 (today (not pinned))
+Reference  : 2026-09-06 (pinned)
 
 ------------------------------------------------------------------------------
 1. NORMALISATIONS APPLIED
@@ -17,13 +17,13 @@ Repairs made where the intended value is unambiguous.
 REPAIR                            ROWS
 phone_normalised                   900
 date_normalised                    750
-name_normalised                    224
-status_normalised                  209
-status_alias_mapped                 31
-income_normalised                   22
-income_suffix_expanded              14
+name_normalised                    225
+status_normalised                  196
+status_alias_mapped                 36
+income_normalised                   23
+income_suffix_expanded              17
 ------------------------------------------------------------------------------
-TOTAL                             2150
+TOTAL                             2147
 
 Rules: phone -> XXX-XXX-XXXX, dates -> YYYY-MM-DD, names -> Title Case,
 status -> lower case against the permitted set, email -> lower case.
@@ -36,35 +36,35 @@ data/rejects/quarantine.csv with the reason, never dropped: a deleted
 row is an unanswerable question later.
 
 REASON                            ROWS
-missing_required_field             691
+missing_required_field             679
 malformed_email                    175
-malformed_name                     151
-unmappable_account_status          110
+malformed_name                     147
+unmappable_account_status          118
 income_out_of_range                 95
-name_too_short                      75
+name_too_short                      78
 duplicate_customer_id               50
-unparseable_date                    39
-unparseable_phone                   34
+unparseable_date                    42
+unparseable_phone                   35
 future_created_date                 30
-implausible_age                     20
-address_too_short                   10
+implausible_age                     21
+address_too_short                   14
 
-Distinct rows quarantined: 1,316
+Distinct rows quarantined: 1,318
 (A row can fail several rules, so reasons sum above this figure.)
 
 ------------------------------------------------------------------------------
 3. RECONCILIATION
 ------------------------------------------------------------------------------
 Rows in                    5,000
-Rows cleaned               3,684
-Rows quarantined           1,316
+Rows cleaned               3,682
+Rows quarantined           1,318
 ------------------------------------------------------------------------------
 Balance                    5,000   OK
 
 Asserted on every run. Without it, a row lost to a silent exception
 looks identical to a row that was never there.
 
-Retention: 73.7%
+Retention: 73.6%
 
 ------------------------------------------------------------------------------
 4. POLICY SENSITIVITY
@@ -75,11 +75,11 @@ That is a governance choice, not a fact about the data.
 
 Treated as optional: address, income, phone
 
-Quarantined under current policy              1316
-Failing only on a blank optional field         427
-Retention if those were kept and flagged     82.2%
+Quarantined under current policy              1318
+Failing only on a blank optional field         418
+Retention if those were kept and flagged     82.0%
 
-Retaining them would raise retention from 73.7% to 82.2%,
+Retaining them would raise retention from 73.6% to 82.0%,
 at the cost of nulls flowing downstream. The strict policy is kept
 here because the brief declares these fields mandatory; the number
 is reported so the trade-off can be re-argued with evidence.
