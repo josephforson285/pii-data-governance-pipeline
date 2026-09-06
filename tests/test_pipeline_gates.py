@@ -296,7 +296,7 @@ def test_cleaning_never_emits_an_unclassified_column(cfg):
     assert "marketing_note" not in cleaned.columns
 
 
-def test_validation_report_reflects_coercion_only_failures(cfg):
+def test_validation_report_reflects_coercion_only_failures(cfg, tmp_path):
     """The narrative keyed off rule failures alone, so a run blocked purely by
     coercion still read 'every row satisfies the schema'."""
     import copy
@@ -308,12 +308,14 @@ def test_validation_report_reflects_coercion_only_failures(cfg):
     raw["schema"]["income"]["nullable"] = True
     nullable = Config(raw)
 
+    src = tmp_path / "in.csv"
     clean_frame = pd.DataFrame([row()])
+    clean_frame.to_csv(src, index=False)
     dirty = pd.DataFrame([row(income="abc")])
     pre = validate(clean_frame, nullable, "pre-clean")
     post = validate(dirty, nullable, "post-clean")
     assert len(post.failures) == 0 and post.coercion and not post.passed
 
-    text = render_validation_report(pre, Path("x.csv"), nullable, post=post)
+    text = render_validation_report(pre, src, nullable, post=post)
     assert "Publication is blocked" in text
     assert "Every row remaining after cleaning satisfies" not in text
