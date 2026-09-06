@@ -1,13 +1,14 @@
-# Single source of truth for pipeline policy. Every threshold, pattern and
-# remediation rule lives here; no module may hardcode a policy value.
-# Bump `version` on any change - it is stamped into every report so two runs
+# Primary source of truth for configurable schema, validation, remediation,
+# masking, release and reporting policy. Detector patterns and sentinel
+# representations stay with their modules - implementation, not policy.
+# Bump `version` on any change: it is stamped into every report, so two runs
 # that disagree can be explained.
-version: 2
+version: 3
 
 # Date all age, future-date and generator calculations resolve against. null
 # means today, which makes both the data and the results drift; pinning it
 # makes the whole project reproducible from the seed.
-reference_date: 2026-09-06
+reference_date: "2026-09-06"
 
 # Sentinel nulls (values that read as present but mean absent) are defined in
 # src/pipeline/profile.py:SENTINELS - a data-representation concern rather than
@@ -124,7 +125,7 @@ masking:
     email:
       strategy: email_local
       description: "j.doe@gmail.com -> j***@gmail.com"
-      rationale: "Domain kept: analytic, not identifying"
+      rationale: "Domain retained for provider-mix analysis; lower identifying power than the full address, but still a quasi-identifier on a rare domain"
     phone:
       strategy: last_four
       description: "555-123-4567 -> ***-***-4567"
@@ -146,8 +147,9 @@ masking:
       description: "2024-03-15 -> 2024-**-**"
       rationale: "Near-unique when exact (1957 distinct values over 3684 rows); year retains tenure cohorts"
 
-# Columns released unmasked. Listed explicitly so the k-anonymity assessment
-# can be computed over everything actually shared, not a hand-picked subset.
+# Columns intentionally released without masking. The quasi-identifier lists
+# define the attributes used for re-identification measurement; they are not
+# every field in the released extract.
 release:
   unmasked_columns: [customer_id, account_status]
   quasi_identifiers_before: [date_of_birth, address_postal, income]
@@ -158,5 +160,9 @@ reporting:
   # are redacted in every report.
   # created_date is included on the evidence: it has ~1 distinct value per two
   # rows, which makes it a strong quasi-identifier despite being operational.
+  # customer_id is included: pseudonymous rather than directly identifying,
+  # but a stable linkage key that should not appear in report examples. The
+  # quarantine file keeps it deliberately - see clean.quarantine_frame.
   sensitive_columns:
-    [first_name, last_name, email, phone, date_of_birth, address, created_date]
+    [customer_id, first_name, last_name, email, phone, date_of_birth, address,
+     created_date]

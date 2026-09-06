@@ -212,3 +212,41 @@ def test_unexpected_columns_fail_under_the_configured_policy(cfg, tmp_path):
     )
     assert proc.returncode == 1
     assert "mystery_column" in proc.stderr
+
+
+def test_raw_and_masked_income_bands_share_one_label(cfg):
+    """The two sides of the k-anonymity comparison must read alike."""
+    from pipeline.mask import make_bander
+    from pipeline.privacy import income_band
+
+    raw = income_band("52000", cfg.income_band_width)
+    masked = make_bander(cfg.income_band_width)("52000")
+    assert raw == masked == "50000-74999"
+
+
+def test_income_band_rejects_a_non_positive_width():
+    from pipeline.privacy import income_band
+
+    with pytest.raises(ValueError, match="must be positive"):
+        income_band("52000", 0)
+
+
+def test_standalone_mask_refuses_unvalidated_input(cfg, tmp_path):
+    """Regression: the standalone command wrote a masked file without
+    validating its input or verifying its output, bypassing the gates the
+    full pipeline enforces."""
+    import subprocess
+    import sys
+
+    src = tmp_path / "dirty.csv"
+    pd.DataFrame([row(email="not-an-email", phone="nope")]).to_csv(src, index=False)
+
+    proc = subprocess.run(
+        [sys.executable, "-m", "pipeline", "mask", "--input", str(src),
+         "--processed", str(tmp_path / "proc"), "--reports", str(tmp_path / "rep")],
+        capture_output=True, text=True,
+        env={"PYTHONPATH": "src", "PATH": "/usr/bin:/bin"},
+    )
+    assert proc.returncode == 1
+    assert not (tmp_path / "proc" / "customers_masked.csv").exists()
+    assert not (tmp_path / "rep" / "masked_sample.txt").exists()

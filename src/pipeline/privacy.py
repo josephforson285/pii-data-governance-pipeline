@@ -1,8 +1,10 @@
 """Shared re-identification measurement.
 
-Parts 2 and 5 both group rows by quasi-identifier signature. One
-implementation, so a change to the band width cannot move one number and not
-the other.
+Parts 2 and 5 both group rows by quasi-identifier signature, so one
+implementation keeps a band-width change from moving one number and not the
+other. Date of birth is deliberately compared at its released granularity -
+exact before masking, year after - so the delta includes the effect of
+generalising it.
 """
 from __future__ import annotations
 
@@ -12,6 +14,11 @@ from collections import Counter
 import pandas as pd
 
 from pipeline.config import Config
+
+# Quasi-identifiers derived from a column rather than being one. config.py
+# keeps its own copy for load-time validation: importing this module there
+# would make a cycle, and one constant does not justify a third module.
+DERIVED = {"address_postal"}
 
 def postal_code(value: object) -> str:
     m = re.search(r"\b(\d{5})(?:-\d{4})?\b", str(value))
@@ -25,6 +32,8 @@ def income_band(value: object, width: int) -> str:
     parse, collapse every row onto a shared '?' and make the population look
     far more anonymous than it is.
     """
+    if width <= 0:
+        raise ValueError(f"income band width must be positive, got {width}")
     text = str(value).strip()
     if re.fullmatch(r"\d+-\d+", text):
         return text
@@ -34,7 +43,9 @@ def income_band(value: object, width: int) -> str:
         return "?"
     if pd.isna(amount):
         return "?"
-    return f"{int(amount // width) * width}"
+    lo = int(amount // width) * width
+    # Same label the masker produces, so raw and masked signatures read alike.
+    return f"{lo}-{lo + width - 1}"
 
 
 def quasi_series(df: pd.DataFrame, name: str, cfg: Config) -> list[str]:
@@ -58,13 +69,14 @@ def quasi_series(df: pd.DataFrame, name: str, cfg: Config) -> list[str]:
     return [str(v) for v in df[name]]
 
 
-def signatures(df: pd.DataFrame, columns: list[str], cfg: Config) -> list[tuple]:
+def signatures(df: pd.DataFrame, columns: list[str],
+               cfg: Config) -> list[tuple[str, ...]]:
     if not columns or df.empty:
         return []
     return list(zip(*(quasi_series(df, name, cfg) for name in columns)))
 
 
-def k_buckets(keys: list[tuple]) -> dict[str, int]:
+def k_buckets(keys: list[tuple[str, ...]]) -> dict[str, int]:
     """Rows per k-anonymity band, counting rows rather than groups."""
     buckets: dict[str, int] = {}
     for size in Counter(keys).values():
@@ -74,7 +86,7 @@ def k_buckets(keys: list[tuple]) -> dict[str, int]:
     return buckets
 
 
-def incomplete_share(keys: list[tuple]) -> float:
+def incomplete_share(keys: list[tuple[str, ...]]) -> float:
     """Fraction of signatures carrying an unknown component.
 
     Rows whose quasi-identifiers could not be parsed collapse onto a shared

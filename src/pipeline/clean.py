@@ -143,8 +143,16 @@ def clean_income(value: Any, cap: float) -> tuple[float | None, str | None]:
         return None, "unparseable_income"
     if amount < 0 or amount > cap:
         return None, "income_out_of_range"
-    if tag is None and str(value).strip() != f"{amount}":
-        tag = "income_normalised"
+    # Compare numerically: '50000' and 50000.0 are the same value, and
+    # counting that as a repair inflates the normalisation figures.
+    original = str(value).strip()
+    if tag is None:
+        try:
+            unchanged = float(original) == amount
+        except ValueError:
+            unchanged = False
+        if not unchanged:
+            tag = "income_normalised"
     return round(amount, 2), tag
 
 

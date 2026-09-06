@@ -13,6 +13,19 @@ RULES = ROOT / "config" / "rules.yml"
 log = logging.getLogger("pipeline")
 
 
+def _structure_problem(df, cfg) -> str | None:
+    """Structural check shared by the commands that assume a conformant frame,
+    so a standalone command cannot be laxer than `run`."""
+    missing = [c for c in cfg.schema if c not in df.columns]
+    if missing:
+        return f"input is missing required columns: {', '.join(missing)}"
+    unexpected = [c for c in df.columns if c not in cfg.schema]
+    if unexpected and cfg.unexpected_column_policy == "fail":
+        return (f"input has columns absent from the schema: {', '.join(unexpected)}. "
+                f"They are unclassified, so nothing masks them.")
+    return None
+
+
 def _cmd_generate(args: argparse.Namespace) -> int:
     from pipeline.config import load as load_config
     from pipeline.generate import write
@@ -89,8 +102,14 @@ def _cmd_clean(args: argparse.Namespace) -> int:
     cfg = load_config(Path(args.rules))
     raw = load_raw(src)
 
+    problem = _structure_problem(raw, cfg)
+    if problem:
+        log.error("%s", problem)
+        return 1
+
     pre = validate(raw, cfg, stage="pre-clean")
-    log.info("pre-clean: %d rule failures", len(pre.failures))
+    log.info("pre-clean: %d rule failures, %d coercion failures",
+             len(pre.failures), len(pre.coercion))
 
     cleaned, clog = clean(raw, cfg)
     if not clog.reconciles():
@@ -105,7 +124,8 @@ def _cmd_clean(args: argparse.Namespace) -> int:
     quarantine_frame(clog, cfg.sensitive_columns).to_csv(Path(args.rejects) / "quarantine.csv", index=False)
 
     post = validate(cleaned, cfg, stage="post-clean")
-    log.info("post-clean: %d rule failures", len(post.failures))
+    log.info("post-clean: %d rule failures, %d coercion failures",
+             len(post.failures), len(post.coercion))
 
     write(Path(args.reports) / "cleaning_log.txt", render_cleaning_log(clog, src, cfg))
     write(Path(args.reports) / "validation_results.txt",
@@ -115,8 +135,9 @@ def _cmd_clean(args: argparse.Namespace) -> int:
     # Same publication gate as `run`: the extract is written only once it is
     # known to satisfy the schema it claims to satisfy.
     if not post.passed:
-        log.error("post-clean validation failed with %d failures; refusing to "
-                  "write customers_cleaned.csv", len(post.failures))
+        log.error("post-clean validation failed: %d rule failures, %d coercion "
+                  "failures; refusing to write customers_cleaned.csv",
+                  len(post.failures), len(post.coercion))
         return 1
     cleaned.to_csv(Path(args.processed) / "customers_cleaned.csv", index=False)
     log.info("published customers_cleaned.csv (%d rows)", len(cleaned))
@@ -124,27 +145,46 @@ def _cmd_clean(args: argparse.Namespace) -> int:
 
 
 def _cmd_mask(args: argparse.Namespace) -> int:
-    import pandas as pd
-
+    """Standalone masking. Runs the same gates as `run`: an input that has not
+    been validated, or an output still carrying identifiers, is refused."""
     from pipeline.config import load as load_config
+    from pipeline.loading import load_raw
     from pipeline.mask import mask
+    from pipeline.pii import verify_release
     from pipeline.report import render_masked_sample, write
+    from pipeline.validate import validate
 
     src = Path(args.input)
     cfg = load_config(Path(args.rules))
-    cleaned = pd.read_csv(src, dtype=str, keep_default_na=False)
+    cleaned = load_raw(src)
+    if _structure_problem(cleaned, cfg) is not None:
+        log.error("%s", _structure_problem(cleaned, cfg))
+        return 1
+
+    checked = validate(cleaned, cfg, stage="pre-mask")
+    if not checked.passed:
+        log.error("input failed validation: %d rule failures, %d coercion failures; "
+                  "refusing to mask unvalidated data",
+                  len(checked.failures), len(checked.coercion))
+        return 1
+
     result = mask(cleaned, cfg)
+
+    residual = verify_release(result.masked)
+    if residual:
+        detail = ", ".join(f"{f.detector} in {f.column} ({f.row_count} rows)" for f in residual)
+        log.error("masked extract still contains direct identifiers: %s; "
+                  "refusing to write", detail)
+        return 1
 
     Path(args.processed).mkdir(parents=True, exist_ok=True)
     out_csv = Path(args.processed) / "customers_masked.csv"
     result.masked.to_csv(out_csv, index=False)
-    log.info("masked %d columns over %d rows -> %s",
-             len(result.columns_masked), len(result.masked), out_csv.name)
-    log.info("uniquely re-identifiable: %d -> %d rows", result.unique_before, result.unique_after)
-
     write(Path(args.reports) / "masked_sample.txt",
           render_masked_sample(result, cleaned, src, cfg))
-    log.info("wrote masked_sample.txt")
+    log.info("masked %d columns over %d rows; uniquely re-identifiable %d -> %d",
+             len(result.columns_masked), len(result.masked),
+             result.unique_before, result.unique_after)
     return 0
 
 

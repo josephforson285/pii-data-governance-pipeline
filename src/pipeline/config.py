@@ -1,8 +1,9 @@
 """Typed access to config/rules.yml.
 
-Every threshold, pattern and policy value the pipeline uses comes from here.
-Modules take a Config rather than importing constants from each other, so a
-rule cannot be changed in one place and stay stale in another.
+Schema, validation, remediation, masking, release and reporting policy is
+exposed through this object, so a rule cannot be changed in one place and stay
+stale in another. Detector patterns and sentinel representations stay with
+their specialist modules - they are implementation, not policy.
 """
 from __future__ import annotations
 
@@ -142,6 +143,36 @@ KNOWN_STRATEGIES = {"initial", "email_local", "last_four", "year_only", "suppres
 DERIVED_QUASI = {"address_postal"}
 
 
+REQUIRED_SECTIONS = ("thresholds", "schema", "remediation", "masking",
+                     "release", "reporting")
+
+
+def _structural_problems(raw: dict[str, Any]) -> list[str]:
+    """Missing sections, checked before any property is read.
+
+    Property access raises KeyError on a missing section, which would abort
+    before a single problem could be collected - so the caller would fix them
+    one crash at a time instead of seeing the list.
+    """
+    problems = [f"missing required section: {name}"
+                for name in REQUIRED_SECTIONS if name not in raw]
+    if "version" not in raw:
+        problems.append("missing required key: version")
+
+    value = raw.get("reference_date")
+    if value is not None and not isinstance(value, date):
+        try:
+            date.fromisoformat(str(value))
+        except ValueError:
+            problems.append(f"reference_date {value!r} is not an ISO date")
+
+    for column, spec in (raw.get("masking", {}).get("rules") or {}).items():
+        for field in ("strategy", "description", "rationale"):
+            if field not in (spec or {}):
+                problems.append(f"masking rule {column!r} is missing {field!r}")
+    return problems
+
+
 def validate_config(cfg: Config) -> None:
     """Reject a config the pipeline cannot honour, at load time.
 
@@ -149,11 +180,17 @@ def validate_config(cfg: Config) -> None:
     later as a confusing error, or - worse - as silence: a masking rule naming
     a column that does not exist simply would not run.
     """
-    problems: list[str] = []
+    problems = _structural_problems(cfg._raw)
+    if problems:
+        # Value checks below read properties that would raise without these.
+        raise ValueError("config/rules.yml is not usable:\n  - " + "\n  - ".join(problems))
+
     schema = cfg.schema
 
     if cfg.version < 1:
         problems.append(f"version must be >= 1, got {cfg.version}")
+    if cfg.min_age < 0:
+        problems.append(f"min_age must not be negative, got {cfg.min_age}")
     if cfg.min_age >= cfg.max_age:
         problems.append(f"min_age {cfg.min_age} must be below max_age {cfg.max_age}")
     if cfg.income_cap < 0:
@@ -170,6 +207,13 @@ def validate_config(cfg: Config) -> None:
         if dtype not in KNOWN_DTYPES:
             problems.append(f"schema.{name}.dtype {dtype!r} unknown; "
                             f"expected one of {sorted(KNOWN_DTYPES)}")
+        checks = spec.get("checks") or {}
+        lo, hi = checks.get("min_len"), checks.get("max_len")
+        for bound, label in ((lo, "min_len"), (hi, "max_len")):
+            if bound is not None and int(bound) < 0:
+                problems.append(f"schema.{name}.{label} must not be negative, got {bound}")
+        if lo is not None and hi is not None and int(lo) > int(hi):
+            problems.append(f"schema.{name}: min_len {lo} exceeds max_len {hi}")
 
     for check in cfg.dataframe_checks:
         if check.op not in KNOWN_DF_OPS:
@@ -217,6 +261,9 @@ def validate_config(cfg: Config) -> None:
 
 
 def load(path: Path) -> Config:
-    cfg = Config(yaml.safe_load(path.read_text(encoding="utf-8")), path)
+    raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(raw, dict) or not raw:
+        raise ValueError(f"{path} must contain a non-empty YAML mapping")
+    cfg = Config(raw, path)
     validate_config(cfg)
     return cfg

@@ -26,6 +26,11 @@ def _safe(value: object, sensitive: bool) -> str:
     return redact(str(value)) if sensitive else str(value)
 
 
+def _pct(num: float, den: float) -> float:
+    """Percentage, or zero when there is nothing to divide by."""
+    return 100 * num / den if den else 0.0
+
+
 def _sensitive_check(name: str, cfg: Config) -> bool:
     """A profiler check name is sensitive when it names a sensitive column."""
     return any(col in name for col in cfg.sensitive_columns)
@@ -85,7 +90,7 @@ def render_quality_report(p: QualityProfile, source: Path, cfg: Config) -> str:
     out += _section("2. COMPLETENESS")
     out.append(f"{'COLUMN':<16}{'NULL':>8}{'SENTINEL':>10}{'MISSING':>9}{'PCT':>8}")
     for c in p.columns:
-        pct = 100 * c.missing_count / p.n_rows if p.n_rows else 0.0
+        pct = _pct(c.missing_count, p.n_rows)
         out.append(
             f"{c.name:<16}{c.null_count:>8}{c.sentinel_count:>10}"
             f"{c.missing_count:>9}{pct:>7.2f}%"
@@ -140,18 +145,23 @@ def render_quality_report(p: QualityProfile, source: Path, cfg: Config) -> str:
     for k, v in sorted(invalid.items(), key=lambda x: -x[1]):
         out.append(f"{repr(k):<20}{v:>8}   INVALID")
     out.append("")
-    invalid_pct = 100 * sum(invalid.values()) / p.n_rows if p.n_rows else 0.0
+    invalid_pct = _pct(sum(invalid.values()), p.n_rows)
     out.append(f"Invalid total: {sum(invalid.values())} rows ({invalid_pct:.2f}%)")
     out.append("")
 
     out += _section("SUMMARY")
-    worst = max(p.columns, key=lambda c: c.missing_count)
+    worst = max(p.columns, key=lambda c: c.missing_count, default=None)
     out.append(f"Rows profiled            : {p.n_rows:,}")
     out.append(f"Columns with missing data: {sum(1 for c in p.columns if c.missing_count)}")
-    worst_pct = 100 * worst.missing_count / p.n_rows if p.n_rows else 0.0
-    out.append(f"Least complete column    : {worst.name} ({worst_pct:.2f}% missing)")
+    if worst is None:
+        out.append("Least complete column    : none (no columns)")
+    else:
+        out.append(f"Least complete column    : {worst.name} "
+                   f"({_pct(worst.missing_count, p.n_rows):.2f}% missing)")
     out.append(f"Invalid-value findings   : {sum(i['count'] for i in p.invalid_values.values())}")
-    out.append(f"Non-canonical formats    : {sum(len(s) - 1 for s in p.format_inventory.values())}")
+    out.append(f"Additional format shapes : "
+               f"{sum(max(len(s) - 1, 0) for s in p.format_inventory.values())}")
+    out.append("  (shapes beyond the canonical one, not a count of bad records)")
     out.append("")
     return "\n".join(out) + "\n"
 
@@ -178,6 +188,9 @@ def render_pii_report(r: PIIReport, source: Path, cfg: Config) -> str:
     out.append("Every column is scanned with every pattern. Detecting by column")
     out.append("name would find only the PII we already knew about.")
     out.append("")
+    out.append("Scope: these patterns cover common US-formatted identifiers. Absence")
+    out.append("of a finding does not establish absence of international-format PII.")
+    out.append("")
 
     out += _section("3. CONFIRMED MATCHES")
     out.append(f"{'COLUMN':<16}{'DETECTOR':<14}{'ROWS':>7}{'MATCHES':>9}   SAMPLE (redacted)")
@@ -199,7 +212,7 @@ def render_pii_report(r: PIIReport, source: Path, cfg: Config) -> str:
     kept = sum(f.row_count for f in r.findings)
     out.append("")
     out.append(f"Raw hits {total_hits:,} -> confirmed {kept:,} "
-               f"({100 * kept / total_hits:.1f}% confirmation rate).")
+               f"({_pct(kept, total_hits):.1f}% confirmation rate).")
     out.append("")
     out.append("This is a confirmation rate, not precision. Precision would need")
     out.append("each match labelled true or false against ground truth; these are")
@@ -227,7 +240,7 @@ def render_pii_report(r: PIIReport, source: Path, cfg: Config) -> str:
     out.append("")
 
     out += _section("6. BREACH EXPOSURE")
-    pct_exposed = 100 * r.rows_with_pii / r.n_rows if r.n_rows else 0.0
+    pct_exposed = _pct(r.rows_with_pii, r.n_rows)
     out.append(f"Records containing personal data : {r.rows_with_pii:,} of "
                f"{r.n_rows:,} ({pct_exposed:.1f}%)")
     out.append("")
@@ -265,16 +278,19 @@ def render_pii_report(r: PIIReport, source: Path, cfg: Config) -> str:
     for label in ["k=1 (unique)", "k=2", "k=3-5", "k>5"]:
         if label in r.k_anonymity:
             v = r.k_anonymity[label]
-            out.append(f"{label:<16}{v:>8}{100 * v / r.n_rows:>8.1f}%")
+            out.append(f"{label:<16}{v:>8}{_pct(v, r.n_rows):>8.1f}%")
     out.append("")
-    pct = 100 * r.unique_rows / r.n_rows
+    pct = _pct(r.unique_rows, r.n_rows)
     out.append(f"{pct:.1f}% of records are unique on quasi-identifiers alone (k=1).")
-    out.append("Those individuals stay re-identifiable after every direct identifier")
-    out.append("is masked, by anyone holding a second dataset with the same attributes.")
+    out.append("Those records are uniquely distinguishable on the modelled")
+    out.append("quasi-identifiers, so they carry elevated linkage risk wherever")
+    out.append("matching auxiliary data exists. Masking direct identifiers does")
+    out.append("not change that.")
     out.append("")
-    out.append("The masked output is therefore pseudonymous, not anonymous, and remains")
-    out.append("personal data under GDPR Recital 26. Genuine anonymisation would need")
-    out.append("generalisation of the quasi-identifiers to reach a k threshold.")
+    out.append("The masked output should be treated as pseudonymised rather than")
+    out.append("anonymous for this assessment: k-anonymity alone does not settle")
+    out.append("that question, and Recital 26 keeps pseudonymised data in scope.")
+    out.append("Reaching a k threshold would need further generalisation.")
     out.append("")
     return "\n".join(out) + "\n"
 
@@ -313,7 +329,7 @@ def render_validation_report(pre: ValidationResult, source: Path, cfg: Config,
         out.append("-" * WIDTH)
         out.append(f"{'TOTAL':<44}{len(pre.failures):>10}")
         out.append("")
-        failing_pct = 100 * len(pre.failing_rows) / pre.n_rows if pre.n_rows else 0.0
+        failing_pct = _pct(len(pre.failing_rows), pre.n_rows)
         out.append(f"Rows with at least one failure: {len(pre.failing_rows):,} "
                    f"of {pre.n_rows:,} ({failing_pct:.1f}%)")
     else:
@@ -401,7 +417,7 @@ def render_cleaning_log(log: CleaningLog, source: Path, cfg: Config) -> str:
     out.append("Asserted on every run. Without it, a row lost to a silent exception")
     out.append("looks identical to a row that was never there.")
     out.append("")
-    retention = 100 * log.rows_out / log.rows_in if log.rows_in else 0.0
+    retention = _pct(log.rows_out, log.rows_in)
     out.append(f"Retention: {retention:.1f}%")
     out.append("")
 
@@ -416,10 +432,11 @@ def render_cleaning_log(log: CleaningLog, source: Path, cfg: Config) -> str:
     out.append(f"{'Quarantined under current policy':<42}{s['quarantined']:>8}")
     out.append(f"{'Failing only on a blank optional field':<42}{s['recoverable_under_tiered_policy']:>8}")
     out.append(f"{'Retention if those were kept and flagged':<42}"
-               f"{100 * s['retention_if_relaxed'] / log.rows_in:>7.1f}%")
+               f"{_pct(s['retention_if_relaxed'], log.rows_in):>7.1f}%")
     out.append("")
-    out.append(f"Retaining them would raise retention from {100 * log.rows_out / log.rows_in:.1f}% "
-               f"to {100 * s['retention_if_relaxed'] / log.rows_in:.1f}%,")
+    out.append(f"Retaining them would raise retention from "
+               f"{_pct(log.rows_out, log.rows_in):.1f}% to "
+               f"{_pct(s['retention_if_relaxed'], log.rows_in):.1f}%,")
     out.append("at the cost of nulls flowing downstream. The strict policy is kept")
     out.append("here because the brief declares these fields mandatory; the number")
     out.append("is reported so the trade-off can be re-argued with evidence.")
@@ -469,8 +486,12 @@ def render_masked_sample(r: MaskResult, original: "pd.DataFrame", source: Path,
     out.append("Group sizes on the quasi-identifiers, before and after. Larger groups")
     out.append("mean each person is hidden among more people.")
     out.append("")
-    out.append(f"Before : {', '.join(r.quasi_before)}")
-    out.append(f"After  : {', '.join(r.quasi_after)}")
+    out.append(f"Before : {', '.join(r.quasi_before)}"
+               f"   (unparseable component in {100 * r.incomplete_before:.1f}%)")
+    out.append(f"After  : {', '.join(r.quasi_after)}"
+               f"   (unparseable component in {100 * r.incomplete_after:.1f}%)")
+    out.append("Rows whose quasi-identifiers would not parse share an 'unknown'")
+    out.append("signature, which groups them and overstates their protection.")
     out.append("The two sets differ because masking removed dimensions. The after")
     out.append("set covers every released attribute designated a quasi-identifier,")
     out.append("including columns left unmasked - scoring only the masked ones")
@@ -481,8 +502,8 @@ def render_masked_sample(r: MaskResult, original: "pd.DataFrame", source: Path,
     for label in ["k=1 (unique)", "k=2", "k=3-5", "k>5"]:
         out.append(f"{label:<16}{r.k_before.get(label, 0):>10}{r.k_after.get(label, 0):>10}")
     out.append("")
-    out.append(f"Uniquely re-identifiable: {100 * r.unique_before / total:.1f}% "
-               f"-> {100 * r.unique_after / total:.1f}%")
+    out.append(f"Uniquely re-identifiable: {_pct(r.unique_before, total):.1f}% "
+               f"-> {_pct(r.unique_after, total):.1f}%")
     out.append("")
     out.append("Achieved by generalising the quasi-identifiers, not by masking the")
     out.append("direct identifiers: dropping the postal code with the address, coarsening")
@@ -611,6 +632,9 @@ def render_scorecard(card: ScoreCard, source: Path, n_rows: int, cfg: Config) ->
     out.append("            fired. A miss here means the diagnosis was wrong, even")
     out.append("            though the row was handled.")
     out.append("")
+    out.append("CONTAINMENT share of planted defects that did not survive into the")
+    out.append("            cleaned extract. Measures cleaning, not the release:")
+    out.append("            masking may remove what does survive.")
     out.append("SPECIFICITY share of defect-free rows that were not quarantined.")
     out.append("            The counterweight to recall:")
     out.append("            quarantining everything scores perfect recall and")
@@ -618,15 +642,18 @@ def render_scorecard(card: ScoreCard, source: Path, n_rows: int, cfg: Config) ->
     out.append("")
 
     out += _section("2. PER-DEFECT RESULTS")
-    out.append(f"{'DEFECT':<34}{'COLUMN':<16}{'PLANTED':>8}{'RECALL':>9}{'ATTRIB':>9}")
+    out.append(f"{'DEFECT':<32}{'COLUMN':<15}{'PLANTED':>8}{'RECALL':>8}"
+               f"{'ATTRIB':>8}{'CONTAIN':>9}")
     for s_ in card.scores:
-        out.append(f"{s_.defect:<34}{s_.column:<16}{s_.planted:>8}"
-                   f"{100 * s_.recall:>8.1f}%{100 * s_.attribution:>8.1f}%")
+        out.append(f"{s_.defect:<32}{s_.column:<15}{s_.planted:>8}"
+                   f"{100 * s_.recall:>7.1f}%{100 * s_.attribution:>7.1f}%"
+                   f"{100 * s_.pre_mask_containment:>8.1f}%")
     out.append("-" * WIDTH)
-    out.append(f"{'TOTAL (micro)':<50}{card.planted:>8}"
-               f"{100 * card.recall:>8.1f}%{100 * card.attribution:>8.1f}%")
-    out.append(f"{'TOTAL (macro, per defect class)':<50}{len(card.scores):>8}"
-               f"{100 * card.macro_recall:>8.1f}%{100 * card.macro_attribution:>8.1f}%")
+    out.append(f"{'TOTAL (micro)':<47}{card.planted:>8}"
+               f"{100 * card.recall:>7.1f}%{100 * card.attribution:>7.1f}%"
+               f"{100 * card.pre_mask_containment:>8.1f}%")
+    out.append(f"{'TOTAL (macro, per defect class)':<47}{len(card.scores):>8}"
+               f"{100 * card.macro_recall:>7.1f}%{100 * card.macro_attribution:>7.1f}%")
     out.append("")
     out.append("Micro totals weight by planted volume, so frequent defects dominate.")
     out.append("Macro totals weight each defect class equally, so a rare broken rule")
@@ -641,8 +668,9 @@ def render_scorecard(card: ScoreCard, source: Path, n_rows: int, cfg: Config) ->
     if not misses:
         out.append("None: every planted defect was acted on.")
     else:
-        out.append("A row here reached the output without the pipeline acting on that")
-        out.append("column. These are the findings that need investigation.")
+        out.append("A planted defect here was not acted on in its own column. The")
+        out.append("row may still have been contained by another control; these")
+        out.append("need review rather than assuming either outcome.")
         out.append("")
         out.append(f"{'DEFECT':<34}{'COLUMN':<16}{'PLANTED':>8}{'MISSED':>8}")
         for s_ in misses:
@@ -656,9 +684,9 @@ def render_scorecard(card: ScoreCard, source: Path, n_rows: int, cfg: Config) ->
         out.append("None: every handled defect was caught by the expected check.")
     else:
         out.append("The row was handled, but by a different check than expected.")
-        out.append("This is usually classification ambiguity rather than a defect:")
-        out.append("a planted value that is both malformed and sentinel-null is")
-        out.append("legitimately reportable as either.")
+        out.append("This may be legitimate classification ambiguity - a value that is")
+        out.append("both malformed and sentinel-null is reportable as either - or a")
+        out.append("mismatch in the expected mapping. Worth reviewing, not assuming.")
         out.append("")
         out.append(f"{'DEFECT':<34}{'RECALL':>9}{'ATTRIB':>9}{'DIFF':>8}")
         for s_ in diverged:

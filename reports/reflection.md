@@ -71,7 +71,7 @@ attacker may hold attributes I did not model.
 ## 4. Validation strategy
 
 Rules live in `config/rules.yml`, so policy changes without touching code.
-Validation runs both sides of cleaning: **3,504 failures across 2,645 rows to
+Validation runs both sides of cleaning: **3,527 failures across 2,658 rows to
 zero**. `lazy=True` is what makes a report possible rather than a traceback.
 Separating uncoercible from absent values mattered: 489 dates were present and
 unparseable, 71 blank — different fixes, and the 489 matched the profiler's

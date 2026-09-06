@@ -53,7 +53,7 @@ DECLARED = {
     "email":          (DIRECT, "high", "Contactable; account identifier"),
     "phone":          (DIRECT, "high", "Contactable"),
     "date_of_birth":  (QUASI, "high", "Strong quasi-identifier with location and financial attributes"),
-    "address":        (QUASI, "high", "Location data; can identify a household directly"),
+    "address":        (QUASI, "high", "Precise location; highly identifying when linked with other attributes"),
     "income":         (QUASI, "high", "Financial data; discriminatory if disclosed"),
     "account_status": ("non-PII", "low", "Operational attribute"),
     "created_date":   (QUASI, "medium", "Near-unique when exact; a strong quasi-identifier despite being operational"),
@@ -126,7 +126,8 @@ def redact(value: str) -> str:
     return v[:44]
 
 
-def _scan_column(series: pd.Series, column: str) -> list[Finding]:
+def _scan_column(series: pd.Series, column: str,
+                 apply_suppressions: bool = True) -> list[Finding]:
     found = []
     for det in DETECTORS:
         rows, samples, matches = [], [], 0
@@ -142,7 +143,8 @@ def _scan_column(series: pd.Series, column: str) -> list[Finding]:
         if rows:
             found.append(Finding(column, det.name, det.category, det.sensitivity,
                                  matches, len(rows), rows, samples,
-                                 suppression_for(det.name, column)))
+                                 suppression_for(det.name, column)
+                                 if apply_suppressions else None))
     return found
 
 
@@ -157,10 +159,9 @@ def verify_release(df: pd.DataFrame) -> list[Finding]:
     """
     residual: list[Finding] = []
     for column in df.columns:
-        # Suppressions are deliberately not applied. They exist to cut noise
-        # while triaging raw data; on a released extract they would let a real
-        # identifier through because a rule said that shape is usually benign.
-        for finding in _scan_column(df[column], column):
+        # Suppressions cut noise while triaging raw data; on a release they
+        # would wave through a real identifier.
+        for finding in _scan_column(df[column], column, apply_suppressions=False):
             if finding.category == DIRECT:
                 residual.append(finding)
     return residual
@@ -180,6 +181,8 @@ def detect(df: pd.DataFrame, cfg: Config) -> PIIReport:
     for f in findings:
         pii_rows.update(f.rows)
     # Every row also carries a name and an id, so exposure is effectively total.
+    # Every row carries a name and an id by schema, so exposure is total
+    # regardless of what the content scan found.
     declared_pii_rows = len(df)
 
     keys = signatures(df, cfg.quasi_identifiers_before, cfg)

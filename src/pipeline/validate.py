@@ -160,7 +160,8 @@ def _dataframe_check_failures(typed: pd.DataFrame, cfg: Config) -> list[Failure]
             failures.append(Failure(
                 column=check.right,
                 check=check.name,
-                failure_case=str(typed.at[idx, check.right])[:24],
+                failure_case=(f"{check.left}={typed.at[idx, check.left]} "
+                              f"vs {typed.at[idx, check.right]}")[:40],
                 index=int(idx),
             ))
     return failures
@@ -185,10 +186,10 @@ def _coerce_for_validation(df: pd.DataFrame, cfg: Config) -> pd.DataFrame:
             exact = numeric.notna() & (numeric % 1 == 0)
             out[name] = numeric.where(exact).astype("Int64")
         elif kind == "float64":
-            out[name] = pd.to_numeric(
-                out[name].astype(str).str.replace(r"[$,]", "", regex=True).str.strip(),
-                errors="coerce",
-            )
+            # Strict, like the date branch: '$50,000' is a format defect the
+            # cleaner repairs, so pre-clean validation should report it rather
+            # than quietly accepting it and understating the delta.
+            out[name] = pd.to_numeric(out[name], errors="coerce")
         elif kind == "date":
             out[name] = pd.to_datetime(out[name], format="%Y-%m-%d", errors="coerce")
         else:

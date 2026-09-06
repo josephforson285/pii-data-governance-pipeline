@@ -17,7 +17,7 @@ export PYTHONPATH=src
 python -m pipeline generate      # synthetic raw dataset + defect manifest
 python -m pipeline run           # every stage, all reports
 python -m pipeline score         # detection measured against the manifest
-pytest                           # 127 tests
+pytest                           # 138 tests
 ```
 
 Individual stages (`profile`, `detect`, `validate`, `clean`, `mask`) can be run
@@ -45,7 +45,7 @@ clean data is clean. The pre/post delta is what shows remediation worked.
 | Measure | Value |
 | --- | --- |
 | Rows in / cleaned / quarantined | 5,000 / 3,682 / 1,318 |
-| Rule failures, pre -> post | 3,504 -> 0 |
+| Rule failures, pre -> post | 3,527 -> 0 |
 | Rows with PII leaked into free text | 40, incl. 8 SSNs |
 | Uniquely re-identifiable, pre -> post mask | 100% -> 47.8% |
 | Detection recall / attribution | 100% / 97.0% |

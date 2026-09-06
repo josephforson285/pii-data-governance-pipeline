@@ -4,9 +4,9 @@ PII DETECTION REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T18:12:34Z
+Generated  : 2026-09-06T18:53:27Z
 Pipeline   : v0.1.0
-Rules      : v2
+Rules      : v3
 Reference  : 2026-09-06 (pinned)
 
 ------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ last_name       direct identifier   high      Identifies with forename
 email           direct identifier   high      Contactable; account identifier
 phone           direct identifier   high      Contactable
 date_of_birth   quasi-identifier    high      Strong quasi-identifier with location and financial attributes
-address         quasi-identifier    high      Location data; can identify a household directly
+address         quasi-identifier    high      Precise location; highly identifying when linked with other attributes
 income          quasi-identifier    high      Financial data; discriminatory if disclosed
 account_status  non-PII             low       Operational attribute
 created_date    quasi-identifier    medium    Near-unique when exact; a strong quasi-identifier despite being operational
@@ -41,6 +41,9 @@ ip_address    direct identifier   medium    Personal data under GDPR (Breyer, C-
 
 Every column is scanned with every pattern. Detecting by column
 name would find only the PII we already knew about.
+
+Scope: these patterns cover common US-formatted identifiers. Absence
+of a finding does not establish absence of international-format PII.
 
 ------------------------------------------------------------------------------
 3. CONFIRMED MATCHES
@@ -127,10 +130,13 @@ GROUP SIZE          ROWS      PCT
 k=1 (unique)        5000   100.0%
 
 100.0% of records are unique on quasi-identifiers alone (k=1).
-Those individuals stay re-identifiable after every direct identifier
-is masked, by anyone holding a second dataset with the same attributes.
+Those records are uniquely distinguishable on the modelled
+quasi-identifiers, so they carry elevated linkage risk wherever
+matching auxiliary data exists. Masking direct identifiers does
+not change that.
 
-The masked output is therefore pseudonymous, not anonymous, and remains
-personal data under GDPR Recital 26. Genuine anonymisation would need
-generalisation of the quasi-identifiers to reach a k threshold.
+The masked output should be treated as pseudonymised rather than
+anonymous for this assessment: k-anonymity alone does not settle
+that question, and Recital 26 keeps pseudonymised data in scope.
+Reaching a k threshold would need further generalisation.
 

@@ -4,9 +4,9 @@ VALIDATION RESULTS
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T18:12:35Z
+Generated  : 2026-09-06T18:53:27Z
 Pipeline   : v0.1.0
-Rules      : v2
+Rules      : v3
 Reference  : 2026-09-06 (pinned)
 
 Engine: pandera, lazy=True - every rule is evaluated against every
@@ -28,8 +28,8 @@ counted as missing - a different defect needing a different fix.
 COLUMN                UNCOERCIBLE   EXAMPLES
 date_of_birth                 492   ####-##-##, ##-##-####, ####/##/##, 
 created_date                  300   ##/##/####, ##-##-####, ####/##/##, 
-income                         17   75k
-TOTAL                         809
+income                         40   75k, 60,000.00, $52,000
+TOTAL                         832
 
 ------------------------------------------------------------------------------
 3. RULE FAILURES
@@ -39,7 +39,7 @@ phone.str_matches                               1036       0    -1036
 date_of_birth.not_nullable                       560       0     -560
 account_status.isin                              350       0     -350
 created_date.not_nullable                        300       0     -300
-income.not_nullable                              252       0     -252
+income.not_nullable                              275       0     -275
 email.str_matches                                235       0     -235
 first_name.str_matches                           124       0     -124
 address.length_10_200                             99       0      -99
@@ -55,9 +55,9 @@ created_date.not_in_future                        30       0      -30
 income.less_than_or_equal_to                      25       0      -25
 date_of_birth.age_18_120                          20       0      -20
 ------------------------------------------------------------------------------
-TOTAL                                           3504       0    -3504
+TOTAL                                           3527       0    -3527
 
-Rows failing : 2,645 -> 0
+Rows failing : 2,658 -> 0
 
 Every published row satisfies the schema. Rows that could not be
 repaired without inventing data are in the quarantine file with a

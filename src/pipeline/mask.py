@@ -14,7 +14,7 @@ from dataclasses import dataclass
 import pandas as pd
 
 from pipeline.config import Config
-from pipeline.privacy import k_buckets, signatures
+from pipeline.privacy import incomplete_share, k_buckets, signatures
 
 Masker = Callable[[object], str]
 
@@ -30,8 +30,8 @@ def mask_initial(value: object) -> str:
 
 def mask_email_local(value: object) -> str:
     """john.doe@gmail.com -> j***@gmail.com. The domain is kept for provider-mix
-    analysis; on a rare or corporate domain it still narrows the population,
-    so it reduces rather than removes identifying power."""
+    analysis; on a rare domain it still narrows the population, so this reduces
+    rather than removes identifying power."""
     s = "" if value is None else str(value).strip()
     if "@" not in s:
         return "***"
@@ -59,14 +59,14 @@ def mask_year_only(value: object) -> str:
     return f"{m.group(1)}-**-**" if m else "****-**-**"
 
 
-def make_suppressor(placeholder: str):
+def make_suppressor(placeholder: str) -> Masker:
     def suppress(_value: object) -> str:
         """Replaced entirely. Free text cannot be partially masked safely."""
         return placeholder
     return suppress
 
 
-def make_bander(width: int):
+def make_bander(width: int) -> Masker:
     def band(value: object) -> str:
         """52000 -> 50000-74999. Generalisation, not suppression: the band
         still supports segmentation while collapsing a unique value."""
@@ -121,6 +121,8 @@ class MaskResult:
     columns_untouched: list[str]
     quasi_before: list[str]
     quasi_after: list[str]
+    incomplete_before: float
+    incomplete_after: float
     k_before: dict[str, int]
     k_after: dict[str, int]
     unique_before: int
@@ -146,11 +148,13 @@ def mask(df: pd.DataFrame, cfg: Config) -> MaskResult:
     masked = apply_masks(df, cfg)
     # Both sides use the shared signature logic, so the comparison stays
     # like-for-like when a band width or quasi-identifier set changes.
-    before = k_buckets(signatures(df, cfg.quasi_identifiers_before, cfg))
+    keys_before = signatures(df, cfg.quasi_identifiers_before, cfg)
+    keys_after = signatures(masked, cfg.quasi_identifiers_after, cfg)
+    before = k_buckets(keys_before)
     # The after set covers every released attribute designated a
     # quasi-identifier, including columns left unmasked - assessing only the
     # masked columns would flatter the result.
-    after = k_buckets(signatures(masked, cfg.quasi_identifiers_after, cfg))
+    after = k_buckets(keys_after)
     masked_columns = [r.column for r in cfg.mask_rules if r.column in df.columns]
     return MaskResult(
         masked=masked,
@@ -158,6 +162,8 @@ def mask(df: pd.DataFrame, cfg: Config) -> MaskResult:
         columns_untouched=[c for c in df.columns if c not in masked_columns],
         quasi_before=cfg.quasi_identifiers_before,
         quasi_after=cfg.quasi_identifiers_after,
+        incomplete_before=incomplete_share(keys_before),
+        incomplete_after=incomplete_share(keys_after),
         k_before=before,
         k_after=after,
         unique_before=before.get("k=1 (unique)", 0),

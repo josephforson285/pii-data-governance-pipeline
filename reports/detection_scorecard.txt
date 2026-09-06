@@ -4,9 +4,9 @@ DETECTION SCORECARD
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T18:12:37Z
+Generated  : 2026-09-06T18:53:28Z
 Pipeline   : v0.1.0
-Rules      : v2
+Rules      : v3
 Reference  : 2026-09-06 (pinned)
 
 Measured against the generator's manifest of planted defects.
@@ -22,6 +22,9 @@ ATTRIBUTION the specific check expected to catch it is the one that
             fired. A miss here means the diagnosis was wrong, even
             though the row was handled.
 
+CONTAINMENT share of planted defects that did not survive into the
+            cleaned extract. Measures cleaning, not the release:
+            masking may remove what does survive.
 SPECIFICITY share of defect-free rows that were not quarantined.
             The counterweight to recall:
             quarantining everything scores perfect recall and
@@ -30,32 +33,32 @@ SPECIFICITY share of defect-free rows that were not quarantined.
 ------------------------------------------------------------------------------
 2. PER-DEFECT RESULTS
 ------------------------------------------------------------------------------
-DEFECT                            COLUMN           PLANTED   RECALL   ATTRIB
-income_non_numeric                income                50   100.0%     0.0%
-address_too_short                 address               60   100.0%    23.3%
-dob_invalid_value                 date_of_birth         50   100.0%    84.0%
-phone_unparseable                 phone                 40   100.0%    87.5%
-missing_email                     email                100   100.0%   100.0%
-missing_phone                     phone                150   100.0%   100.0%
-missing_income                    income               225   100.0%   100.0%
-missing_address                   address               75   100.0%   100.0%
-missing_dob                       date_of_birth         60   100.0%   100.0%
-phone_nonstandard_format          phone                900   100.0%   100.0%
-dob_nonstandard_format            date_of_birth        450   100.0%   100.0%
-created_date_nonstandard_format   created_date         300   100.0%   100.0%
-created_date_future               created_date          30   100.0%   100.0%
-income_negative                   income                70   100.0%   100.0%
-income_above_cap                  income                25   100.0%   100.0%
-status_invalid                    account_status       350   100.0%   100.0%
-email_malformed                   email                175   100.0%   100.0%
-first_name_dirty                  first_name           250   100.0%   100.0%
-last_name_dirty                   last_name            200   100.0%   100.0%
-pii_leaked_in_address             address               40   100.0%   100.0%
-age_impossible                    date_of_birth         20   100.0%   100.0%
-duplicate_customer_id             customer_id           50   100.0%   100.0%
+DEFECT                          COLUMN          PLANTED  RECALL  ATTRIB  CONTAIN
+income_non_numeric              income               50  100.0%    0.0%   100.0%
+address_too_short               address              60  100.0%   23.3%   100.0%
+dob_invalid_value               date_of_birth        50  100.0%   84.0%   100.0%
+phone_unparseable               phone                40  100.0%   87.5%   100.0%
+missing_email                   email               100  100.0%  100.0%   100.0%
+missing_phone                   phone               150  100.0%  100.0%   100.0%
+missing_income                  income              225  100.0%  100.0%   100.0%
+missing_address                 address              75  100.0%  100.0%   100.0%
+missing_dob                     date_of_birth        60  100.0%  100.0%   100.0%
+phone_nonstandard_format        phone               900  100.0%  100.0%   100.0%
+dob_nonstandard_format          date_of_birth       450  100.0%  100.0%   100.0%
+created_date_nonstandard_format created_date        300  100.0%  100.0%   100.0%
+created_date_future             created_date         30  100.0%  100.0%   100.0%
+income_negative                 income               70  100.0%  100.0%   100.0%
+income_above_cap                income               25  100.0%  100.0%   100.0%
+status_invalid                  account_status      350  100.0%  100.0%   100.0%
+email_malformed                 email               175  100.0%  100.0%   100.0%
+first_name_dirty                first_name          250  100.0%  100.0%   100.0%
+last_name_dirty                 last_name           200  100.0%  100.0%   100.0%
+pii_leaked_in_address           address              40  100.0%  100.0%    25.0%
+age_impossible                  date_of_birth        20  100.0%  100.0%   100.0%
+duplicate_customer_id           customer_id          50  100.0%  100.0%   100.0%
 ------------------------------------------------------------------------------
-TOTAL (micro)                                         3670   100.0%    97.0%
-TOTAL (macro, per defect class)                         22   100.0%    90.7%
+TOTAL (micro)                                      3670  100.0%   97.0%    99.2%
+TOTAL (macro, per defect class)                      22  100.0%   90.7%
 
 Micro totals weight by planted volume, so frequent defects dominate.
 Macro totals weight each defect class equally, so a rare broken rule
@@ -70,9 +73,9 @@ None: every planted defect was acted on.
 4. RECALL AND ATTRIBUTION DIVERGENCE
 ------------------------------------------------------------------------------
 The row was handled, but by a different check than expected.
-This is usually classification ambiguity rather than a defect:
-a planted value that is both malformed and sentinel-null is
-legitimately reportable as either.
+This may be legitimate classification ambiguity - a value that is
+both malformed and sentinel-null is reportable as either - or a
+mismatch in the expected mapping. Worth reviewing, not assuming.
 
 DEFECT                               RECALL   ATTRIB    DIFF
 income_non_numeric                   100.0%     0.0%      50

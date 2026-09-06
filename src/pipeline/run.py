@@ -146,6 +146,7 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
         with _Timer(result, "validate_pre", len(raw)) as t:
             pre = validate(raw, cfg, stage="pre-clean")
             result.outputs["failures_pre"] = len(pre.failures)
+            result.outputs["coercion_pre"] = len(pre.coercion)
             t.finish(len(raw), f"{len(pre.failures)} rule failures")
 
         with _Timer(result, "clean", len(raw)) as t:
@@ -168,16 +169,19 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
             artifact(write(reports / "validation_results.txt",
                            render_validation_report(pre, source, cfg, post=post)))
             result.outputs["failures_post"] = len(post.failures)
+            result.outputs["coercion_post"] = len(post.coercion)
             t.finish(len(cleaned), f"{len(post.failures)} rule failures")
 
         with _Timer(result, "publish", len(cleaned)) as t:
             # A row that survived cleaning and still fails the schema was
             # neither repaired nor quarantined - a defect in the cleaner.
             if not post.passed:
-                offenders = ", ".join(sorted({f.column for f in post.failures})[:5])
+                offenders = ", ".join(
+                    sorted({f.column for f in post.failures + post.coercion})[:5])
                 raise RuntimeError(
-                    f"post-clean validation failed with {len(post.failures)} "
-                    f"failures across [{offenders}]; refusing to publish. "
+                    f"post-clean validation failed: {len(post.failures)} rule "
+                    f"failures, {len(post.coercion)} coercion failures across "
+                    f"[{offenders}]; refusing to publish. "
                     f"See reports/validation_results.txt"
                 )
             cleaned.to_csv(processed / "customers_cleaned.csv", index=False)

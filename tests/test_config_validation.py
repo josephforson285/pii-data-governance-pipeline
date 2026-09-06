@@ -77,3 +77,41 @@ def test_reference_date_is_pinned_for_submission(cfg):
         "an unpinned reference date makes both the generated data and the "
         "age checks drift over time"
     )
+
+
+def test_empty_yaml_is_rejected_clearly(tmp_path):
+    from pipeline.config import load
+
+    bad = tmp_path / "rules.yml"
+    bad.write_text("")
+    with pytest.raises(ValueError, match="non-empty YAML mapping"):
+        load(bad)
+
+
+def test_missing_sections_are_listed_not_crashed_through(cfg, tmp_path):
+    """Property access raises KeyError on a missing section, which would abort
+    before a single problem could be collected."""
+    import yaml
+
+    from pipeline.config import load
+
+    raw = copy.deepcopy(cfg._raw)
+    del raw["masking"], raw["release"]
+    bad = tmp_path / "rules.yml"
+    bad.write_text(yaml.safe_dump(raw))
+    with pytest.raises(ValueError) as exc:
+        load(bad)
+    assert "masking" in str(exc.value) and "release" in str(exc.value)
+
+
+@pytest.mark.parametrize("mutate,expected", [
+    (lambda r: r["thresholds"].update(min_age=-1), "must not be negative"),
+    (lambda r: r["schema"]["first_name"]["checks"].update(min_len=100), "exceeds max_len"),
+    (lambda r: r.update(reference_date="banana"), "not an ISO date"),
+    (lambda r: r["masking"]["rules"]["email"].pop("rationale"), "missing 'rationale'"),
+])
+def test_further_structural_problems_are_rejected(cfg, mutate, expected):
+    from pipeline.config import validate_config
+
+    with pytest.raises(ValueError, match=expected):
+        validate_config(broken(cfg, mutate))

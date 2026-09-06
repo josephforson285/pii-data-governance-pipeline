@@ -4,9 +4,9 @@ DATA QUALITY REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T18:12:34Z
+Generated  : 2026-09-06T18:53:27Z
 Pipeline   : v0.1.0
-Rules      : v2
+Rules      : v3
 Reference  : 2026-09-06 (pinned)
 
 ------------------------------------------------------------------------------
@@ -135,5 +135,6 @@ Rows profiled            : 5,000
 Columns with missing data: 5
 Least complete column    : income (4.70% missing)
 Invalid-value findings   : 955
-Non-canonical formats    : 21
+Additional format shapes : 21
+  (shapes beyond the canonical one, not a count of bad records)
 
