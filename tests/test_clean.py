@@ -75,6 +75,23 @@ def test_status_alias_and_rejection(cfg):
     assert clean_status("closed", permitted, aliases)[1] == "unmappable_account_status"
 
 
+@pytest.mark.parametrize("value,expected", [
+    ("(555) 123-4567", "555-123-4567"),
+    ("555.123.4567", "555-123-4567"),
+    ("+1-555-123-4567", "555-123-4567"),
+    ("15551234567", "555-123-4567"),
+])
+def test_phone_formats_normalise_to_one_shape(value, expected):
+    assert clean_phone(value)[0] == expected
+
+
+@pytest.mark.parametrize("value", ["12345", "555-CALL-NOW", "+44 20 7946 0958"])
+def test_unparseable_phones_are_quarantined(value):
+    out, reason = clean_phone(value)
+    assert out is None
+    assert reason == "unparseable_phone"
+
+
 def test_email_lowercased_and_validated():
     assert clean_email("John.Doe@Gmail.com")[0] == "john.doe@gmail.com"
     assert clean_email("john@@corp.com")[1] == "malformed_email"
