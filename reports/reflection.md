@@ -106,8 +106,11 @@ the profiler's independent count exactly.
 Measured against a held-out manifest of 3,670 planted defects: **100% recall,
 96.8% attribution** (90.0% macro, weighting each defect class equally rather
 than by volume). Recall alone would be a poor score — a pipeline that
-quarantined every row would reach 100% — so it has to be read against the
-73.7% retention figure, which that pipeline would drive to zero.
+quarantined every row would reach 100% — so the harness also measures
+**specificity**: of the 2,283 rows with nothing planted in them, **none** were
+quarantined, giving 100%. The two cannot both be gamed, and there is a test
+asserting that a quarantine-everything pipeline scores 100% recall and 0%
+specificity.
 
 Two things the measurement caught that reading the output would not. Attribution
 sits below recall because some planted values are legitimately reportable
@@ -122,8 +125,15 @@ earlier stage happened to discard is not an invariant.
 
 ## 5. Production operations
 
-5,000 rows in 0.7s, non-zero exit on failure, execution report written even
+5,000 rows in 1.4s, non-zero exit on failure, execution report written even
 when a run dies. Every run asserts `rows_in == rows_out + rows_quarantined`.
+
+Post-clean validation is a **publication gate**: the cleaned extract is written
+only after it satisfies the schema it claims to satisfy, and masking does not
+run otherwise. A row that survived cleaning while still failing validation is a
+defect in the cleaner — it was neither repaired nor quarantined — and
+publishing it would put a row the pipeline calls compliant into the shared
+output.
 
 **Retention is the gap I would close first.** The pipeline creates four copies
 of every subject's personal data — raw, cleaned, quarantined, masked — and
