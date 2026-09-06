@@ -127,3 +127,49 @@ def test_config_reference_date_is_reported(cfg):
     raw = dict(cfg._raw)
     raw["reference_date"] = "2021-06-01"
     assert Config(raw).reference_date_is_pinned
+
+
+# --- release verification --------------------------------------------------
+
+def test_release_verification_passes_a_correctly_masked_extract(cfg):
+    from pipeline.mask import mask
+    from pipeline.pii import verify_release
+
+    leaky = pd.DataFrame([row(address="12 High St, contact a@b.com, SSN 123-45-6789")])
+    assert verify_release(mask(leaky, cfg).masked) == []
+
+
+def test_release_verification_catches_an_unmasked_column(cfg):
+    """Regression: the check scanned only columns the policy claimed to mask,
+    so removing a masking rule removed the check with it."""
+    from pipeline.config import Config
+    from pipeline.mask import mask
+    from pipeline.pii import verify_release
+
+    raw = dict(cfg._raw)
+    raw["masking"] = {**raw["masking"], "rules": {
+        k: v for k, v in raw["masking"]["rules"].items() if k != "address"}}
+    weakened = Config(raw)
+
+    leaky = pd.DataFrame([row(address="12 High St, contact a@b.com, SSN 123-45-6789")])
+    residual = verify_release(mask(leaky, weakened).masked)
+    assert residual, "an unsuppressed address carrying an SSN must be caught"
+    assert {f.detector for f in residual} >= {"us_ssn", "email"}
+
+
+def test_containment_counts_defects_reaching_the_extract():
+    """Recall says the row was acted on; containment says it did not survive."""
+    from pipeline.clean import CleaningLog, Repair
+    from pipeline.score import score
+
+    truth = {"n_rows": 4, "defects": {
+        "phone_nonstandard_format": {"column": "phone", "count": 2, "rows": [0, 1]}}}
+    log = CleaningLog(rows_in=4, rows_out=4)
+    log.repaired = [Repair(0, "phone", "phone_normalised")]  # row 1 untouched
+
+    class _NoLeaks:
+        leaks: list = []
+
+    card = score(truth, log, _NoLeaks())
+    assert card.escaped == 1
+    assert card.containment == 0.5

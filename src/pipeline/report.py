@@ -567,6 +567,7 @@ def render_execution_report(r: RunResult) -> str:
         "failures_post": "Rule failures after cleaning",
         "unique_before": "Uniquely re-identifiable before masking",
         "unique_after": "Uniquely re-identifiable after masking",
+        "residual_identifiers": "Direct identifiers left in the masked extract",
     }
     for key, label in labels.items():
         if key in o:
@@ -665,6 +666,18 @@ def render_scorecard(card: ScoreCard, source: Path, n_rows: int, cfg: Config) ->
     out.append(f"{'Handled':<34}{card.handled:>8,}   {100 * card.recall:.1f}%")
     out.append(f"{'Correctly attributed':<34}{card.attributed:>8,}   {100 * card.attribution:.1f}%")
     out.append("")
+    out.append(f"{'Reached the published extract':<34}{card.escaped:>8,}   "
+               f"containment {100 * card.containment:.1f}%")
+    out.append("")
+    if card.escaped:
+        out.append("Escaped defects were published without the cleaner rewriting that")
+        out.append("column. That is not automatically a failure - a planted value may")
+        out.append("violate no declared rule - but it did survive into the extract,")
+        out.append("which recall alone would not say. PII leaked into free text is the")
+        out.append("case here: cleaning normalises address whitespace and leaves the")
+        out.append("embedded identifiers, which address suppression removes at masking")
+        out.append("time. The verify_release stage checks that it did.")
+        out.append("")
     out.append(f"{'Rows with no planted defect':<34}{card.clean_rows:>8,}")
     out.append(f"{'  of those, quarantined':<34}{card.falsely_quarantined:>8,}")
     out.append(f"{'Specificity':<34}{'':>8}   {100 * card.specificity:.1f}%")

@@ -86,7 +86,7 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
     from pipeline.clean import clean, quarantine_frame
     from pipeline.loading import load_raw
     from pipeline.mask import mask
-    from pipeline.pii import detect
+    from pipeline.pii import detect, verify_release
     from pipeline.profile import profile
     from pipeline.report import (
         render_cleaning_log, render_masked_sample, render_pii_report,
@@ -199,6 +199,18 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
             result.outputs["unique_before"] = masked.unique_before
             result.outputs["unique_after"] = masked.unique_after
             t.finish(len(masked.masked), f"unique {masked.unique_before} -> {masked.unique_after}")
+
+        with _Timer(result, "verify_release", len(masked.masked)) as t:
+            residual = verify_release(masked.masked)
+            if residual:
+                detail = ", ".join(f"{f.detector} in {f.column} ({f.row_count} rows)"
+                                   for f in residual)
+                raise RuntimeError(
+                    f"masked extract still contains direct identifiers: {detail}. "
+                    f"The masking policy does not cover what the scan found."
+                )
+            result.outputs["residual_identifiers"] = 0
+            t.finish(len(masked.masked), "no direct identifiers remain")
     except Exception:
         # _Timer has already recorded which stage failed and why; the caller
         # needs the partial result to write the execution report.

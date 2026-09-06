@@ -4,7 +4,7 @@ DETECTION SCORECARD
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : e8548ce51f229c0e
 Rows       : 5,000
-Generated  : 2026-09-06T17:16:01Z
+Generated  : 2026-09-06T17:24:21Z
 Pipeline   : v0.1.0
 Rules      : v2
 Reference  : 2026-09-06 (today (not pinned))
@@ -87,6 +87,16 @@ Defect classes measured                 22
 Defects planted                      3,670
 Handled                              3,670   100.0%
 Correctly attributed                 3,553   96.8%
+
+Reached the published extract           31   containment 99.2%
+
+Escaped defects were published without the cleaner rewriting that
+column. That is not automatically a failure - a planted value may
+violate no declared rule - but it did survive into the extract,
+which recall alone would not say. PII leaked into free text is the
+case here: cleaning normalises address whitespace and leaves the
+embedded identifiers, which address suppression removes at masking
+time. The verify_release stage checks that it did.
 
 Rows with no planted defect          2,283
   of those, quarantined                  0

@@ -151,6 +151,28 @@ def _scan_column(series: pd.Series, column: str) -> list[Finding]:
     return found
 
 
+def verify_release(df: pd.DataFrame) -> list[Finding]:
+    """Re-scan a masked extract for direct identifiers.
+
+    Masking is asserted everywhere else in this pipeline; this is the only
+    place it is checked. Part 2 found emails, phones and SSNs embedded in
+    free-text addresses, and those survive cleaning untouched - the control
+    that removes them is address suppression at masking time. Verifying the
+    output closes the loop rather than trusting that the suppressor ran.
+
+    Scans every column in the extract, not only the ones the policy claims to
+    mask. Scoping it to masked columns made the check disappear along with any
+    masking rule that was removed - it could not catch the one failure it
+    exists to catch.
+    """
+    residual: list[Finding] = []
+    for column in df.columns:
+        for finding in _scan_column(df[column], column):
+            if finding.confirmed and finding.category == DIRECT:
+                residual.append(finding)
+    return residual
+
+
 def detect(df: pd.DataFrame, cfg: Config) -> PIIReport:
     scanned: list[Finding] = []
     for column in df.columns:

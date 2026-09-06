@@ -22,6 +22,7 @@ class Score:
     planted: int
     handled: int
     attributed: int
+    escaped: int = 0
 
     @property
     def recall(self) -> float:
@@ -33,6 +34,17 @@ class Score:
         """Was it caught by the check that should have caught it."""
         return self.attributed / self.planted if self.planted else 1.0
 
+    @property
+    def containment(self) -> float:
+        """Share of planted defects that did not reach the published output.
+
+        Stricter than recall: `handled` counts any action on the row's column,
+        which a defect could survive if the action addressed something else.
+        This counts only rows that were quarantined, or whose column the
+        cleaner actually rewrote before publication.
+        """
+        return 1 - (self.escaped / self.planted) if self.planted else 1.0
+
 
 @dataclass
 class ScoreCard:
@@ -40,6 +52,14 @@ class ScoreCard:
     unmeasured: list[str]
     clean_rows: int = 0
     falsely_quarantined: int = 0
+
+    @property
+    def escaped(self) -> int:
+        return sum(s.escaped for s in self.scores)
+
+    @property
+    def containment(self) -> float:
+        return 1 - (self.escaped / self.planted) if self.planted else 1.0
 
     @property
     def specificity(self) -> float:
@@ -137,6 +157,14 @@ def score(truth: dict, clean_log, pii_report) -> ScoreCard:
     for f in pii_report.leaks:
         leak_rows.update(f.rows)
 
+    # Rows that reached the published extract. Publication is gated on
+    # post-clean validation, so every one of these satisfies the schema.
+    rejected_rows = {r.row for r in clean_log.rejections}
+    published = set(range(truth["n_rows"])) - rejected_rows
+    repaired_rows_by_column: dict[str, set[int]] = {}
+    for r in clean_log.repaired:
+        repaired_rows_by_column.setdefault(r.column, set()).add(r.row)
+
     scores, unmeasured = [], []
     for defect, info in truth["defects"].items():
         planted = set(info["rows"])
@@ -160,7 +188,13 @@ def score(truth: dict, clean_log, pii_report) -> ScoreCard:
             else:
                 attributed = handled
 
-        scores.append(Score(defect, column, len(planted), len(handled), len(attributed)))
+        # Escaped: published without the cleaner rewriting that column, so the
+        # planted value is still in the shared output. Such a defect is not
+        # necessarily harmful - it may simply not violate any declared rule -
+        # but it did survive, and recall alone would not say so.
+        escaped = planted & published - repaired_rows_by_column.get(column, set())
+        scores.append(Score(defect, column, len(planted), len(handled),
+                            len(attributed), len(escaped)))
 
     # Specificity: rows with nothing planted in them that were quarantined
     # anyway. Without this, recall alone cannot distinguish a good pipeline
