@@ -4,7 +4,7 @@ MASKED SAMPLE - BEFORE / AFTER
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 3,682
-Generated  : 2026-09-06T18:53:27Z
+Generated  : 2026-09-06T19:05:07Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)

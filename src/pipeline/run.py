@@ -94,6 +94,12 @@ def run(source: Path, rules_path: Path, processed: Path, rejects: Path,
     rejects.mkdir(parents=True, exist_ok=True)
     reports.mkdir(parents=True, exist_ok=True)
 
+    # Clear what this run publishes. A failed run would otherwise leave the
+    # previous run's extract in place, looking current.
+    for stale in ("customers_cleaned.csv", "customers_masked.csv"):
+        (processed / stale).unlink(missing_ok=True)
+    (rejects / "quarantine.csv").unlink(missing_ok=True)
+
     def artifact(path: Path) -> None:
         result.artifacts.append(path)
 

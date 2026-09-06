@@ -231,7 +231,7 @@ def test_income_band_rejects_a_non_positive_width():
         income_band("52000", 0)
 
 
-def test_standalone_mask_refuses_unvalidated_input(cfg, tmp_path):
+def test_standalone_mask_refuses_unvalidated_input(tmp_path):
     """Regression: the standalone command wrote a masked file without
     validating its input or verifying its output, bypassing the gates the
     full pipeline enforces."""
@@ -250,3 +250,16 @@ def test_standalone_mask_refuses_unvalidated_input(cfg, tmp_path):
     assert proc.returncode == 1
     assert not (tmp_path / "proc" / "customers_masked.csv").exists()
     assert not (tmp_path / "rep" / "masked_sample.txt").exists()
+
+
+def test_profile_separates_repairable_formats_from_unrepairable_values(cfg):
+    """'04/15/2020' needs a parser; 'invalid_date' needs a decision. Calling
+    both unparseable told you nothing about what to do next."""
+    df = pd.DataFrame([row(date_of_birth="04/15/2020"), row(date_of_birth="invalid_date"),
+                       row(income="75k"), row(income="not disclosed")])
+    v = profile(df, cfg).invalid_values
+    assert v["date_of_birth_repairable_format"]["count"] == 1
+    assert v["date_of_birth_unrepairable"]["count"] == 1
+    assert v["income_repairable_format"]["count"] == 1
+    # 'not disclosed' is a sentinel, so it is missing rather than unrepairable
+    assert v["income_unrepairable"]["count"] == 0

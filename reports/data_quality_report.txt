@@ -4,7 +4,7 @@ DATA QUALITY REPORT
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T18:53:27Z
+Generated  : 2026-09-06T19:05:06Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)
@@ -51,6 +51,9 @@ SENTINEL counts values that read as present but mean absent
 ------------------------------------------------------------------------------
 3. UNIQUENESS
 ------------------------------------------------------------------------------
+Raw values, before normalisation: '00123' and '123' count as
+distinct here, and absent ids are excluded rather than grouped.
+
 customer_id unique      : NO
 Distinct ids duplicated : 47
 Surplus rows            : 50
@@ -98,14 +101,20 @@ created_date  (8 shapes)
 ------------------------------------------------------------------------------
 5. INVALID VALUES
 ------------------------------------------------------------------------------
-CHECK                         COUNT   EXAMPLES
-unparseable_date_of_birth       492   ####-##-##, ##-##-####, ####/##/##, ##
-unparseable_created_date        300   ##/##/####, ##/##/####, ##-##-####, ##
-non_numeric_income               17   75k
-negative_income                  70   -26572.96, -39772.12, -28555.12, -2057
-income_above_cap                 25   781058296.67, 500389206.67, 902300167.
-age_outside_policy               21   18, 156, 162, 165, 172
-future_created_date              30   ####-##-##, ####-##-##, ####-##-##
+CHECK                               COUNT   EXAMPLES
+date_of_birth_repairable_format       450   ##-##-####, ####/##/##, ####/##/
+date_of_birth_unrepairable             42   ####-##-##, invalid_date, ####-#
+created_date_repairable_format        300   ##/##/####, ##/##/####, ##-##-##
+created_date_unrepairable               0   
+income_repairable_format               17   75k
+income_unrepairable                     0   
+negative_income                        70   -26572.96, -39772.12, -28555.12,
+income_above_cap                       25   781058296.67, 500389206.67, 9023
+age_outside_policy                     21   156.3y, 161.8y, 164.9y, 171.9y, 
+future_created_date                    30   ####-##-##, ####-##-##, ####-##-
+
+'repairable_format' values are non-canonical but recoverable by the
+cleaner; 'unrepairable' ones need a decision, not a parser.
 
 ------------------------------------------------------------------------------
 6. CATEGORICAL VALIDITY - account_status

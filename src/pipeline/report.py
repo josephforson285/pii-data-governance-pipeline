@@ -102,6 +102,9 @@ def render_quality_report(p: QualityProfile, source: Path, cfg: Config) -> str:
 
     out += _section("3. UNIQUENESS")
     dup_rows = sum(p.duplicate_ids.values()) - len(p.duplicate_ids)
+    out.append("Raw values, before normalisation: '00123' and '123' count as")
+    out.append("distinct here, and absent ids are excluded rather than grouped.")
+    out.append("")
     out.append(f"customer_id unique      : {'NO' if p.duplicate_ids else 'YES'}")
     out.append(f"Distinct ids duplicated : {len(p.duplicate_ids)}")
     out.append(f"Surplus rows            : {dup_rows}")
@@ -126,11 +129,14 @@ def render_quality_report(p: QualityProfile, source: Path, cfg: Config) -> str:
     out.append("")
 
     out += _section("5. INVALID VALUES")
-    out.append(f"{'CHECK':<28}{'COUNT':>7}   EXAMPLES")
+    out.append(f"{'CHECK':<34}{'COUNT':>7}   EXAMPLES")
     for name, info in p.invalid_values.items():
         sensitive = _sensitive_check(name, cfg)
-        ex = ", ".join(_safe(e, sensitive) for e in info["examples"])[:38]
-        out.append(f"{name:<28}{info['count']:>7}   {ex}")
+        ex = ", ".join(_safe(e, sensitive) for e in info["examples"])[:32]
+        out.append(f"{name:<34}{info['count']:>7}   {ex}")
+    out.append("")
+    out.append("'repairable_format' values are non-canonical but recoverable by the")
+    out.append("cleaner; 'unrepairable' ones need a decision, not a parser.")
     out.append("")
 
     out += _section("6. CATEGORICAL VALIDITY - account_status")
@@ -589,9 +595,11 @@ def render_execution_report(r: RunResult) -> str:
         "pii_findings": "PII finding types confirmed",
         "pii_leaks": "Rows with PII leaked into free text",
         "failures_pre": "Rule failures before cleaning",
+        "coercion_pre": "Values that would not convert, before cleaning",
         "repairs": "Values normalised",
         "quarantined": "Rows quarantined",
         "failures_post": "Rule failures after cleaning",
+        "coercion_post": "Values that would not convert, after cleaning",
         "unique_before": "Uniquely re-identifiable before masking",
         "unique_after": "Uniquely re-identifiable after masking",
         "residual_identifiers": "Direct identifiers left in the masked extract",

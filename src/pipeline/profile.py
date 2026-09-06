@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from collections import Counter
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 from typing import Any
 
 import pandas as pd
@@ -94,10 +94,29 @@ def _as_number(v: Any) -> float | None:
 
 
 def _as_date(v: Any) -> date | None:
+    """Canonical ISO only. Other formats are repairable, not invalid."""
     try:
         return date.fromisoformat(str(v).strip())
     except ValueError:
         return None
+
+
+def _repairable_date(v: Any, formats: list[str]) -> bool:
+    for fmt in formats:
+        try:
+            datetime.strptime(str(v).strip(), fmt)
+            return True
+        except ValueError:
+            continue
+    return False
+
+
+def _repairable_number(v: Any) -> bool:
+    """Values the cleaner recovers: '$52,000', '60,000.00', '75k'."""
+    text = str(v).strip()
+    if re.fullmatch(r"\d+(\.\d+)?[kK]", text):
+        return True
+    return _as_number(text) is not None
 
 
 def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
@@ -110,6 +129,7 @@ def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
     n = len(df)
     today = cfg.reference_date
     cap = cfg.income_cap
+    formats = cfg.date_formats
     columns = []
     for name in df.columns:
         s = df[name]
@@ -140,17 +160,43 @@ def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
     incomes = [x for x in (_as_number(v) for v in col("income")) if x is not None]
 
     invalid = {
-        "unparseable_date_of_birth": {
-            "count": sum(1 for v in col("date_of_birth") if not is_missing(v) and _as_date(v) is None),
-            "examples": _examples(str(v) for v in col("date_of_birth") if not is_missing(v) and _as_date(v) is None),
+        # Split by what remediation can do: a repairable format needs a
+        # parser, an unrepairable value needs a decision.
+        "date_of_birth_repairable_format": {
+            "count": sum(1 for v in col("date_of_birth") if not is_missing(v)
+                         and _as_date(v) is None and _repairable_date(v, formats)),
+            "examples": _examples(str(v) for v in col("date_of_birth") if not is_missing(v)
+                                  and _as_date(v) is None and _repairable_date(v, formats)),
         },
-        "unparseable_created_date": {
-            "count": sum(1 for v in col("created_date") if not is_missing(v) and _as_date(v) is None),
-            "examples": _examples(str(v) for v in col("created_date") if not is_missing(v) and _as_date(v) is None),
+        "date_of_birth_unrepairable": {
+            "count": sum(1 for v in col("date_of_birth") if not is_missing(v)
+                         and _as_date(v) is None and not _repairable_date(v, formats)),
+            "examples": _examples(str(v) for v in col("date_of_birth") if not is_missing(v)
+                                  and _as_date(v) is None and not _repairable_date(v, formats)),
         },
-        "non_numeric_income": {
-            "count": sum(1 for v in col("income") if not is_missing(v) and _as_number(v) is None),
-            "examples": _examples(str(v) for v in col("income") if not is_missing(v) and _as_number(v) is None),
+        "created_date_repairable_format": {
+            "count": sum(1 for v in col("created_date") if not is_missing(v)
+                         and _as_date(v) is None and _repairable_date(v, formats)),
+            "examples": _examples(str(v) for v in col("created_date") if not is_missing(v)
+                                  and _as_date(v) is None and _repairable_date(v, formats)),
+        },
+        "created_date_unrepairable": {
+            "count": sum(1 for v in col("created_date") if not is_missing(v)
+                         and _as_date(v) is None and not _repairable_date(v, formats)),
+            "examples": _examples(str(v) for v in col("created_date") if not is_missing(v)
+                                  and _as_date(v) is None and not _repairable_date(v, formats)),
+        },
+        "income_repairable_format": {
+            "count": sum(1 for v in col("income") if not is_missing(v)
+                         and _as_number(v) is None and _repairable_number(v)),
+            "examples": _examples(str(v) for v in col("income") if not is_missing(v)
+                                  and _as_number(v) is None and _repairable_number(v)),
+        },
+        "income_unrepairable": {
+            "count": sum(1 for v in col("income") if not is_missing(v)
+                         and not _repairable_number(v)),
+            "examples": _examples(str(v) for v in col("income") if not is_missing(v)
+                                  and not _repairable_number(v)),
         },
         "negative_income": {"count": sum(1 for x in incomes if x < 0), "examples": _examples(x for x in incomes if x < 0)},
         "income_above_cap": {"count": sum(1 for x in incomes if x > cap), "examples": _examples((x for x in incomes if x > cap), 3)},
@@ -158,7 +204,7 @@ def profile(df: pd.DataFrame, cfg: Config) -> QualityProfile:
         # disagree about whether a record's age is acceptable.
         "age_outside_policy": {
             "count": sum(1 for a in ages if not cfg.min_age <= a <= cfg.max_age),
-            "examples": _examples(sorted(round(a) for a in ages
+            "examples": _examples(sorted(f"{a:.1f}y" for a in ages
                                          if not cfg.min_age <= a <= cfg.max_age)),
         },
         "future_created_date": {
