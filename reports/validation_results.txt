@@ -4,7 +4,7 @@ VALIDATION RESULTS
 Source     : /home/redsteam/Desktop/bear/ML/pii-data-governance-pipeline/data/raw/customers_raw.csv
 SHA256     : fee85faca79359aa
 Rows       : 5,000
-Generated  : 2026-09-06T23:20:40Z
+Generated  : 2026-09-07T00:40:52Z
 Pipeline   : v0.1.0
 Rules      : v3
 Reference  : 2026-09-06 (pinned)
@@ -23,6 +23,10 @@ Declared in config/rules.yml, so rules change without touching code.
 Present but unconvertible. Pandera sees these as null once coerced,
 which would lump them with genuinely missing values - a different
 defect needing a different fix. They also block publication.
+
+These are a subset of the rule failures below, not additional to
+them: an uncoercible value becomes null and then fails not_nullable.
+Do not sum the two totals.
 
 COLUMN                   PRE    POST    DELTA
 date_of_birth            492       0     -492
@@ -64,11 +68,52 @@ that could not be repaired without inventing data are in the
 quarantine file with a reason, not silently dropped.
 
 ------------------------------------------------------------------------------
-4. FAILURE DETAIL
+4. FAILURE DETAIL - PRE-CLEAN
 ------------------------------------------------------------------------------
-First 40 failures. Values from identifying columns are redacted.
+40 of 3,527 pre-clean failures, sampled across checks. All were
+resolved by cleaning. Identifying values are redacted.
 
     ROW   COLUMN          CHECK                     VALUE
+      0   customer_id     field_uniqueness          #
+   2485   address         not_nullable              None
+   3817   date_of_birth   not_nullable              nan
+   2017   date_of_birth   age_18_120                ####-##-## ##:##:##
+   1977   address         length_10_200                
+   1710   income          not_nullable              nan
+    788   created_date    not_nullable              nan
+   3577   account_status  isin                      closed
+   2358   created_date    not_in_future             ####-##-## ##:##:##
+   2983   income          greater_than_or_equal_to  -39924.91
+   3721   income          less_than_or_equal_to     678070798.9
+   3301   email           str_matches               noah.corp.com
+    391   phone           str_matches               ### ### ####
+   2401   phone           not_nullable              None
+    376   first_name      str_matches               Katelyn#
+   4948   first_name      length_2_50               X
+   3474   last_name       str_matches                 Fowler  
+   3430   email           not_nullable              None
+   2039   last_name       length_2_50               X
+      8   customer_id     field_uniqueness          #
+    914   address         not_nullable              None
+   4963   date_of_birth   not_nullable              nan
+    128   date_of_birth   age_18_120                ####-##-## ##:##:##
+   1413   address         length_10_200             PO Box
+   1420   income          not_nullable              nan
+    579   created_date    not_nullable              nan
+   4976   account_status  isin                      ACTIVE
+   1070   created_date    not_in_future             ####-##-## ##:##:##
+   2671   income          greater_than_or_equal_to  -21087.35
+   4003   income          less_than_or_equal_to     856177530.28
+   3017   email           str_matches               not an email
+    330   phone           str_matches               phone pending
+   1481   phone           not_nullable              None
+     79   first_name      str_matches               Sabrina###
+   4935   first_name      length_2_50               X
+   3007   last_name       str_matches               Johnson###
+   2400   email           not_nullable              None
+    216   last_name       length_2_50               X
+   1362   customer_id     field_uniqueness          ##
+    994   address         not_nullable              None
 
 ------------------------------------------------------------------------------
 SUMMARY

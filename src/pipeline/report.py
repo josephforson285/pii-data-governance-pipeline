@@ -303,6 +303,10 @@ def render_validation_report(pre: ValidationResult, source: Path, cfg: Config,
     out.append("which would lump them with genuinely missing values - a different")
     out.append("defect needing a different fix. They also block publication.")
     out.append("")
+    out.append("These are a subset of the rule failures below, not additional to")
+    out.append("them: an uncoercible value becomes null and then fails not_nullable.")
+    out.append("Do not sum the two totals.")
+    out.append("")
     if post is None:
         out.append(f"{'COLUMN':<20}{'UNCOERCIBLE':>13}   EXAMPLES")
         for col, n in pre.coercion_by_column.items():
@@ -357,11 +361,36 @@ def render_validation_report(pre: ValidationResult, source: Path, cfg: Config,
             out.append("quarantine file with a reason, not silently dropped.")
     out.append("")
 
-    out += _section("4. FAILURE DETAIL")
-    out.append("First 40 failures. Values from identifying columns are redacted.")
+    # Post failures are the blocking ones when any survive; when none do, the
+    # pre-clean examples are what a reader wants to see. Rendering post
+    # unconditionally left an empty table under a heading promising failures.
+    source_result = post if (post is not None and post.failures) else pre
+    out += _section(f"4. FAILURE DETAIL - {source_result.stage.upper()}")
+
+    # Spread the sample across checks. Taking the first 40 in order produced
+    # forty near-identical rows from whichever check happened to fire first.
+    by_check: dict[str, list] = {}
+    for f in source_result.failures:
+        by_check.setdefault(f"{f.column}.{f.check}", []).append(f)
+    shown = []
+    while len(shown) < 40 and any(by_check.values()):
+        for group in by_check.values():
+            if group and len(shown) < 40:
+                shown.append(group.pop(0))
+
+    total = len(source_result.failures)
+    if not shown:
+        out.append("No failures at either stage.")
+    elif source_result is pre and post is not None:
+        out.append(f"{len(shown)} of {total:,} pre-clean failures, sampled across "
+                   f"checks. All were")
+        out.append("resolved by cleaning. Identifying values are redacted.")
+    else:
+        out.append(f"{len(shown)} of {total:,} failures, sampled across checks. "
+                   f"Identifying")
+        out.append("values are redacted.")
     out.append("")
     out.append(f"{'ROW':>7}   {'COLUMN':<16}{'CHECK':<26}VALUE")
-    shown = (post or pre).failures[:40]
     for f in shown:
         row = str(f.index) if f.index is not None else "-"
         value = _safe(f.failure_case, f.column in cfg.sensitive_columns)[:24]

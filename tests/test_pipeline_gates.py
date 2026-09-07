@@ -318,3 +318,37 @@ def test_validation_report_reflects_coercion_only_failures(cfg, tmp_path):
     text = render_validation_report(pre, src, nullable, post=post)
     assert "Publication is blocked" in text
     assert "Every row remaining after cleaning satisfies" not in text
+
+
+def test_failure_detail_shows_pre_clean_when_post_is_empty(cfg, tmp_path):
+    """Rendering post unconditionally left an empty table under a heading
+    promising 'First 40 failures'."""
+    from pipeline.report import render_validation_report
+
+    src = tmp_path / "in.csv"
+    dirty = pd.DataFrame([row(email="bad"), row(customer_id="2", phone="nope")])
+    dirty.to_csv(src, index=False)
+    clean_frame = pd.DataFrame([row(), row(customer_id="2")])
+
+    pre = validate(dirty, cfg, "pre-clean")
+    post = validate(clean_frame, cfg, "post-clean")
+    assert pre.failures and not post.failures
+
+    text = render_validation_report(pre, src, cfg, post=post)
+    assert "FAILURE DETAIL - PRE-CLEAN" in text
+    assert "pre-clean failures, sampled across checks" in text
+
+
+def test_failure_detail_prefers_post_when_post_fails(cfg, tmp_path):
+    """When rows survive cleaning and still fail, those are the blocking ones."""
+    from pipeline.report import render_validation_report
+
+    src = tmp_path / "in.csv"
+    dirty = pd.DataFrame([row(email="bad")])
+    dirty.to_csv(src, index=False)
+
+    pre = validate(dirty, cfg, "pre-clean")
+    post = validate(pd.DataFrame([row(phone="nope")]), cfg, "post-clean")
+    assert post.failures
+
+    assert "FAILURE DETAIL - POST-CLEAN" in render_validation_report(pre, src, cfg, post=post)
